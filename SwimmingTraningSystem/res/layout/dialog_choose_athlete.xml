@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="#FF6633" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="选择运动员"
+            android:textColor="#fff"
+            android:textSize="20sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_content"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:background="#e2e2e2"
+        android:padding="5dp" >
+
+        <ListView
+            android:id="@+id/choose_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:cacheColorHint="#00000000"
+            android:divider="@drawable/base_list_divider_drawable"
+            android:fastScrollEnabled="true"
+            android:scrollbars="none" >
+        </ListView>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#E0E0E0"
+        android:orientation="horizontal"
+        android:padding="10dp" >
+
+        <Button
+            android:id="@+id/choose_back"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_weight="1.0"
+            android:background="@drawable/dialog_btn_selector"
+            android:text="返回" />
+
+        <Button
+            android:id="@+id/choose"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1.0"
+            android:background="@drawable/dialog_btn_selector"
+            android:text="确定" />
+    </LinearLayout>
+
+</LinearLayout>

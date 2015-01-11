@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/view_plan_dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="#FF6633" >
+
+        <TextView
+            android:id="@+id/dispatch_athlete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="查看计划"
+            android:textColor="#fff"
+            android:textSize="20sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/clcokset_rl"
+        android:layout_width="match_parent"
+        android:layout_height="250dp" >
+
+        <LinearLayout
+            android:id="@+id/view_plan_ll1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="10dp" >
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="泳池大小"
+                    android:textColor="@color/aliceblue" />
+
+                <TextView
+                    android:id="@+id/view_plan_pool_length"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:text="1000米"
+                    android:textColor="@color/dark_orange"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="游泳趟数"
+                    android:textColor="@color/aliceblue" />
+
+                <TextView
+                    android:id="@+id/view_plan_times"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:text="20趟"
+                    android:textColor="@color/dark_orange"
+                    android:textSize="20sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_below="@id/view_plan_ll1"
+            android:background="#e2e2e2" />
+
+        <ListView
+            android:id="@+id/planlist_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/view_plan_ll1"
+            android:cacheColorHint="#00000000"
+            android:divider="@drawable/base_list_divider_drawable"
+            android:fastScrollEnabled="false" >
+        </ListView>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#E0E0E0"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="5dp" >
+
+        <Button
+            android:id="@+id/view_plan_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/dialog_btn_selector"
+            android:paddingBottom="10dp"
+            android:paddingLeft="50dp"
+            android:paddingRight="50dp"
+            android:paddingTop="10dp"
+            android:text="返回" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<litepal>
+
+    <dbname value="SwimmingTranning" >
+    </dbname>
+
+    <version value="1" >
+    </version>
+
+    <list>
+
+        <mapping class="com.example.swimmingtraningsystem.model.User" >
+        </mapping>
+
+        <mapping class="com.example.swimmingtraningsystem.model.Plan" >
+        </mapping>
+
+        <mapping class="com.example.swimmingtraningsystem.model.Athlete" >
+        </mapping>
+
+        <mapping class="com.example.swimmingtraningsystem.model.Score" >
+        </mapping>
+    </list>
+
+</litepal>

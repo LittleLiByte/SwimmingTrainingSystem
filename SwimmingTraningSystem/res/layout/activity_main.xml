@@ -1,0 +1,18 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_main"
+    android:paddingTop="30dp"
+    tools:context="com.example.swimmingtraningsystem.activity.MainActivity"
+    tools:ignore="MergeRootFrame" >
+
+    <com.example.swimmingtraningsystem.view.SexangleViewGroup
+        android:id="@+id/sexangleView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:layout_marginTop="40dp" />
+
+</RelativeLayout>

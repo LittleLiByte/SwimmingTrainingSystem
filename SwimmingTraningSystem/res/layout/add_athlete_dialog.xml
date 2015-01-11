@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:background="#FF6633"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="添加运动员"
+            android:textColor="#fff"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_content"
+        android:layout_width="match_parent"
+        android:layout_height="230dp"
+        android:background="#e2e2e2" >
+
+        <LinearLayout
+            android:id="@+id/add_ll1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" >
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="运动员ID:"
+                android:textColor="#FF6633"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/et_userID"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/bg_edit"
+                android:editable="false"
+                android:paddingLeft="5dp" >
+            </EditText>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/add_ll2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/add_ll1"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" >
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="运动员姓名:"
+                android:textColor="#FF6633"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/add_et_user"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/bg_edit"
+                android:maxLength="20"
+                android:paddingLeft="5dp"
+                android:singleLine="true" >
+            </EditText>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/add_ll3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/add_ll2"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" >
+
+            <TextView
+                android:id="@+id/tv_userID"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingLeft="5dp"
+                android:text="运动员年龄:"
+                android:textColor="#FF6633"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/add_et_age"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/bg_edit"
+                android:inputType="number"
+                android:maxLength="3"
+                android:paddingLeft="5dp" >
+            </EditText>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/add_ll4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/add_ll3"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" >
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingLeft="5dp"
+                android:text="联系方式:"
+                android:textColor="#FF6633"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/add_et_contact"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/bg_edit"
+                android:inputType="number"
+                android:maxLength="20"
+                android:paddingLeft="5dp"
+                android:singleLine="true" >
+            </EditText>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/add_ll5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/add_ll4"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" >
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingLeft="5dp"
+                android:text="备注:"
+                android:textColor="#FF6633"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/add_et_extra"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/bg_edit"
+                android:paddingLeft="5dp" >
+            </EditText>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#E0E0E0"
+        android:orientation="horizontal"
+        android:padding="10dp" >
+
+        <Button
+            android:id="@+id/add_cancle"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_weight="1.0"
+            android:background="@drawable/dialog_btn_selector"
+            android:text="取消" />
+
+        <Button
+            android:id="@+id/add_ok"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1.0"
+            android:background="@drawable/dialog_btn_selector"
+            android:text="确定" />
+    </LinearLayout>
+
+</LinearLayout>

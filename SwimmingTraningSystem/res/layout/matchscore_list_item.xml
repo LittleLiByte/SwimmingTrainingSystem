@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:background="#EDEDED"
+    android:orientation="horizontal" >
+
+    <TextView
+        android:id="@+id/tvrank"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        android:gravity="center_vertical"
+        android:text="第"
+        android:textColor="#666666"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/ranking"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginLeft="20dp"
+        android:gravity="center_vertical"
+        android:text="1"
+        android:textSize="25sp"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/match_score"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginLeft="20dp"
+        android:gravity="center_vertical"
+        android:text="00分00秒000"
+        android:textSize="20sp" />
+
+</LinearLayout>

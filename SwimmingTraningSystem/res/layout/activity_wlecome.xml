@@ -4,14 +4,14 @@
     android:layout_height="match_parent"
     android:background="@drawable/shuilifang1" >
 
-    <TextView
+    <com.example.swimmingtraningsystem.view.MyTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="68dp"
+        android:layout_marginBottom="40dp"
         android:text="欢迎使用本游泳计时系统"
-        android:textSize="18sp"
-        android:textColor="#FFFF8F" />
+        android:textColor="#FFFF8F"
+        android:textSize="18sp" />
 
 </RelativeLayout>

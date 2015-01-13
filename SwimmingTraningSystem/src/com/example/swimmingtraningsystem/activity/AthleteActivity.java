@@ -4,18 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -33,6 +27,9 @@ import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.adapter.AthleteListAdapter;
 import com.example.swimmingtraningsystem.db.DBManager;
+import com.example.swimmingtraningsystem.effect.Effectstype;
+import com.example.swimmingtraningsystem.effect.NiftyDialogBuilder;
+import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.User;
 import com.example.swimmingtraningsystem.util.XUtils;
@@ -40,7 +37,6 @@ import com.example.swimmingtraningsystem.util.XUtils;
 public class AthleteActivity extends Activity {
 	private MyApplication app;
 	private ListView listView;
-	private AlertDialog alertDialog;
 
 	private Toast toast;
 	private AthleteListAdapter adapter;
@@ -49,8 +45,12 @@ public class AthleteActivity extends Activity {
 	private DBManager dbManager;
 	protected String TAG = "com.example.swimmingtraningsystem";
 	private User us;
-	private long row;
 	private Long userId;
+
+	private EditText athleteName;
+	private EditText athleteAge;
+	private EditText athleteContact;
+	private EditText others;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,56 +76,67 @@ public class AthleteActivity extends Activity {
 	 * @param v
 	 */
 	public void add(View v) {
-		createDialog();
-		Window window = alertDialog.getWindow();
-		Button cancel_btn = (Button) window.findViewById(R.id.add_cancle);
-		Button success = (Button) window.findViewById(R.id.add_ok);
-		final EditText userID = (EditText) window.findViewById(R.id.et_userID);
-		final EditText athleteName = (EditText) window
-				.findViewById(R.id.add_et_user);
-		final EditText athleteAge = (EditText) window
-				.findViewById(R.id.add_et_age);
-		final EditText athleteContact = (EditText) window
-				.findViewById(R.id.add_et_contact);
-		final EditText others = (EditText) window
-				.findViewById(R.id.add_et_extra);
-		row = dbManager.getLatestAthleteId();
-		userID.setText(String.format("%1$03d", row + 1));
 
-		success.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				String name = athleteName.getText().toString().trim();
-				String ageString = athleteAge.getText().toString().trim();
-				String phone = athleteContact.getText().toString().trim();
-				String other = others.getText().toString().trim();
-				boolean isExit = dbManager.isAthleteNameExsit(userId, name);
-				if (TextUtils.isEmpty(name)) {
-					XUtils.showToast(AthleteActivity.this, toast, "名字不能为空");
-				} else if (isExit) {
-					XUtils.showToast(AthleteActivity.this, toast,
-							"存在运动员名字重复，请更改！");
-				} else if (TextUtils.isEmpty(ageString)) {
-					XUtils.showToast(AthleteActivity.this, toast, "年龄不能为空");
-				} else {
-					int age = Integer.parseInt(ageString);
-					addAthlete(row, name, age, phone, other);
-					list = dbManager.getAthletes(userId);
-					adapter.setDatas(list);
-					adapter.notifyDataSetChanged();
-					XUtils.showToast(AthleteActivity.this, toast, "添加成功");
-					alertDialog.dismiss();
+		final NiftyDialogBuilder addDialog = NiftyDialogBuilder
+				.getInstance(this);
+		Effectstype effect = Effectstype.RotateLeft;
 
-				}
+		addDialog
+				.withTitle("添加运动员")
+				.withMessage(null)
+				.withIcon(getResources().getDrawable(R.drawable.ic_launcher))
+				.isCancelableOnTouchOutside(false)
+				.withDuration(700)
+				.withEffect(effect)
+				.withButton1Text("取消")
+				.withButton2Text("确定")
+				.setButton1Click(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						addDialog.dismiss();
+					}
+				})
+				.setButton2Click(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
 
-			}
-		});
-		cancel_btn.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				alertDialog.dismiss();
-			}
-		});
+						String name = athleteName.getText().toString().trim();
+						String ageString = athleteAge.getText().toString()
+								.trim();
+						String phone = athleteContact.getText().toString()
+								.trim();
+						String other = others.getText().toString().trim();
+
+						boolean isExit = dbManager.isAthleteNameExsit(userId,
+								name);
+						if (TextUtils.isEmpty(name)) {
+							XUtils.showToast(AthleteActivity.this, toast,
+									"名字不能为空");
+						} else if (isExit) {
+							XUtils.showToast(AthleteActivity.this, toast,
+									"存在运动员名字重复，请更改！");
+						} else if (TextUtils.isEmpty(ageString)) {
+							XUtils.showToast(AthleteActivity.this, toast,
+									"年龄不能为空");
+						} else {
+							int age = Integer.parseInt(ageString);
+							addAthlete(name, age, phone, other);
+							list = dbManager.getAthletes(userId);
+							adapter.setDatas(list);
+							adapter.notifyDataSetChanged();
+							XUtils.showToast(AthleteActivity.this, toast,
+									"添加成功");
+							addDialog.dismiss();
+						}
+					}
+				}).setCustomView(R.layout.add_athlete_dialog, v.getContext())
+				.show();
+
+		Window window = addDialog.getWindow();
+		athleteName = (EditText) window.findViewById(R.id.add_et_user);
+		athleteAge = (EditText) window.findViewById(R.id.add_et_age);
+		athleteContact = (EditText) window.findViewById(R.id.add_et_contact);
+		others = (EditText) window.findViewById(R.id.add_et_extra);
 	}
 
 	/**
@@ -137,30 +148,21 @@ public class AthleteActivity extends Activity {
 	 * @param contact
 	 * @param others
 	 */
-	public void addAthlete(long id, String name, int age, String contact,
-			String others) {
+	public void addAthlete(String name, int age, String contact, String others) {
 
 		Athlete a = new Athlete();
-		a.setId(id);
 		a.setName(name);
 		a.setAge(age);
 		a.setPhone(contact);
 		a.setExtras(others);
 		a.setUser(us);
-
-		JSONObject jsonObject = new JSONObject();
-		try {
-			jsonObject.put("id", id);
-			jsonObject.put("name", name);
-			jsonObject.put("age", age);
-			jsonObject.put("phone", contact);
-			jsonObject.put("extras", others);
-			jsonObject.put("user", userId);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		createNewRequest(jsonObject.toString());
 		dbManager.addAthlete(a);
+
+		a = null;
+		a = dbManager.getLatestAthlete();
+		String json = JsonTools.creatJsonString(a);
+		createNewRequest(json);
+
 	}
 
 	/**
@@ -216,13 +218,6 @@ public class AthleteActivity extends Activity {
 
 	public void back(View v) {
 		finish();
-	}
-
-	private void createDialog() {
-		alertDialog = new AlertDialog.Builder(this).create();
-		alertDialog.setView(getLayoutInflater().inflate(
-				R.layout.add_athlete_dialog, null));
-		alertDialog.show();
 	}
 
 }

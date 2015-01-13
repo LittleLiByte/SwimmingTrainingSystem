@@ -42,19 +42,6 @@ public class DBManager {
 		return DataSupport.find(User.class, id);
 	}
 
-	/**
-	 * 获取最后user表最后一个id
-	 * 
-	 * @return
-	 */
-	public long getLatestUserId() {
-		int size = DataSupport.count(User.class);
-		if (size != 0) {
-			return DataSupport.findLast(User.class).getId();
-		} else {
-			return 0L;
-		}
-	}
 
 	/**
 	 * 通过用户名查找其登录密码
@@ -79,8 +66,12 @@ public class DBManager {
 	 * @return
 	 */
 	public User getUserByName(String name) {
-		User user = DataSupport.where("username=?", name).find(User.class)
-				.get(0);
+		User user = null;
+		List<User> users = DataSupport.where("username=?", name).find(
+				User.class);
+		if (users.size() != 0) {
+			user = users.get(0);
+		}
 		return user;
 	}
 
@@ -91,20 +82,6 @@ public class DBManager {
 	}
 
 	/**
-	 * 获取最后user表最后一个id
-	 * 
-	 * @return
-	 */
-	public long getLatestAthleteId() {
-		int size = DataSupport.count(Athlete.class);
-		if (size != 0) {
-			return DataSupport.findLast(Athlete.class).getId();
-		} else {
-			return 0L;
-		}
-	}
-
-	/**
 	 * 添加一名运动员的信息到数据库
 	 * 
 	 * @param a
@@ -112,6 +89,12 @@ public class DBManager {
 	 */
 	public void addAthlete(Athlete a) {
 		a.save();
+	}
+
+	public Athlete getLatestAthlete() {
+		Athlete a = DataSupport.findLast(Athlete.class, true);
+		return a;
+
 	}
 
 	/**

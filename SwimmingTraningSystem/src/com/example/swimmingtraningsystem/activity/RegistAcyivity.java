@@ -23,7 +23,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
-import com.example.swimmingtraningsystem.db.DBManager;
 import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.User;
 import com.example.swimmingtraningsystem.util.XUtils;
@@ -71,13 +70,12 @@ public class RegistAcyivity extends Activity {
 			XUtils.showToast(this, toast, "两次输入密码不一致");
 		} else {
 			User newUser = new User();
-			newUser.setId(DBManager.getInstance().getLatestUserId() + 1);
 			newUser.setUsername(user);
 			newUser.setPassword(pass);
 			newUser.setEmail(Email);
 			newUser.setPhone(cellphone);
-			newRequest(JsonTools.creatJsonString(newUser));
 			newUser.save();
+			newRequest(JsonTools.creatJsonString(newUser));
 			XUtils.showToast(this, toast, "注册成功！");
 			finish();
 		}

@@ -4,21 +4,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +31,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.db.DBManager;
+import com.example.swimmingtraningsystem.effect.Effectstype;
+import com.example.swimmingtraningsystem.effect.NiftyDialogBuilder;
 import com.example.swimmingtraningsystem.model.User;
 import com.example.swimmingtraningsystem.util.XUtils;
 import com.example.swimmingtraningsystem.view.LoadingDialog;
@@ -45,14 +43,14 @@ public class LoginActivity extends Activity {
 	private DBManager dbManager;
 	private EditText etLogin;
 	private EditText etPassword;
-	//private TextView forget;
+	// private TextView forget;
 	private TextView sethost;
 	private Toast toast;
 	private boolean isConnect = false;
 	private String TAG = "swimmingtraningsystem";
 	private RequestQueue mQueue;
-	private AlertDialog dialog;
 	private Dialog loadingDialog;
+	private Effectstype effect;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +83,7 @@ public class LoginActivity extends Activity {
 			defaulrUser.setUsername("defaultUser");
 			defaulrUser.setPassword("123456");
 			defaulrUser.save();
-			createDialog(LoginActivity.this);
+			showSettingDialog(LoginActivity.this);
 			XUtils.SaveLoginInfo(LoginActivity.this, false);
 		}
 
@@ -108,7 +106,7 @@ public class LoginActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				createDialog(LoginActivity.this);
+				showSettingDialog(LoginActivity.this);
 			}
 		});
 	}
@@ -140,6 +138,7 @@ public class LoginActivity extends Activity {
 			if (!isConnect) {
 				if (loadingDialog == null) {
 					loadingDialog = LoadingDialog.createDialog(this);
+					loadingDialog.setCanceledOnTouchOutside(false);
 				}
 				loadingDialog.show();
 				// 尝试连接服务器，如果连接成功则直接登录
@@ -189,10 +188,20 @@ public class LoginActivity extends Activity {
 						// TODO Auto-generated method stub
 						Log.i(TAG, response);
 						loadingDialog.dismiss();
-						if (response.equals("ok")) {
+						if (response.equals("1")) {
 							// 将当前用户id保存为全局变量
 							User user = dbManager.getUserByName(s1);
-							app.getMap().put("CurrentUser", user.getId());
+							if (user == null) {
+								User loginUser = new User();
+								loginUser.setUsername(s1);
+								loginUser.setPassword(s2);
+								loginUser.save();
+								app.getMap().put("CurrentUser",
+										loginUser.getId());
+							} else {
+								app.getMap().put("CurrentUser", user.getId());
+							}
+
 							XUtils.showToast(LoginActivity.this, toast, "登陆成功");
 							Intent i = new Intent(LoginActivity.this,
 									MainActivity.class);
@@ -251,31 +260,34 @@ public class LoginActivity extends Activity {
 	 * 
 	 * @param context
 	 */
-	protected void createDialog(Context context) {
-		LayoutInflater inflater = this.getLayoutInflater();
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		View customView = inflater.inflate(R.layout.dialog_setting_host, null);
-		builder.setView(customView);
-		dialog = builder.show();
-		Window window = dialog.getWindow();
-		final TextView ip = (TextView) window.findViewById(R.id.tv_ip);
-		final TextView port = (TextView) window.findViewById(R.id.tv_port);
-
-		((Button) window.findViewById(R.id.close))
-				.setOnClickListener(new OnClickListener() {
-
+	protected void showSettingDialog(Context context) {
+		final NiftyDialogBuilder settingDialog = NiftyDialogBuilder
+				.getInstance(this);
+		effect = Effectstype.Slit;
+		settingDialog.withTitle("服务器IP与端口设置").withMessage(null)
+				.withIcon(getResources().getDrawable(R.drawable.ic_launcher))
+				.isCancelableOnTouchOutside(true).withDuration(700)
+				// def
+				.withEffect(effect)
+				// def Effectstype.Slidetop
+				.withButton1Text("取消")
+				// def gone
+				.withButton2Text("完成")
+				// def gone
+				.setCustomView(R.layout.dialog_setting_host, context)
+				.setButton1Click(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						// TODO Auto-generated method stub
-						dialog.dismiss();
+						settingDialog.dismiss();
 					}
-				});
-		((Button) window.findViewById(R.id.host_done))
-				.setOnClickListener(new OnClickListener() {
-
+				}).setButton2Click(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						// TODO Auto-generated method stub
+						Window window = settingDialog.getWindow();
+						final TextView ip = (TextView) window
+								.findViewById(R.id.tv_ip);
+						final TextView port = (TextView) window
+								.findViewById(R.id.tv_port);
 						String hostIp = ip.getText().toString().trim();
 						String hostPort = port.getText().toString().trim();
 						if (TextUtils.isEmpty(hostIp)
@@ -293,10 +305,10 @@ public class LoginActivity extends Activity {
 							XUtils.SaveLoginInfo(LoginActivity.this, hostUrl);
 
 							XUtils.showToast(LoginActivity.this, toast, "设置成功!");
-							dialog.dismiss();
+							settingDialog.dismiss();
 						}
 					}
-				});
+				}).show();
 
 	}
 
@@ -304,29 +316,36 @@ public class LoginActivity extends Activity {
 	 * 用户无法连接服务器时弹出该对话框，选择默认帐号或已注册的帐号进行登录使用
 	 */
 	private void showUserSelectDialog() {
-		AlertDialog.Builder build = new AlertDialog.Builder(this);
-		build.setTitle("无法连接服务器！").setMessage(
-				"如果要继续使用，未注册请选择系统默认帐号登录，已注册请用注册帐号登录");
-		build.setPositiveButton("已注册帐号登录",
-				new DialogInterface.OnClickListener() {
+		final NiftyDialogBuilder userDialog = NiftyDialogBuilder
+				.getInstance(this);
+		effect = Effectstype.SlideBottom;
+		userDialog.withTitle("无法连接服务器！")
+				.withMessage("如果要继续使用，未注册请选择系统默认帐号登录，已注册请用注册帐号登录")
+				.withIcon(getResources().getDrawable(R.drawable.ic_launcher))
+				.isCancelableOnTouchOutside(true).withDuration(700)
+				// def
+				.withEffect(effect).withButton1Text("默认帐号登录")
+				// def gone
+				.withButton2Text("已注册帐号登录")
+				// def gone
+				.setButton1Click(new View.OnClickListener() {
 					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						etLogin.setText("");
-						etPassword.setText("");
-						dialog.dismiss();
-					}
-				});
-		build.setNegativeButton("默认帐号登录",
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
+					public void onClick(View v) {
 						etLogin.setText("defaultUser");
 						etLogin.setEnabled(false);
 						etPassword.setText("123456");
 						etPassword.setEnabled(false);
-						dialog.dismiss();
+						userDialog.dismiss();
+					}
+				}).setButton2Click(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						etLogin.setText("");
+						etPassword.setText("");
+						userDialog.dismiss();
 					}
 				}).show();
+
 	}
 
 	@Override

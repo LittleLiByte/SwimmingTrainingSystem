@@ -3,6 +3,9 @@
 
     <drawable name="blank">#00000000</drawable>
 
+    <color name="dialog_bg">#FFB13D</color>
+    <color name="btn_press_color">#FF6600</color>
+    <color name="btn_unpress_color">#FF8533</color>
     <color name="lightgray">#e2e2e2</color>
     <color name="unwhite">#ffffff</color>
     <color name="FlightCXListInfoActivityBg">#DCDCDC</color>

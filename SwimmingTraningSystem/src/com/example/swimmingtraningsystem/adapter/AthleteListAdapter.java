@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.annotation.SuppressLint;
+import org.litepal.crud.DataSupport;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,7 +16,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -33,19 +33,18 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.db.DBManager;
+import com.example.swimmingtraningsystem.effect.Effectstype;
+import com.example.swimmingtraningsystem.effect.NiftyDialogBuilder;
 import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.util.XUtils;
 
-@SuppressLint("ShowToast")
 public class AthleteListAdapter extends BaseAdapter {
 
 	private Context context;
 	private RequestQueue mQueue;
 	private List<Athlete> athletes;
-	private AlertDialog alertDialog;
 	private boolean editable = false;
-	private EditText ID;
 	private EditText athleteName;
 	private EditText athleteAge;
 	private EditText athleteContact;
@@ -113,20 +112,65 @@ public class AthleteListAdapter extends BaseAdapter {
 	}
 
 	private void createDialog(final int position) {
-		alertDialog = new AlertDialog.Builder(context).create();
-		alertDialog.setView(LayoutInflater.from(context).inflate(
-				R.layout.view_athlete_dialog, null));
-		alertDialog.show();
-		Window window = alertDialog.getWindow();
-		ID = (EditText) window.findViewById(R.id.et_userID);
+		final NiftyDialogBuilder viewDialog = NiftyDialogBuilder
+				.getInstance(context);
+		Effectstype effect = Effectstype.RotateLeft;
+		viewDialog
+				.withTitle("查看运动员信息")
+				.withMessage(null)
+				.withIcon(
+						context.getResources().getDrawable(
+								R.drawable.ic_launcher))
+				.isCancelableOnTouchOutside(true).withDuration(500)
+				.withEffect(effect).withButton1Text("修改").withButton2Text("提交")
+				.setCustomView(R.layout.add_athlete_dialog, context)
+				.setButton1Click(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						editable = true;
+						athleteName.setBackgroundResource(R.drawable.bg_edit);
+						athleteAge.setBackgroundResource(R.drawable.bg_edit);
+						athleteContact
+								.setBackgroundResource(R.drawable.bg_edit);
+						others.setBackgroundResource(R.drawable.bg_edit);
+						athleteName.setEnabled(true);
+						athleteAge.setEnabled(true);
+						athleteContact.setEnabled(true);
+						others.setEnabled(true);
+					}
+				}).setButton2Click(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						if (editable) {
+							editable = false;
+							String ath_name = athleteName.getText().toString()
+									.trim();
+							String ath_age = athleteAge.getText().toString()
+									.trim();
+							String ath_phone = athleteContact.getText()
+									.toString().trim();
+							String ath_extras = others.getText().toString()
+									.trim();
+
+							dbManager.updateAthlete(athletes, position,
+									ath_name, ath_age, ath_phone, ath_extras);
+							setDatas(dbManager.getAthletes(userID));
+							notifyDataSetChanged();
+
+							// 同步服务器
+							createNewRequest1(athletes, position);
+
+							XUtils.showToast(context, toast, "修改成功");
+						}
+						viewDialog.dismiss();
+					}
+				}).show();
+
+		Window window = viewDialog.getWindow();
 		athleteName = (EditText) window.findViewById(R.id.add_et_user);
 		athleteAge = (EditText) window.findViewById(R.id.add_et_age);
 		athleteContact = (EditText) window.findViewById(R.id.add_et_contact);
 		others = (EditText) window.findViewById(R.id.add_et_extra);
-		ImageButton exit = (ImageButton) window.findViewById(R.id.exit_dialog);
-		Button modify = (Button) window.findViewById(R.id.view_modify);
-		Button post = (Button) window.findViewById(R.id.post);
-		ID.setText(String.format("%1$03d", athletes.get(position).getId()));
 		athleteName.setText(athletes.get(position).getName());
 		athleteAge.setText(athletes.get(position).getAge() + "");
 		athleteContact.setText(athletes.get(position).getPhone());
@@ -136,64 +180,7 @@ public class AthleteListAdapter extends BaseAdapter {
 		athleteAge.setEnabled(false);
 		athleteContact.setEnabled(false);
 		others.setEnabled(false);
-		// 退出按钮
-		exit.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				alertDialog.dismiss();
-			}
-		});
-
-		// 将对话输入框转换成可编辑状态
-		modify.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				editable = true;
-				athleteName.setBackgroundResource(R.drawable.bg_edit);
-				athleteAge.setBackgroundResource(R.drawable.bg_edit);
-				athleteContact.setBackgroundResource(R.drawable.bg_edit);
-				others.setBackgroundResource(R.drawable.bg_edit);
-				athleteName.setEnabled(true);
-				athleteAge.setEnabled(true);
-				athleteContact.setEnabled(true);
-				others.setEnabled(true);
-			}
-		});
-
-		post.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				if (editable) {
-					editable = false;
-
-					String ath_name = athleteName.getText().toString().trim();
-					String ath_age = athleteAge.getText().toString().trim();
-					String ath_phone = athleteContact.getText().toString()
-							.trim();
-					String ath_extras = others.getText().toString().trim();
-
-					dbManager.updateAthlete(athletes, position, ath_name,
-							ath_age, ath_phone, ath_extras);
-					setDatas(dbManager.getAthletes(userID));
-					notifyDataSetChanged();
-
-					// 同步服务器
-					createNewRequest1(athletes, position, ath_name, ath_age,
-							ath_phone, ath_extras);
-
-					XUtils.showToast(context, toast, "修改成功");
-					alertDialog.dismiss();
-				} else {
-					alertDialog.dismiss();
-				}
-			}
-		});
 	}
 
 	final class ViewHolder {
@@ -264,14 +251,13 @@ public class AthleteListAdapter extends BaseAdapter {
 	 * 
 	 * @param obj
 	 */
-	public void createNewRequest1(List<Athlete> athletes, int position,
-			String ath_name, String ath_age, String ath_phone, String ath_extras) {
+	public void createNewRequest1(List<Athlete> athletes, int position) {
 
 		Athlete obj = athletes.get(position);
-		obj.setName(ath_name);
-		obj.setAge(Integer.parseInt(ath_age));
-		obj.setPhone(ath_phone);
-		obj.setExtras(ath_extras);
+
+		obj = DataSupport.find(Athlete.class, obj.getId(), true);
+		System.out.println("JsonTools.creatJsonString(obj)----->"
+				+ JsonTools.creatJsonString(obj));
 		final String athleteJson = JsonTools.creatJsonString(obj);
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				XUtils.HOSTURL + "modifyAthlete", new Listener<String>() {

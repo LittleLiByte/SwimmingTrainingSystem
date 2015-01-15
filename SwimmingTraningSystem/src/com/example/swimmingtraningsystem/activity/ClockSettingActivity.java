@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -186,5 +187,19 @@ public class ClockSettingActivity extends Activity {
 
 	public void clcokset_back(View v) {
 		finish();
+		overridePendingTransition(R.anim.slide_bottom_in,
+				R.anim.slide_top_out);
 	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+			finish();
+			overridePendingTransition(R.anim.slide_bottom_in,
+					R.anim.slide_top_out);
+			return false;
+		}
+		return false;
+	}
+
 }

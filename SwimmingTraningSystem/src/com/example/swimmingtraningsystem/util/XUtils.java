@@ -7,8 +7,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.swimmingtraningsystem.R;
@@ -106,5 +104,22 @@ public class XUtils {
 			mToast.setDuration(Toast.LENGTH_SHORT);
 		}
 		mToast.show();
+	}
+
+	private static long lastClickTime;
+
+	/**
+	 * 防止快速的重复点击出现
+	 * 
+	 * @return
+	 */
+	public static boolean isFastDoubleClick() {
+		long time = System.currentTimeMillis();
+		long timeD = time - lastClickTime;
+		if (0 < timeD && timeD < 800) {
+			return true;
+		}
+		lastClickTime = time;
+		return false;
 	}
 }

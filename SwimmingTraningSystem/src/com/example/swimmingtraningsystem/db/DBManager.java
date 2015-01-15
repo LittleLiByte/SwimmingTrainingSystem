@@ -12,12 +12,13 @@ import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.Plan;
 import com.example.swimmingtraningsystem.model.Score;
 import com.example.swimmingtraningsystem.model.Temp;
+import com.example.swimmingtraningsystem.model.Upid;
 import com.example.swimmingtraningsystem.model.User;
 import com.example.swimmingtraningsystem.util.MyComparable;
 import com.example.swimmingtraningsystem.util.XUtils;
 
 /**
- * 数据库工具类
+ * 数据库操作类
  * 
  * @author LittleByte
  * 
@@ -42,7 +43,6 @@ public class DBManager {
 		return DataSupport.find(User.class, id);
 	}
 
-
 	/**
 	 * 通过用户名查找其登录密码
 	 * 
@@ -62,7 +62,6 @@ public class DBManager {
 	 * 通过登录名查找user对象
 	 * 
 	 * @param name
-	 *            从登录名获取，不会为空，因此不用判断
 	 * @return
 	 */
 	public User getUserByName(String name) {
@@ -105,7 +104,7 @@ public class DBManager {
 	public List<Athlete> getAthletes(long userId) {
 		String id = String.valueOf(userId);
 		List<Athlete> athletes = DataSupport.where("user_id=?", id).find(
-				Athlete.class);
+				Athlete.class, true);
 		return athletes;
 	}
 
@@ -248,12 +247,9 @@ public class DBManager {
 	}
 
 	public Long getLatestPlanId() {
-		int size = DataSupport.count(Plan.class);
-		if (size != 0) {
-			return DataSupport.findLast(Plan.class).getId();
-		} else {
-			return 0L;
-		}
+		long id = DataSupport.max(Plan.class, "id", Long.class);
+		System.out.println("idddddd------>" + id);
+		return id;
 	}
 
 	/**
@@ -286,10 +282,17 @@ public class DBManager {
 
 	}
 
-	public int getPlanCount() {
-		int count = 0;
-		count = DataSupport.count(Plan.class);
-		return count;
+	public List<Upid> getdeletePlanId(List<Plan> plans) {
+		List<Upid> upids = new ArrayList<Upid>();
+		for (Plan p : plans) {
+			Upid upid = new Upid();
+			Plan enity = DataSupport.find(Plan.class, p.getId(), true);
+			upid.setPid(enity.getPid());
+			upid.setUid(enity.getUser().getUid());
+			upids.add(upid);
+		}
+		return upids;
+
 	}
 
 	public List<Plan> getPlanByPName(String name) {
@@ -418,26 +421,4 @@ public class DBManager {
 		return temps;
 	}
 
-	// public List<Integer> getRecentDateInScore() {
-	// List<Integer> ints = new ArrayList<Integer>();
-	// List<String> dates = new ArrayList<String>();
-	// List<Score> scores = DataSupport.findAll(Score.class);
-	// for (Score s : scores) {
-	// if (!dates.contains(s.getDate())) {
-	// dates.add(s.getDate());
-	// List<Score> lists = DataSupport.where("date=?", s.getDate())
-	// .find(Score.class);
-	// }
-	// }
-	// return ints;
-	// }
-
-	public long getLatestScoreID() {
-		int size = DataSupport.count(Score.class);
-		if (size != 0) {
-			return DataSupport.findLast(Score.class).getId();
-		} else {
-			return 0L;
-		}
-	}
 }

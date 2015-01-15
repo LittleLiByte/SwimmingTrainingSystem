@@ -4,10 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
@@ -33,11 +37,11 @@ import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.User;
 import com.example.swimmingtraningsystem.util.XUtils;
+import com.example.swimmingtraningsystem.view.Switch;
 
 public class AthleteActivity extends Activity {
 	private MyApplication app;
 	private ListView listView;
-
 	private Toast toast;
 	private AthleteListAdapter adapter;
 	private List<Athlete> list;
@@ -46,15 +50,16 @@ public class AthleteActivity extends Activity {
 	protected String TAG = "com.example.swimmingtraningsystem";
 	private User us;
 	private Long userId;
-
 	private EditText athleteName;
 	private EditText athleteAge;
 	private EditText athleteContact;
 	private EditText others;
+	private Switch toggleButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
+		this.setTheme(R.style.AppThemeLight);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_athlete);
@@ -67,7 +72,7 @@ public class AthleteActivity extends Activity {
 		adapter = new AthleteListAdapter(this, list, userId);
 		listView.setAdapter(adapter);
 		mQueue = Volley.newRequestQueue(this);
-
+		// getAthleteRequest();
 	}
 
 	/**
@@ -80,7 +85,7 @@ public class AthleteActivity extends Activity {
 		final NiftyDialogBuilder addDialog = NiftyDialogBuilder
 				.getInstance(this);
 		Effectstype effect = Effectstype.RotateLeft;
-
+		Window window = addDialog.getWindow();
 		addDialog
 				.withTitle("添加运动员")
 				.withMessage(null)
@@ -106,7 +111,7 @@ public class AthleteActivity extends Activity {
 						String phone = athleteContact.getText().toString()
 								.trim();
 						String other = others.getText().toString().trim();
-
+						String gender = toggleButton.getPrivateImeOptions();
 						boolean isExit = dbManager.isAthleteNameExsit(userId,
 								name);
 						if (TextUtils.isEmpty(name)) {
@@ -120,27 +125,22 @@ public class AthleteActivity extends Activity {
 									"年龄不能为空");
 						} else {
 							int age = Integer.parseInt(ageString);
-							addAthlete(name, age, phone, other);
-							list = dbManager.getAthletes(userId);
-							adapter.setDatas(list);
-							adapter.notifyDataSetChanged();
-							XUtils.showToast(AthleteActivity.this, toast,
-									"添加成功");
+							addAthlete(name, age, gender, phone, other);
 							addDialog.dismiss();
 						}
 					}
 				}).setCustomView(R.layout.add_athlete_dialog, v.getContext())
 				.show();
 
-		Window window = addDialog.getWindow();
 		athleteName = (EditText) window.findViewById(R.id.add_et_user);
 		athleteAge = (EditText) window.findViewById(R.id.add_et_age);
 		athleteContact = (EditText) window.findViewById(R.id.add_et_contact);
 		others = (EditText) window.findViewById(R.id.add_et_extra);
+		toggleButton = (Switch) window.findViewById(R.id.toggle_gender);
 	}
 
 	/**
-	 * 保存一个运动员信息到数据库
+	 * 保存一个运动员信息
 	 * 
 	 * @param number
 	 * @param name
@@ -148,20 +148,29 @@ public class AthleteActivity extends Activity {
 	 * @param contact
 	 * @param others
 	 */
-	public void addAthlete(String name, int age, String contact, String others) {
+	public void addAthlete(String name, int age, String gender, String contact,
+			String others) {
 
 		Athlete a = new Athlete();
 		a.setName(name);
 		a.setAge(age);
+		a.setGender(gender);
 		a.setPhone(contact);
 		a.setExtras(others);
 		a.setUser(us);
-		dbManager.addAthlete(a);
 
-		a = null;
-		a = dbManager.getLatestAthlete();
-		String json = JsonTools.creatJsonString(a);
-		createNewRequest(json);
+		// 根据是否能够连接服务器来操作，如果能够连接服务器，则使用服务返回的数据，否则将数据保存到本地使用
+		boolean isConnect = (Boolean) app.getMap().get("isConnect");
+
+		if (isConnect) {
+			String json = JsonTools.creatJsonString(a);
+			addAthleteequest(json);
+		} else {
+			a.save();
+			list = dbManager.getAthletes(userId);
+			adapter.setDatas(list);
+			adapter.notifyDataSetChanged();
+		}
 
 	}
 
@@ -170,7 +179,7 @@ public class AthleteActivity extends Activity {
 	 * 
 	 * @param obj
 	 */
-	public void createNewRequest(final String athleteJson) {
+	public void addAthleteequest(final String athleteJson) {
 		StringRequest request = new StringRequest(Method.POST, XUtils.HOSTURL
 				+ "addAthlete", new Listener<String>() {
 
@@ -178,11 +187,25 @@ public class AthleteActivity extends Activity {
 			public void onResponse(String response) {
 				// TODO Auto-generated method stub
 				Log.i(TAG, response);
-				if (response.equals("ok")) {
+				try {
+					JSONObject obj = new JSONObject(response);
+					int resCode = (Integer) obj.get("resCode");
+					if (resCode == 1) {
+						XUtils.showToast(AthleteActivity.this, toast, "添加成功");
+						String userJson = obj.get("athlete").toString();
+						Athlete a = JsonTools
+								.getObject(userJson, Athlete.class);
+						a.save();
+						list = dbManager.getAthletes(userId);
+						adapter.setDatas(list);
+						adapter.notifyDataSetChanged();
+					}
 
-				} else {
-
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
+
 			}
 		}, new ErrorListener() {
 
@@ -216,8 +239,74 @@ public class AthleteActivity extends Activity {
 		mQueue.add(request);
 	}
 
+	/**
+	 * 获取运动员信息
+	 */
+	private void getAthleteRequest() {
+		StringRequest getrequest = new StringRequest(Method.GET, XUtils.HOSTURL
+				+ "getAthletes", new Listener<String>() {
+
+			@Override
+			public void onResponse(String response) {
+				// TODO Auto-generated method stub
+				Log.i(TAG, response);
+				if (response.equals("1")) {
+					try {
+						JSONObject jsonObject = new JSONObject(response);
+						int resCode = (Integer) jsonObject.get("resCode");
+						if (resCode == 1) {
+							String jsonString = jsonObject.get("athlete")
+									.toString();
+							List<Athlete> athltes = JsonTools.getObjects(
+									jsonString, Athlete.class);
+						}
+
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				} else {
+
+				}
+			}
+		}, new ErrorListener() {
+
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				// TODO Auto-generated method stub
+				Log.e(TAG, error.getMessage());
+			}
+		}) {
+			@Override
+			public RetryPolicy getRetryPolicy() {
+				// TODO Auto-generated method stub
+				// 超时设置
+				RetryPolicy retryPolicy = new DefaultRetryPolicy(
+						XUtils.SOCKET_TIMEOUT,
+						DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+						DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+				return retryPolicy;
+			}
+		};
+
+		mQueue.add(getrequest);
+	}
+
 	public void back(View v) {
 		finish();
+		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+			finish();
+			overridePendingTransition(R.anim.slide_bottom_in,
+					R.anim.slide_top_out);
+			return false;
+		}
+		return false;
 	}
 
 }

@@ -52,6 +52,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.adapter.MyAndroidWheelAdapter;
 import com.example.swimmingtraningsystem.db.DBManager;
+import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.Plan;
 import com.example.swimmingtraningsystem.model.Score;
@@ -74,7 +75,6 @@ public class SeparateTimingActivity extends Activity {
 
 	private LinearLayout poolway;
 	private TextView tv_clock;
-	private List<Score> scoreLists = new ArrayList<Score>();
 	/**
 	 * 保存所有计时成绩
 	 */
@@ -403,13 +403,15 @@ public class SeparateTimingActivity extends Activity {
 	}
 
 	private void saveScores() {
-		JSONArray jsonArray = new JSONArray();
 		// 获取本次记录测试的日期
 		String date = (String) app.getMap().get("testDate");
 		// 第几趟测试
 		int nowCurrent = (Integer) app.getMap().get("current");
 		Plan p = dbManager.queryPlan(planID);
 		long userid = (Long) app.getMap().get("CurrentUser");
+
+		List<Score> sl = new ArrayList<Score>();
+		
 		for (int i = 0; i < COUNT_MAX; i++) {
 			Score s = new Score();
 			String athName = tv_tips.get(i).getText().toString().substring(5);
@@ -417,28 +419,16 @@ public class SeparateTimingActivity extends Activity {
 			s.setDate(date);
 			s.setTimes(nowCurrent);
 			s.setScore(tv_times.get(i).getText().toString());
-			ath.getScores().add(s);
-			p.getScores().add(s);
 			s.setAthlete(ath);
 			s.setP(p);
-
-			// 此处因为Gson包的bug，直接转整个对象会出现无限递归循环的bug，因此手动用最原始的方式生存json串
-			JSONObject jsonObject = new JSONObject();
-			try {
-				jsonObject.put("id", s.getId());
-				jsonObject.put("times", nowCurrent);
-				jsonObject.put("score", tv_times.get(i).getText().toString());
-				jsonObject.put("date", date);
-				jsonObject.put("athlete", ath.getId());
-				jsonObject.put("plan", p.getId());
-				jsonArray.put(jsonObject);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			sl.add(s);
+		}
+		String js = JsonTools.creatJsonString(sl);
+		for (Score s : sl) {
 			s.save();
 		}
 		XUtils.showToast(context, toast, "保存成功！");
-		createNewRequest(jsonArray.toString());
+		createNewRequest(js);
 		int swimTime = ((Integer) app.getMap().get("swimTime")) - 1;
 		if (swimTime != 0) {
 			app.getMap().put("swimTime", swimTime);

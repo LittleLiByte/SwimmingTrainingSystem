@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
@@ -210,9 +213,7 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 			XUtils.showToast(activity, toast, "该计划没有添加任何运动员！");
 			return;
 		} else {
-			long newsetId = dbManager.getLatestPlanId();
 			Plan p = new Plan();
-			p.setId(newsetId + 1);
 			p.setName(pl_name);
 			p.setPool(poolScale);
 			p.setTime(distance);
@@ -220,10 +221,14 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 			p.setAthlete(planList);
 			// 在存入数据库之前就生存Json字符串，否则会报错！
 			jsonStr = JsonTools.creatJsonString(p);
-			p.save();
-			XUtils.showToast(activity, toast, "计划添加成功！");
-			// 提交请求
-			createNewRequest();
+			if ((Boolean) app.getMap().get("isConnect")) {
+				// 如果可以连接服务器，则提交请求
+				addPlanRequest();
+			} else {
+				// 否则将数据保存本地使用
+				p.save();
+				XUtils.showToast(activity, toast, "计划添加成功！");
+			}
 			activity.finish();
 		}
 
@@ -244,13 +249,27 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 		}
 	}
 
-	public void createNewRequest() {
+	public void addPlanRequest() {
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				XUtils.HOSTURL + "addPlan", new Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {
-						// TODO Auto-generated method stub
+						try {
+							JSONObject obj = new JSONObject(response);
+							int resCode = (Integer) obj.get("resCode");
+							if (resCode == 1) {
+								XUtils.showToast(activity, toast, "添加成功");
+								String userJson = obj.get("plan").toString();
+								Plan pl = JsonTools.getObject(userJson,
+										Plan.class);
+								pl.save();
+							}
+
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}, new ErrorListener() {
 

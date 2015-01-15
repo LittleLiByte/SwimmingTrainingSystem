@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
 import android.app.AlertDialog;
@@ -156,11 +158,8 @@ public class AthleteListAdapter extends BaseAdapter {
 									ath_name, ath_age, ath_phone, ath_extras);
 							setDatas(dbManager.getAthletes(userID));
 							notifyDataSetChanged();
-
 							// 同步服务器
-							createNewRequest1(athletes, position);
-
-							XUtils.showToast(context, toast, "修改成功");
+							modifyAthRequest(athletes, position);
 						}
 						viewDialog.dismiss();
 					}
@@ -218,7 +217,7 @@ public class AthleteListAdapter extends BaseAdapter {
 								int result = dbManager.deleteAthlete(athletes,
 										position);
 								if (result != 0) {
-									createNewRequest2(athletes.get(position));
+									deleteAthRequest(athletes.get(position));
 									setDatas(dbManager.getAthletes(userID));
 									notifyDataSetChanged();
 									XUtils.showToast(context, toast, "删除成功");
@@ -247,17 +246,15 @@ public class AthleteListAdapter extends BaseAdapter {
 	}
 
 	/**
-	 * 将对象转换成json字符串，在提交到服务器
+	 * 修改运动员信息
 	 * 
 	 * @param obj
 	 */
-	public void createNewRequest1(List<Athlete> athletes, int position) {
+	public void modifyAthRequest(List<Athlete> athletes, int position) {
 
 		Athlete obj = athletes.get(position);
 
 		obj = DataSupport.find(Athlete.class, obj.getId(), true);
-		System.out.println("JsonTools.creatJsonString(obj)----->"
-				+ JsonTools.creatJsonString(obj));
 		final String athleteJson = JsonTools.creatJsonString(obj);
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				XUtils.HOSTURL + "modifyAthlete", new Listener<String>() {
@@ -266,10 +263,20 @@ public class AthleteListAdapter extends BaseAdapter {
 					public void onResponse(String response) {
 						// TODO Auto-generated method stub
 						Log.i("ModifyAthlete", response);
-						if (response.equals("ok")) {
-
-						} else {
+						JSONObject obj;
+						try {
+							obj = new JSONObject(response);
+							int resCode = (Integer) obj.get("resCode");
+							if (resCode == 1) {
+								XUtils.showToast(context, toast, "修改成功");
+							} else {
+								XUtils.showToast(context, toast, "修改失败");
+							}
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
+
 					}
 				}, new ErrorListener() {
 
@@ -303,8 +310,9 @@ public class AthleteListAdapter extends BaseAdapter {
 		mQueue.add(stringRequest);
 	}
 
-	public void createNewRequest2(final Athlete a) {
+	public void deleteAthRequest(Athlete a) {
 
+		final String jsonString = JsonTools.creatJsonString(a);
 		StringRequest stringRequest2 = new StringRequest(Method.POST,
 				XUtils.HOSTURL + "deleteAthlete", new Listener<String>() {
 
@@ -312,7 +320,20 @@ public class AthleteListAdapter extends BaseAdapter {
 					public void onResponse(String response) {
 						// TODO Auto-generated method stub
 						Log.i("AthleteListAdapter", response);
-						XUtils.showToast(context, toast, "成功同步至服务器！");
+
+						JSONObject obj;
+						try {
+							obj = new JSONObject(response);
+							int resCode = (Integer) obj.get("resCode");
+							if (resCode == 1) {
+								XUtils.showToast(context, toast, "删除成功");
+							} else {
+								XUtils.showToast(context, toast, "删除失败");
+							}
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}, new ErrorListener() {
 
@@ -327,7 +348,7 @@ public class AthleteListAdapter extends BaseAdapter {
 			protected Map<String, String> getParams() throws AuthFailureError {
 				// 设置请求参数
 				Map<String, String> map = new HashMap<String, String>();
-				map.put("deleteAthlete", a.getId() + "");
+				map.put("deleteAthlete", jsonString);
 				return map;
 			}
 		};

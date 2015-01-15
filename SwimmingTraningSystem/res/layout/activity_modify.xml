@@ -107,7 +107,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/modify_ll3"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         android:background="@drawable/bg_login"
         android:gravity="center"
         android:onClick="modify"

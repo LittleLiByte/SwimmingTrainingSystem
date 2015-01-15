@@ -15,11 +15,14 @@ import org.litepal.crud.DataSupport;
 public class Athlete extends DataSupport {
 
 	private long id;
+	private int aid;
 	private String name;
 	private int age;
+	private String gender;
 	private String phone;
 	private String extras;
 	private User user;
+	private int uid;
 	private List<Plan> plans = new ArrayList<Plan>();
 	private List<Score> scores = new ArrayList<Score>();
 
@@ -29,6 +32,14 @@ public class Athlete extends DataSupport {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public int getAid() {
+		return aid;
+	}
+
+	public void setAid(int aid) {
+		this.aid = aid;
 	}
 
 	public String getName() {
@@ -47,6 +58,14 @@ public class Athlete extends DataSupport {
 		this.age = age;
 	}
 
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
 	public String getPhone() {
 		return phone;
 	}
@@ -61,6 +80,14 @@ public class Athlete extends DataSupport {
 
 	public void setExtras(String extras) {
 		this.extras = extras;
+	}
+
+	public int getUid() {
+		return uid;
+	}
+
+	public void setUid(int uid) {
+		this.uid = uid;
 	}
 
 	public User getUser() {
@@ -90,10 +117,10 @@ public class Athlete extends DataSupport {
 
 	@Override
 	public String toString() {
-		return "Athlete [id=" + id + ", name=" + name + ", age=" + age
-				+ ", phone=" + phone + ", extras=" + extras + ", user="
-				+ user.getId() + ", plans=" + plans + ", scores=" + scores
-				+ "]";
+		return "Athlete [id=" + id + ", aid=" + aid + ", name=" + name
+				+ ", age=" + age + ", gender=" + gender + ", phone=" + phone
+				+ ", extras=" + extras + ", user=" + user.getUid() + ", plans="
+				+ plans + ", scores=" + scores + "]";
 	}
 
 }

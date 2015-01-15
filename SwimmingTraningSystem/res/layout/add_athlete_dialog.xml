@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.example.swimmingtraningsystem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_dialog"
@@ -8,7 +9,7 @@
     <RelativeLayout
         android:id="@+id/rl_content"
         android:layout_width="match_parent"
-        android:layout_height="210dp"
+        android:layout_height="250dp"
         android:background="#e2e2e2" >
 
         <LinearLayout
@@ -92,6 +93,36 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:paddingLeft="5dp"
+                android:text="性别"
+                android:textColor="#FF6633"
+                android:textSize="18sp" />
+
+            <com.example.swimmingtraningsystem.view.Switch
+                android:id="@+id/toggle_gender"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="15dp"
+                app:textLeft="@string/off"
+                app:textRight="@string/on" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/add_ll5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/add_ll4"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" >
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingLeft="5dp"
                 android:text="联系方式:"
                 android:textColor="#FF6633"
                 android:textSize="18sp" />
@@ -110,11 +141,11 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/add_ll5"
+            android:id="@+id/add_ll6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/add_ll4"
+            android:layout_below="@+id/add_ll5"
             android:layout_marginTop="20dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"

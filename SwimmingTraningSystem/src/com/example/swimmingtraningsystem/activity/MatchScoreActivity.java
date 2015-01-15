@@ -34,6 +34,7 @@ import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.adapter.DragListAdapter;
 import com.example.swimmingtraningsystem.adapter.MatchAdapter;
 import com.example.swimmingtraningsystem.db.DBManager;
+import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.Plan;
 import com.example.swimmingtraningsystem.model.Score;
@@ -101,47 +102,31 @@ public class MatchScoreActivity extends Activity {
 	}
 
 	public void matchDone(View v) {
-		JSONArray jsonArray = new JSONArray();
 		String date = (String) app.getMap().get("testDate");
 		List<Athlete> athletes = dragAdapter.getList();
 		int nowCurrent = (Integer) app.getMap().get("current");
 		p = DBManager.getInstance().queryPlan(planID);
 		List<String> names = new ArrayList<String>();
+
+		List<Score> sLists = new ArrayList<Score>();
 		for (int i = 0; i < scores.length; i++) {
 			Athlete a = athletes.get(i);
 			names.add(a.getName());
-
 			Score s = new Score();
-			s.setId(DBManager.getInstance().getLatestScoreID() + 1);
 			s.setDate(date);
 			s.setTimes(nowCurrent);
 			s.setScore(scores[i]);
-			// 运动员关联成绩
-			a.getScores().add(s);
-			// 计划关联成绩
-			p.getScores().add(s);
 			s.setAthlete(a);
 			s.setP(p);
-
-			// 此处因为Gson包的bug，直接转整个对象会出现无限递归循环的bug，因此手动用最原始的方式生存json串
-			JSONObject jsonObject = new JSONObject();
-			try {
-				jsonObject.put("id", s.getId());
-				jsonObject.put("times", nowCurrent);
-				jsonObject.put("score", scores[i]);
-				jsonObject.put("date", date);
-				jsonObject.put("athlete", a.getId());
-				jsonObject.put("plan", p.getId());
-				jsonArray.put(jsonObject);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			// 保存至数据库
+			sLists.add(s);
+		}
+		String js = JsonTools.creatJsonString(sLists);
+		for (Score s : sLists) {
 			s.save();
 		}
 		XUtils.showToast(this, toast, "保存成功！");
 		// 发送至服务器
-		createNewRequest(jsonArray.toString());
+		createNewRequest(js);
 		int swimTime = ((Integer) app.getMap().get("swimTime")) - 1;
 		if (swimTime != 0) {
 			app.getMap().put("swimTime", swimTime);

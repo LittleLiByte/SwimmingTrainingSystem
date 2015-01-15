@@ -41,6 +41,7 @@ import com.example.swimmingtraningsystem.db.DBManager;
 import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.Plan;
+import com.example.swimmingtraningsystem.model.Upid;
 import com.example.swimmingtraningsystem.util.XUtils;
 
 public class ViewPlanFragment extends Fragment implements OnClickListener {
@@ -103,13 +104,11 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 					}
 				}
 			}
+			// 在数据库中删除之前获取计划对应的uid和pid
+			List<Upid> upids = dbManager.getdeletePlanId(selectid);
 			dbManager.deletePlans(selectid);
 
-			List<Long> planIds = new ArrayList<Long>();
-			for (Plan p : selectid) {
-				planIds.add(p.getId());
-			}
-			createNewRequest(planIds);
+			deletePlanRequest(upids);
 			break;
 		default:
 			break;
@@ -267,10 +266,11 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 		}
 	}
 
-	public void createNewRequest(List<Long> planIds) {
+	public void deletePlanRequest(List<Upid> upids) {
+		// 数据查询出该计划的uid和pid;
+		final String jsonString = JsonTools.creatJsonString(upids);
 
-		final String deletePlans = JsonTools.creatJsonString(planIds);
-
+		System.out.println("jsonString--->" + jsonString);
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				XUtils.HOSTURL + "deletePlans", new Listener<String>() {
 
@@ -296,7 +296,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 			protected Map<String, String> getParams() throws AuthFailureError {
 				// 设置请求参数
 				Map<String, String> map = new HashMap<String, String>();
-				map.put("deletePlansJson", deletePlans);
+				map.put("deletePlansJson", jsonString);
 				return map;
 			}
 

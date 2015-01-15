@@ -9,18 +9,11 @@ import android.widget.TextView;
 
 import com.example.swimmingtraningsystem.R;
 
-/********************************************************************
- * [Summary] TODO 请在此处简要描述此类所实现的功能。因为这项注释主要是为了在IDE环境中生成tip帮助，务必简明扼要 [Remarks]
- * TODO 请在此处详细描述类的功能、调用方法、注意事项、以及与其它类的关系.
- *******************************************************************/
-
 public class LoadingDialog extends Dialog {
-	private Context context = null;
 	private static LoadingDialog customProgressDialog = null;
 
 	public LoadingDialog(Context context) {
 		super(context);
-		this.context = context;
 	}
 
 	public LoadingDialog(Context context, int theme) {

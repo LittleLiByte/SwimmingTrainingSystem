@@ -7,6 +7,7 @@ import org.litepal.crud.DataSupport;
 
 public class User extends DataSupport {
 	private long id;
+	private int uid;
 	private String username;
 	private String password;
 	private String Email;
@@ -20,6 +21,14 @@ public class User extends DataSupport {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public int getUid() {
+		return uid;
+	}
+
+	public void setUid(int uid) {
+		this.uid = uid;
 	}
 
 	public String getUsername() {
@@ -72,9 +81,9 @@ public class User extends DataSupport {
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", username=" + username + ", password="
-				+ password + ", Email=" + Email + ", phone=" + phone
-				+ ", athletes=" + athletes + ", plans=" + plans + "]";
+		return "User [id=" + id + ", uid=" + uid + ", username=" + username
+				+ ", password=" + password + ", Email=" + Email + ", phone="
+				+ phone + ", athletes=" + athletes + ", plans=" + plans + "]";
 	}
 
 }

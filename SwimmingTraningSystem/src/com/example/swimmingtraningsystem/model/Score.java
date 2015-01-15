@@ -62,8 +62,8 @@ public class Score extends DataSupport {
 	@Override
 	public String toString() {
 		return "Score [id=" + id + ", times=" + times + ", score=" + score
-				+ ", date=" + date + ", athlete=" + athlete.getId() + ", p="
-				+ p.getId() + "]";
+				+ ", date=" + date + ", athlete=" + athlete.getAid() + ", p="
+				+ p.getPid() + "]";
 	}
 
 }

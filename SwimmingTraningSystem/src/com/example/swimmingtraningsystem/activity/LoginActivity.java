@@ -3,8 +3,10 @@ package com.example.swimmingtraningsystem.activity;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -33,10 +35,15 @@ import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.db.DBManager;
 import com.example.swimmingtraningsystem.effect.Effectstype;
 import com.example.swimmingtraningsystem.effect.NiftyDialogBuilder;
+import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.User;
 import com.example.swimmingtraningsystem.util.XUtils;
 import com.example.swimmingtraningsystem.view.LoadingDialog;
 
+/**
+ * @author LittleByte
+ * 
+ */
 public class LoginActivity extends Activity {
 
 	private MyApplication app;
@@ -46,10 +53,9 @@ public class LoginActivity extends Activity {
 	// private TextView forget;
 	private TextView sethost;
 	private Toast toast;
-	private boolean isConnect = false;
 	private String TAG = "swimmingtraningsystem";
 	private RequestQueue mQueue;
-	private Dialog loadingDialog;
+	private LoadingDialog loadingDialog;
 	private Effectstype effect;
 
 	@Override
@@ -59,7 +65,6 @@ public class LoginActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_login);
 		intiView();
-
 		initData();
 	}
 
@@ -73,9 +78,7 @@ public class LoginActivity extends Activity {
 		etLogin.setText(username);
 		String passwrod = sp.getString("password", "");
 		etPassword.setText(passwrod);
-
 		mQueue = Volley.newRequestQueue(this);
-
 		boolean isFirst = sp.getBoolean("isFirst", true);
 		if (isFirst) {
 			User defaulrUser = new User();
@@ -92,7 +95,7 @@ public class LoginActivity extends Activity {
 				Context.MODE_PRIVATE);
 		XUtils.HOSTURL = hostSp
 				.getString("hostInfo",
-						"http://192.168.1.230:8080/JsonProject1/servlet/JsonAction?action_flag=");
+						"http://192.168.1.230:8080/SWIMYES/httpPost.action?action_flag=");
 	}
 
 	private void intiView() {
@@ -119,59 +122,67 @@ public class LoginActivity extends Activity {
 	public void onRegister(View v) {
 		Intent i = new Intent(this, RegistAcyivity.class);
 		startActivity(i);
+		overridePendingTransition(R.anim.push_up_in, R.anim.push_up_out);
 	}
 
 	/**
-	 * 登录
+	 * 登录响应
 	 * 
 	 * @param v
 	 */
 	public void onLogin(View v) {
-		String loginString = etLogin.getText().toString().trim();
-		String passwordString = etPassword.getText().toString().trim();
-
-		if (TextUtils.isEmpty(loginString) || TextUtils.isEmpty(passwordString)) {
-			XUtils.showToast(this, toast, "用户名或密码不能为空");
+		if (XUtils.isFastDoubleClick()) {
+			return;
 		} else {
-			// 保存密码
-			XUtils.SaveLoginInfo(this, loginString, passwordString);
-			if (!isConnect) {
-				if (loadingDialog == null) {
-					loadingDialog = LoadingDialog.createDialog(this);
-					loadingDialog.setCanceledOnTouchOutside(false);
-				}
-				loadingDialog.show();
-				// 尝试连接服务器，如果连接成功则直接登录
-				createNewRequest(loginString, passwordString);
-			} else {// 如果连接服务器失败，则会使用离线功能登录，可以保存数据但无法上传
+			String loginString = etLogin.getText().toString().trim();
+			String passwordString = etPassword.getText().toString().trim();
+			if (TextUtils.isEmpty(loginString)
+					|| TextUtils.isEmpty(passwordString)) {
+				XUtils.showToast(this, toast, "用户名或密码不能为空");
+			} else {
+				// 保存密码
+				XUtils.SaveLoginInfo(this, loginString, passwordString);
+				boolean tryConnect = (Boolean) app.getMap().get("isConnect");
+				if (tryConnect) {
+					if (loadingDialog == null) {
+						loadingDialog = LoadingDialog.createDialog(this);
+						loadingDialog.setMessage("正在登录...");
+						loadingDialog.setCanceledOnTouchOutside(false);
+					}
+					loadingDialog.show();
+					// 尝试连接服务器，如果连接成功则直接登录
+					loginRequest(loginString, passwordString);
+				} else {// 如果连接服务器失败，则会使用离线功能登录，可以保存数据但无法上传,只是功能试用
 
-				String result = DBManager.getInstance()
-						.getPassword(loginString);
-				if ("".equals(result)) {
-					XUtils.showToast(this, toast, "帐号或密码错误！");
-					return;
-				}
-				// 可以使用默认帐号和已经注册的帐号
-				if (loginString.equals("defaultUser")
-						|| passwordString.equals(result)) {
+					// 通过用户名查询密码，不匹配则提示
+					String result = dbManager.getPassword(loginString);
+					if ("".equals(result)) {
+						XUtils.showToast(this, toast, "用户名不存在");
+						return;
+					}
+					// 可以使用默认帐号和已经注册的帐号
+					if (loginString.equals("defaultUser")
+							|| passwordString.equals(result)) {
 
-					XUtils.showToast(this, toast, "登陆成功");
-					// 将当前用户id保存为全局变量
-					User user = dbManager.getUserByName(loginString);
-					app.getMap().put("CurrentUser", user.getId());
-					Handler handler = new Handler();
-					Runnable updateThread = new Runnable() {
-						public void run() {
-							Intent intent = new Intent();
-							intent.setClass(LoginActivity.this,
-									MainActivity.class);
-							LoginActivity.this.startActivity(intent);
-							finish();
-						}
-					};
-					handler.postDelayed(updateThread, 100);
-				} else {
-					XUtils.showToast(this, toast, "密码错误！");
+						XUtils.showToast(this, toast, "登陆成功");
+						// 将当前用户id保存为全局变量
+						User user = dbManager.getUserByName(loginString);
+						app.getMap().put("CurrentUser", user.getId());
+						Handler handler = new Handler();
+						Runnable updateThread = new Runnable() {
+							public void run() {
+								Intent intent = new Intent(LoginActivity.this,
+										MainActivity.class);
+								LoginActivity.this.startActivity(intent);
+								overridePendingTransition(R.anim.push_right_in,
+										R.anim.push_left_out);
+								finish();
+							}
+						};
+						handler.postDelayed(updateThread, 100);
+					} else {
+						XUtils.showToast(this, toast, "密码错误！");
+					}
 				}
 			}
 		}
@@ -179,7 +190,7 @@ public class LoginActivity extends Activity {
 	}
 
 	// 提交登录请求
-	public void createNewRequest(final String s1, final String s2) {
+	public void loginRequest(final String s1, final String s2) {
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				XUtils.HOSTURL + "login", new Listener<String>() {
 
@@ -188,28 +199,48 @@ public class LoginActivity extends Activity {
 						// TODO Auto-generated method stub
 						Log.i(TAG, response);
 						loadingDialog.dismiss();
-						if (response.equals("1")) {
-							// 将当前用户id保存为全局变量
-							User user = dbManager.getUserByName(s1);
-							if (user == null) {
-								User loginUser = new User();
-								loginUser.setUsername(s1);
-								loginUser.setPassword(s2);
-								loginUser.save();
-								app.getMap().put("CurrentUser",
-										loginUser.getId());
+						try {
+							JSONObject obj = new JSONObject(response);
+							int resCode = (Integer) obj.get("resCode");
+							if (resCode == 1) {
+								XUtils.showToast(LoginActivity.this, toast,
+										"登录成功");
+								String userJson = obj.get("user").toString();
+								User user = JsonTools.getObject(userJson,
+										User.class);
+
+								if (dbManager.getUserByName(user.getUsername()) != null) {
+									// 如果数据库中不存在该用户，则直接将该用户保存至数据库
+									user.save();
+									app.getMap().put("CurrentUser",
+											user.getId());
+								} else {
+									// 如果该用户信息已存在本地数据库，则取出当前id作为全局变量
+									long currentId = dbManager.getUserByName(
+											user.getUsername()).getId();
+									app.getMap().put("CurrentUser", currentId);
+								}
+							} else if (resCode == 2) {
+								XUtils.showToast(LoginActivity.this, toast,
+										"用户名不存在！");
+							} else if (resCode == 3) {
+								XUtils.showToast(LoginActivity.this, toast,
+										"密码错误！");
 							} else {
-								app.getMap().put("CurrentUser", user.getId());
+								XUtils.showToast(LoginActivity.this, toast,
+										"服务器错误！");
 							}
 
-							XUtils.showToast(LoginActivity.this, toast, "登陆成功");
-							Intent i = new Intent(LoginActivity.this,
-									MainActivity.class);
-							startActivity(i);
-							finish();
-						} else {
-							XUtils.showToast(LoginActivity.this, toast, "密码错误");
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
+
+						XUtils.showToast(LoginActivity.this, toast, "登陆成功");
+						Intent i = new Intent(LoginActivity.this,
+								MainActivity.class);
+						startActivity(i);
+						finish();
 					}
 				}, new ErrorListener() {
 
@@ -218,7 +249,7 @@ public class LoginActivity extends Activity {
 						// TODO Auto-generated method stub
 						Log.e(TAG, error.getMessage());
 						loadingDialog.dismiss();
-						isConnect = true;
+						app.getMap().put("isConnect", false);
 						showUserSelectDialog();
 					}
 				}) {
@@ -267,13 +298,7 @@ public class LoginActivity extends Activity {
 		settingDialog.withTitle("服务器IP与端口设置").withMessage(null)
 				.withIcon(getResources().getDrawable(R.drawable.ic_launcher))
 				.isCancelableOnTouchOutside(true).withDuration(700)
-				// def
-				.withEffect(effect)
-				// def Effectstype.Slidetop
-				.withButton1Text("取消")
-				// def gone
-				.withButton2Text("完成")
-				// def gone
+				.withEffect(effect).withButton1Text("取消").withButton2Text("完成")
 				.setCustomView(R.layout.dialog_setting_host, context)
 				.setButton1Click(new View.OnClickListener() {
 					@Override
@@ -295,11 +320,11 @@ public class LoginActivity extends Activity {
 							XUtils.showToast(LoginActivity.this, toast,
 									"ip与端口地址均不可为空！");
 						} else {
-							String hostUrl = "http://"
-									+ hostIp
-									+ ":"
+							String hostUrl = "http://" + hostIp + ":"
 									+ hostPort
-									+ "/JsonProject1/servlet/JsonAction?action_flag=";
+									// +
+									// "/JsonProject1/servlet/JsonAction?action_flag=";
+									+ "/SWIMYES/httpPost.action?action_flag=";
 							// 保存服务器ip和端口地址到sp
 							XUtils.HOSTURL = hostUrl;
 							XUtils.SaveLoginInfo(LoginActivity.this, hostUrl);
@@ -319,10 +344,13 @@ public class LoginActivity extends Activity {
 		final NiftyDialogBuilder userDialog = NiftyDialogBuilder
 				.getInstance(this);
 		effect = Effectstype.SlideBottom;
-		userDialog.withTitle("无法连接服务器！")
-				.withMessage("如果要继续使用，未注册请选择系统默认帐号登录，已注册请用注册帐号登录")
+		userDialog
+				.withTitle("无法连接服务器！")
+				.withMessage(
+						"如果要继续使用，未注册请选择系统默认帐号登录，已注册请用注册帐号登录\n"
+								+ "注意：默认账号只能试用，数据无法上传至服务器！")
 				.withIcon(getResources().getDrawable(R.drawable.ic_launcher))
-				.isCancelableOnTouchOutside(true).withDuration(700)
+				.isCancelableOnTouchOutside(false).withDuration(700)
 				// def
 				.withEffect(effect).withButton1Text("默认帐号登录")
 				// def gone
@@ -340,8 +368,6 @@ public class LoginActivity extends Activity {
 				}).setButton2Click(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						etLogin.setText("");
-						etPassword.setText("");
 						userDialog.dismiss();
 					}
 				}).show();

@@ -38,6 +38,8 @@ public class MyApplication extends LitePalApplication {
 		map.put("dragList", null);
 		// 保存当前登录的用户id
 		map.put("CurrentUser", "");
+		// 保存打开登录页面时检查是否可以连接服务器的状态
+		map.put("isConnect", true);
 	}
 
 	public Map<String, Object> getMap() {

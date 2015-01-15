@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
@@ -46,6 +47,7 @@ public class SettingActivity extends Activity {
 
 	public void setting_back(View v) {
 		finish();
+		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);
 	}
 
 	public void setting(View v) {
@@ -66,5 +68,16 @@ public class SettingActivity extends Activity {
 			break;
 		}
 
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+			finish();
+			overridePendingTransition(R.anim.slide_bottom_in,
+					R.anim.slide_top_out);
+			return false;
+		}
+		return false;
 	}
 }

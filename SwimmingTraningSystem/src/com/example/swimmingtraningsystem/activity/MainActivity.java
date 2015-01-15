@@ -42,7 +42,8 @@ public class MainActivity extends Activity {
 				i.setClass(MainActivity.this, SettingActivity.class);
 			}
 			startActivity(i);
-
+			overridePendingTransition(R.anim.slide_top_in,
+					R.anim.slide_bottom_out);
 		}
 	};
 

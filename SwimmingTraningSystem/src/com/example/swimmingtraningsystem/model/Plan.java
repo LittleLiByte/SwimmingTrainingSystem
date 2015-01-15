@@ -7,6 +7,7 @@ import org.litepal.crud.DataSupport;
 
 public class Plan extends DataSupport {
 	private long id;
+	private int pid;
 	/**
 	 * ¼Æ»®Ãû×Ö
 	 */
@@ -38,6 +39,14 @@ public class Plan extends DataSupport {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public int getPid() {
+		return pid;
+	}
+
+	public void setPid(int pid) {
+		this.pid = pid;
 	}
 
 	public String getName() {
@@ -90,8 +99,8 @@ public class Plan extends DataSupport {
 
 	@Override
 	public String toString() {
-		return "Plan [id=" + id + ", name=" + name + ", pool=" + pool
-				+ ", time=" + time + ", user=" + user.getId() + ", athlete="
+		return "Plan [id=" + id + ", pid=" + pid + ", name=" + name + ", pool="
+				+ pool + ", time=" + time + ", user=" + user + ", athlete="
 				+ athlete + ", scores=" + scores + "]";
 	}
 

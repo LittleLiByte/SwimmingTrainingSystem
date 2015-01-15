@@ -8,6 +8,7 @@ import org.litepal.crud.DataSupport;
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -78,23 +79,11 @@ public class ScoreActivity extends Activity {
 			}
 		});
 
-		// // 打开界面即显示最近3次的测试成绩
-		// List<String> dates = DBManager.getRecentDateInScore();
-		// int dateSize = dates.size();
-		// if (dateSize >= 3) {
-		// // 如果测试日期集大于等于3，则选取最新的3次
-		// for (int i = dateSize; i > dateSize - 3; i--) {
-		// dateList.add(dates.get(i - 1));
-		// }
-		// } else {
-		// // 否则就全部显示
-		// dateList.addAll(dates);
-		// }
-		// scoreListAdapter1 = new DateScoreListAdapter();
 	}
 
 	public void back(View v) {
 		finish();
+		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);
 	}
 
 	public void query(View v) {
@@ -330,4 +319,16 @@ public class ScoreActivity extends Activity {
 		}
 
 	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+			finish();
+			overridePendingTransition(R.anim.slide_bottom_in,
+					R.anim.slide_top_out);
+			return false;
+		}
+		return false;
+	}
+
 }

@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
-import android.widget.Toast;
 
 import com.example.swimmingtraningsystem.R;
 
@@ -54,7 +53,8 @@ public class SettingActivity extends Activity {
 
 		switch (v.getId()) {
 		case R.id.setting_illustration:
-			Toast.makeText(this, "使用说明", 0).show();
+			Intent intent = new Intent(this, UseTipsActiviy.class);
+			startActivity(intent);
 			break;
 		case R.id.setting_change_password:
 			Intent i = new Intent();

@@ -83,6 +83,10 @@
             android:name="com.example.swimmingtraningsystem.activity.ModifyPassActivity"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="com.example.swimmingtraningsystem.activity.UseTipsActiviy"
+            android:screenOrientation="portrait" >
+        </activity>
     </application>
 
 </manifest>

@@ -55,7 +55,6 @@ public class TimerActivity extends Activity {
 	private TextView tvTip;
 	private TextView time_title;
 
-	private Button resetBtn;
 	private Button match;
 	/**
 	 * 成绩列表
@@ -78,7 +77,7 @@ public class TimerActivity extends Activity {
 	float predegree = 0;
 	float secondpredegree = 0;
 	float hourpredegree = 0;
-
+	private Toast toast;
 	private Handler handler;
 	private Message msg;
 	/**
@@ -120,7 +119,6 @@ public class TimerActivity extends Activity {
 		time_title = (TextView) findViewById(R.id.time_title);
 		tvTime = (TextView) findViewById(R.id.duocitvTime);
 		tvTip = (TextView) findViewById(R.id.textwujici);
-		resetBtn = (Button) findViewById(R.id.resetbutton);
 		scoreList = (ListView) findViewById(R.id.duocijishilist);
 		min_progress = (ImageView) this.findViewById(R.id.duocimin_progress);
 		min_progress_hand = (ImageView) this
@@ -144,13 +142,10 @@ public class TimerActivity extends Activity {
 		time = new String[COUNT_MAX];
 		clockView.setOnClickListener(new OnClickListener() {
 
-			private Toast toast;
-
 			@Override
 			public void onClick(View v) {
 				clickCount++;
-
-				if (athletes < COUNT_MAX) {
+				if (athletes <= COUNT_MAX) {
 					// 开始计时
 					if (clickCount == 1) {
 						okclear = false;
@@ -174,18 +169,12 @@ public class TimerActivity extends Activity {
 					} else {
 						tvTip.setVisibility(View.GONE);
 						setlistview();
-					}
-
-				} else {
-					okclear = true;
-					if (athletes == COUNT_MAX) {
-						setlistview();
-						timerStop();
-						match.setVisibility(View.VISIBLE);
-						XUtils.showToast(TimerActivity.this, toast, "成绩全部记录完成！");
-					} else {
-						XUtils.showToast(TimerActivity.this, toast,
-								"成绩全部已经记录完成！");
+						if (athletes == (COUNT_MAX + 1)) {
+							timerStop();
+							match.setVisibility(View.VISIBLE);
+							XUtils.showToast(TimerActivity.this, toast,
+									"成绩全部记录完成！");
+						}
 					}
 				}
 			}

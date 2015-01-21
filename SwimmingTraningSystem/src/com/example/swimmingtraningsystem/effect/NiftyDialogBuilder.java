@@ -214,6 +214,11 @@ public class NiftyDialogBuilder extends Dialog implements DialogInterface {
 		return this;
 	}
 
+	public NiftyDialogBuilder hideOneButton() {
+		mButton2.setVisibility(View.GONE);
+		return this;
+	}
+
 	public NiftyDialogBuilder hideFoot() {
 		mLinearLayoutFeetView.setVisibility(View.GONE);
 		return this;

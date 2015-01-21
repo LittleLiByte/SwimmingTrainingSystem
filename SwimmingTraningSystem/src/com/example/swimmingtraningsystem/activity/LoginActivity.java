@@ -73,9 +73,9 @@ public class LoginActivity extends Activity {
 		// 检查是否有保存的用户名和密码，如果有就回显
 		SharedPreferences sp = getSharedPreferences("loginInfo",
 				Context.MODE_PRIVATE);
-		String username = sp.getString("username", "");
+		String username = sp.getString("username", "defaultUser");
 		etLogin.setText(username);
-		String passwrod = sp.getString("password", "");
+		String passwrod = sp.getString("password", "123456asdjkl");
 		etPassword.setText(passwrod);
 		mQueue = Volley.newRequestQueue(this);
 		boolean isFirst = sp.getBoolean("isFirst", true);
@@ -347,7 +347,7 @@ public class LoginActivity extends Activity {
 				// def
 				.withEffect(effect).withButton1Text("默认帐号登录")
 				// def gone
-				.withButton2Text("已注册帐号登录")
+				.hideOneButton()
 				// def gone
 				.setButton1Click(new View.OnClickListener() {
 					@Override
@@ -356,11 +356,6 @@ public class LoginActivity extends Activity {
 						etLogin.setEnabled(false);
 						etPassword.setText("123456asdjkl");
 						etPassword.setEnabled(false);
-						userDialog.dismiss();
-					}
-				}).setButton2Click(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
 						userDialog.dismiss();
 					}
 				}).show();

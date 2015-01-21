@@ -20,6 +20,7 @@ import com.example.swimmingtraningsystem.model.Temp;
 
 public class ShowScoreActivity extends Activity {
 	private MyApplication app;
+	private DBManager dbManager;
 	private ExpandableListView listView;
 	private List<String> listTag = new ArrayList<String>();
 	private List<Temp> all;
@@ -34,24 +35,25 @@ public class ShowScoreActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_showscore);
 		app = (MyApplication) getApplication();
+		dbManager=DBManager.getInstance();
 		listView = (ExpandableListView) findViewById(R.id.show_list);
 		planName = (TextView) findViewById(R.id.show_the_plan);
 		int times = (Integer) app.getMap().get("current");
 		String date = getIntent().getStringExtra("testDate");
 		String planString = getIntent().getStringExtra("Plan");
 		planName.setText(planString);
-		List<Score> athScores = DBManager.getInstance().getAthleteNumberInScoreByDate(date);
+		List<Score> athScores =dbManager.getAthleteNumberInScoreByDate(date);
 		athleteCount = athScores.size();
 
 		List<Long> athIds = new ArrayList<Long>();
 		for (Score s : athScores) {
 			athIds.add(s.getAthlete().getId());
 		}
-		all = DBManager.getInstance().getAthleteIdInScoreByDate(date, athIds);
+		all = dbManager.getAthleteIdInScoreByDate(date, athIds);
 		for (int i = 1; i <= times + 1; i++) {
 			if (i <= times) {
 				listTag.add("µÚ" + i + "ÌË");
-				List<Score> ls = DBManager.getInstance().getScoreByDateAndTimes(date, i);
+				List<Score> ls = dbManager.getScoreByDateAndTimes(date, i);
 				list.add(ls);
 			} else {
 				listTag.add("ºÏ¼Æ");
@@ -105,7 +107,7 @@ public class ShowScoreActivity extends Activity {
 			if (groupPosition < getGroupCount() - 1) {
 				Score s = list.get(groupPosition).get(childPosition);
 				tv2.setText(s.getScore());
-				tv3.setText(DBManager.getInstance().getAthleteNameByScoreID(s.getId()));
+				tv3.setText(dbManager.getAthleteNameByScoreID(s.getId()));
 			} else {
 				tv2.setText(all.get(childPosition).getScore());
 				tv3.setText(all.get(childPosition).getAthleteName());
@@ -116,13 +118,7 @@ public class ShowScoreActivity extends Activity {
 
 		@Override
 		public int getChildrenCount(int groupPosition) {
-			// TODO Auto-generated method stub
-			if (groupPosition != getGroupCount() - 1) {
-				return list.get(groupPosition).size();
-			} else {
-				return athleteCount;
-			}
-
+			return athleteCount;
 		}
 
 		@Override

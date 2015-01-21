@@ -24,6 +24,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.db.DBManager;
+import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.util.XUtils;
 
 public class ModifyPassActivity extends Activity {
@@ -53,17 +54,30 @@ public class ModifyPassActivity extends Activity {
 		String oldPassword = modify_oldpass.getText().toString().trim();
 		String newPassword = modify_newpass.getText().toString().trim();
 		String comfPassword = modify_comfirmpass.getText().toString().trim();
+		long userId = (Long) app.getMap().get("CurrentUser");
+		String name=dbManager.getUser(userId).getUsername();
+		String userPass=dbManager.getUser(userId).getPassword();
 		if (TextUtils.isEmpty(oldPassword)) {
 			XUtils.showToast(this, toast, "原密码不能为空！");
 		} else if (TextUtils.isEmpty(newPassword)) {
 			XUtils.showToast(this, toast, "新密码不能为空！");
 		} else if (TextUtils.isEmpty(comfPassword)) {
 			XUtils.showToast(this, toast, "确认密码不能为空！");
-		} else {
-			long userId = (Long) app.getMap().get("CurrentUser");
+		}else if(!userPass.equals(oldPassword)){
+			XUtils.showToast(this, toast, "原密码错误！");
+		}else if(userPass.equals(newPassword)){
+			XUtils.showToast(this, toast, "原密码与新密码相同，无需修改！");
+		}else if(name.equals("defaultUser")){
+			XUtils.showToast(this, toast, "当前为系统默认帐号，不能修改密码！");
+		}else {
 			dbManager.modifyUserPassword(userId, comfPassword);
 			XUtils.showToast(this, toast, "修改密码成功！");
-			modifyRequest(oldPassword, newPassword, comfPassword);
+			// 如果处在联网状态，则发送至服务器
+			boolean isConnect = (Boolean) app.getMap().get("isConnect");
+			if (isConnect) {
+				// 发送至服务器
+				modifyRequest(oldPassword, newPassword, comfPassword);
+			}
 			finish();
 		}
 	}

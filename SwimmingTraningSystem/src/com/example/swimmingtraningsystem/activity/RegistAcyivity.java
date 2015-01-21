@@ -22,7 +22,6 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
-import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -37,7 +36,7 @@ import com.example.swimmingtraningsystem.view.LoadingDialog;
  * 
  */
 public class RegistAcyivity extends Activity {
-
+	private MyApplication app;
 	private String TAG = "swimmingtraningsystem";
 	private EditText username;
 	private EditText password;
@@ -54,6 +53,8 @@ public class RegistAcyivity extends Activity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_regist);
+
+		app = (MyApplication) getApplication();
 		username = (EditText) findViewById(R.id.et_userID);
 		password = (EditText) findViewById(R.id.et_password);
 		password1 = (EditText) findViewById(R.id.et_password1);
@@ -87,17 +88,20 @@ public class RegistAcyivity extends Activity {
 			} else if (TextUtils.isEmpty(pass1) || !pass.equals(pass1)) {
 				XUtils.showToast(this, toast, "两次输入密码不一致");
 			} else {
-				User newUser = new User();
-				newUser.setUsername(user);
-				newUser.setPassword(pass);
-				newUser.setEmail(Email);
-				newUser.setPhone(cellphone);
-				String jsonInfo = JsonTools.creatJsonString(newUser);
-				registRequest(jsonInfo);
-				if (loadingDialog == null) {
-					loadingDialog = LoadingDialog.createDialog(this);
+				// 如果处在联网状态，则发送至服务器
+				boolean isConnect = (Boolean) app.getMap().get("isConnect");
+				if (isConnect) {
+					User newUser = new User();
+					newUser.setUsername(user);
+					newUser.setPassword(pass);
+					newUser.setEmail(Email);
+					newUser.setPhone(cellphone);
+					String jsonInfo = JsonTools.creatJsonString(newUser);
+					// 发送至服务器
+					registRequest(jsonInfo);
+				}else{
+					XUtils.showToast(this, toast, "无法连接服务器，注册失败！");
 				}
-				loadingDialog.show();
 			}
 		}
 
@@ -109,7 +113,10 @@ public class RegistAcyivity extends Activity {
 	 * @param jsonString
 	 */
 	private void registRequest(final String jsonString) {
-
+		if (loadingDialog == null) {
+			loadingDialog = LoadingDialog.createDialog(this);
+		}
+		loadingDialog.show();
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				XUtils.HOSTURL + "regist", new Listener<String>() {
 
@@ -150,8 +157,9 @@ public class RegistAcyivity extends Activity {
 					@Override
 					public void onErrorResponse(VolleyError error) {
 						// TODO Auto-generated method stub
-						Log.e(TAG, error.getMessage());
+						loadingDialog.dismiss();
 						XUtils.showToast(RegistAcyivity.this, toast, "无法连接服务器！");
+
 					}
 				}) {
 
@@ -163,17 +171,10 @@ public class RegistAcyivity extends Activity {
 				return map;
 			}
 
-			@Override
-			public RetryPolicy getRetryPolicy() {
-				// TODO Auto-generated method stub
-				// 超时设置
-				RetryPolicy retryPolicy = new DefaultRetryPolicy(
-						XUtils.SOCKET_TIMEOUT,
-						DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-						DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-				return retryPolicy;
-			}
 		};
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(1500,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);
 	}
 

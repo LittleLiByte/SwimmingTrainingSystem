@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="14"
+        android:minSdkVersion="10"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -20,6 +20,7 @@
         <activity
             android:name="com.example.swimmingtraningsystem.activity.WlecomeActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,36 +28,60 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.example.swimmingtraningsystem.activity.MainActivity" >
+        <activity
+            android:name="com.example.swimmingtraningsystem.activity.MainActivity"
+            android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.example.swimmingtraningsystem.activity.LoginActivity" >
+        <activity
+            android:name="com.example.swimmingtraningsystem.activity.LoginActivity"
+            android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.example.swimmingtraningsystem.activity.RegistAcyivity" >
+        <activity
+            android:name="com.example.swimmingtraningsystem.activity.RegistAcyivity"
+            android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.example.swimmingtraningsystem.activity.ClockSettingActivity" >
+        <activity
+            android:name="com.example.swimmingtraningsystem.activity.ClockSettingActivity"
+            android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.example.swimmingtraningsystem.activity.PlanActivity" >
+        <activity
+            android:name="com.example.swimmingtraningsystem.activity.PlanActivity"
+            android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.example.swimmingtraningsystem.activity.AthleteActivity" >
+        <activity
+            android:name="com.example.swimmingtraningsystem.activity.AthleteActivity"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.example.swimmingtraningsystem.activity.TimerActivity"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
-        <activity android:name="com.example.swimmingtraningsystem.activity.ScoreActivity" >
+        <activity
+            android:name="com.example.swimmingtraningsystem.activity.ScoreActivity"
+            android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.example.swimmingtraningsystem.activity.SettingActivity" >
+        <activity
+            android:name="com.example.swimmingtraningsystem.activity.SettingActivity"
+            android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.example.swimmingtraningsystem.activity.MatchScoreActivity" >
+        <activity
+            android:name="com.example.swimmingtraningsystem.activity.MatchScoreActivity"
+            android:screenOrientation="portrait" >
         </activity>
-        <activity android:name="com.example.swimmingtraningsystem.activity.ShowScoreActivity" >
+        <activity
+            android:name="com.example.swimmingtraningsystem.activity.ShowScoreActivity"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.example.swimmingtraningsystem.activity.SeparateTimingActivity"
+            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen" >
         </activity>
-        <activity android:name="com.example.swimmingtraningsystem.activity.ModifyPassActivity" >
+        <activity
+            android:name="com.example.swimmingtraningsystem.activity.ModifyPassActivity"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 

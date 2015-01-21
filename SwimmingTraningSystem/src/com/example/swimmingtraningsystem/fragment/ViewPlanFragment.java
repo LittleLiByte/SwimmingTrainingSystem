@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -31,13 +30,14 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
-import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.activity.MyApplication;
 import com.example.swimmingtraningsystem.db.DBManager;
+import com.example.swimmingtraningsystem.effect.Effectstype;
+import com.example.swimmingtraningsystem.effect.NiftyDialogBuilder;
 import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.Plan;
@@ -49,14 +49,13 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 	private Activity activity;
 	private DBManager dbManager;
 	private ListView listView;
-	private adapter adapter;
+	private ViewPlanAdapter adapter;
 	private RelativeLayout relative;
 	private List<Plan> plans;
 	private List<Plan> selectid;
 	private Button calcle, delete;
 	private TextView tips;
 	private boolean isMulChoice = false; // 是否多选
-	private AlertDialog alertDialog;
 	private RequestQueue mQueue;
 
 	@Override
@@ -83,7 +82,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 		delete.setOnClickListener(this);
 		selectid = new ArrayList<Plan>();
 		plans = dbManager.getUserPlans(userID);
-		adapter = new adapter(activity, tips);
+		adapter = new ViewPlanAdapter(activity, tips);
 		listView.setAdapter(adapter);
 		mQueue = Volley.newRequestQueue(activity);
 	}
@@ -107,8 +106,14 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 			// 在数据库中删除之前获取计划对应的uid和pid
 			List<Upid> upids = dbManager.getdeletePlanId(selectid);
 			dbManager.deletePlans(selectid);
+			
+			// 如果处在联网状态，则发送至服务器
+			boolean isConnect = (Boolean) app.getMap().get("isConnect");
+			if (isConnect) {
+				// 发送至服务器
+				deletePlanRequest(upids);
+			}
 
-			deletePlanRequest(upids);
 			break;
 		default:
 			break;
@@ -118,7 +123,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 		relative.setVisibility(View.INVISIBLE);
 	}
 
-	class adapter extends BaseAdapter {
+	class ViewPlanAdapter extends BaseAdapter {
 		private Context context;
 		private LayoutInflater inflater = null;
 		public HashMap<Integer, Integer> visiblecheck;// 用来记录是否显示checkBox
@@ -126,7 +131,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 		private TextView tips;
 		private List<String> athleteName = new ArrayList<String>();
 
-		public adapter(Context context, TextView tips) {
+		public ViewPlanAdapter(Context context, TextView tips) {
 			this.context = context;
 			this.tips = tips;
 			inflater = (LayoutInflater) context
@@ -208,40 +213,38 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 		}
 
 		private void createDialog(int position) {
-			alertDialog = new AlertDialog.Builder(context).create();
-			alertDialog.setView(View.inflate(context,
-					R.layout.dialog_view_plan, null));
-			alertDialog.show();
-			Window window = alertDialog.getWindow();
+			final NiftyDialogBuilder selectDialog = NiftyDialogBuilder
+					.getInstance(activity);
+			Effectstype effect = Effectstype.Fall;
+			selectDialog.setCustomView(R.layout.dialog_view_plan, activity);
+			Window window = selectDialog.getWindow();
 			TextView length = (TextView) window
 					.findViewById(R.id.view_plan_pool_length);
 			TextView times = (TextView) window
 					.findViewById(R.id.view_plan_times);
 			length.setText(plans.get(position).getPool());
 			times.setText(plans.get(position).getTime() + "");
-
-			window.findViewById(R.id.view_plan_back).setOnClickListener(
-					new OnClickListener() {
-
-						@Override
-						public void onClick(View v) {
-							// TODO Auto-generated method stub
-							alertDialog.dismiss();
-						}
-					});
 			ListView viewList = (ListView) window
 					.findViewById(R.id.planlist_view);
 			long plan_id = plans.get(position).getId();
 			List<Athlete> athletes = dbManager.getAthInPlan(plan_id);
-			if (athleteName.size() != 0) {
+			if (athleteName.size() != 0)
 				athleteName.clear();
-			}
+
 			for (Athlete a : athletes) {
 				athleteName.add(a.getName());
 			}
 			ArrayAdapter<String> arAdapter = new ArrayAdapter<String>(context,
 					android.R.layout.simple_list_item_1, athleteName);
 			viewList.setAdapter(arAdapter);
+			selectDialog
+					.withTitle("查看计划")
+					.withMessage(null)
+					.withIcon(
+							getResources().getDrawable(R.drawable.ic_launcher))
+					.isCancelableOnTouchOutside(true).withDuration(500)
+					.withEffect(effect).hideFoot().show();
+
 		}
 
 		class Onlongclick implements OnLongClickListener {
@@ -300,18 +303,10 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 				return map;
 			}
 
-			@Override
-			public RetryPolicy getRetryPolicy() {
-				// TODO Auto-generated method stub
-				// 超时设置
-				RetryPolicy retryPolicy = new DefaultRetryPolicy(
-						XUtils.SOCKET_TIMEOUT,
-						DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-						DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-				return retryPolicy;
-			}
 		};
-
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(1500,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);
 	}
 }

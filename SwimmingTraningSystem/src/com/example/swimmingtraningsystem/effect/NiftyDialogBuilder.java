@@ -41,6 +41,8 @@ public class NiftyDialogBuilder extends Dialog implements DialogInterface {
 
 	private LinearLayout mLinearLayoutTopView;
 
+	private LinearLayout mLinearLayoutFeetView;
+
 	private FrameLayout mFrameLayoutCustomView;
 
 	private View mDialogView;
@@ -109,6 +111,8 @@ public class NiftyDialogBuilder extends Dialog implements DialogInterface {
 				.findViewById(R.id.main);
 		mLinearLayoutTopView = (LinearLayout) mDialogView
 				.findViewById(R.id.topPanel);
+		mLinearLayoutFeetView = (LinearLayout) mDialogView
+				.findViewById(R.id.dialog_foot);
 		mLinearLayoutMsgView = (LinearLayout) mDialogView
 				.findViewById(R.id.contentPanel);
 		mFrameLayoutCustomView = (FrameLayout) mDialogView
@@ -207,6 +211,11 @@ public class NiftyDialogBuilder extends Dialog implements DialogInterface {
 	public NiftyDialogBuilder withButtonDrawable(int resid) {
 		mButton1.setBackgroundResource(resid);
 		mButton2.setBackgroundResource(resid);
+		return this;
+	}
+
+	public NiftyDialogBuilder hideFoot() {
+		mLinearLayoutFeetView.setVisibility(View.GONE);
 		return this;
 	}
 

@@ -5,10 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,7 +22,6 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
-import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -108,8 +103,9 @@ public class MatchScoreActivity extends Activity {
 		p = DBManager.getInstance().queryPlan(planID);
 		List<String> names = new ArrayList<String>();
 
-		List<Score> sLists = new ArrayList<Score>();
+		List<Map<String, Object>> scoresJson = new ArrayList<Map<String, Object>>();
 		for (int i = 0; i < scores.length; i++) {
+			Map<String, Object> scoreMap = new HashMap<String, Object>();
 			Athlete a = athletes.get(i);
 			names.add(a.getName());
 			Score s = new Score();
@@ -118,15 +114,23 @@ public class MatchScoreActivity extends Activity {
 			s.setScore(scores[i]);
 			s.setAthlete(a);
 			s.setP(p);
-			sLists.add(s);
-		}
-		String js = JsonTools.creatJsonString(sLists);
-		for (Score s : sLists) {
 			s.save();
+			scoreMap.put("score", scores[i]);
+			scoreMap.put("date", date);
+			scoreMap.put("times", nowCurrent);
+			scoreMap.put("plan", p.getPid());
+			scoreMap.put("athlete", a.getAid());
+			scoresJson.add(scoreMap);
 		}
 		XUtils.showToast(this, toast, "保存成功！");
-		// 发送至服务器
-		createNewRequest(js);
+		
+		//如果处在联网状态，则发送至服务器
+		boolean isConnect = (Boolean) app.getMap().get("isConnect");
+		if (isConnect) {
+			// 发送至服务器
+			createNewRequest(JsonTools.creatJsonString(scoresJson));
+		}
+
 		int swimTime = ((Integer) app.getMap().get("swimTime")) - 1;
 		if (swimTime != 0) {
 			app.getMap().put("swimTime", swimTime);
@@ -221,19 +225,10 @@ public class MatchScoreActivity extends Activity {
 				map.put("scoresJson", jsonString);
 				return map;
 			}
-
-			@Override
-			public RetryPolicy getRetryPolicy() {
-				// TODO Auto-generated method stub
-				// 超时设置
-				RetryPolicy retryPolicy = new DefaultRetryPolicy(
-						XUtils.SOCKET_TIMEOUT,
-						DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-						DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-				return retryPolicy;
-			}
 		};
-
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(1500,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);
 	}
 

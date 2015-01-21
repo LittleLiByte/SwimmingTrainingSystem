@@ -51,11 +51,14 @@ public class XUtils {
 		editor.commit();
 	}
 
-	public static void SaveLoginInfo(Context context, String host) {
+	public static void SaveLoginInfo(Context context, String host, String ip,
+			String port) {
 		SharedPreferences sp = context.getSharedPreferences("loginInfo",
 				context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putString("hostInfo", host);
+		editor.putString("ip", ip);
+		editor.putString("port", port);
 		editor.commit();
 	}
 

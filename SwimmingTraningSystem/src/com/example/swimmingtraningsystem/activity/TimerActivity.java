@@ -101,6 +101,10 @@ public class TimerActivity extends Activity {
 
 	private String[] time;
 
+	private String strTime_count = "";
+	private long time_cur;
+	private long time_beg;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -149,28 +153,24 @@ public class TimerActivity extends Activity {
 				if (athletes < COUNT_MAX) {
 					// 开始计时
 					if (clickCount == 1) {
-						if (null == timer) {
-							if (null == task) {
-								okclear = false;
-								min_progress.setVisibility(View.VISIBLE);
-								second_progress.setVisibility(View.VISIBLE);
-								hour_progress.setVisibility(View.VISIBLE);
-								task = new TimerTask() {
-									@Override
-									public void run() {
-										if (null == msg) {
-											msg = new Message();
-										} else {
-											msg = Message.obtain();
-										}
-										msg.what = 1;
-										handler.sendMessage(msg);
-									}
-								};
+						okclear = false;
+						timer = new Timer(true);
+						min_progress.setVisibility(View.VISIBLE);
+						second_progress.setVisibility(View.VISIBLE);
+						hour_progress.setVisibility(View.VISIBLE);
+						task = new TimerTask() {
+							@Override
+							public void run() {
+								msg = handler.obtainMessage();
+								msg.what = 1;
+								time_cur = System.currentTimeMillis();
+								mlCount = time_cur - time_beg;
+								getStrTime();
+								msg.sendToTarget();
 							}
-							timer = new Timer(true);
-							timer.schedule(task, 1, 1);
-						}
+						};
+						time_beg = System.currentTimeMillis();
+						timer.schedule(task, 1, 10);
 					} else {
 						tvTip.setVisibility(View.GONE);
 						setlistview();
@@ -184,7 +184,8 @@ public class TimerActivity extends Activity {
 						match.setVisibility(View.VISIBLE);
 						XUtils.showToast(TimerActivity.this, toast, "成绩全部记录完成！");
 					} else {
-						XUtils.showToast(TimerActivity.this, toast, "成绩全部已经记录完成！");
+						XUtils.showToast(TimerActivity.this, toast,
+								"成绩全部已经记录完成！");
 					}
 				}
 			}
@@ -201,31 +202,14 @@ public class TimerActivity extends Activity {
 				super.handleMessage(msg);
 				switch (msg.what) {
 				case 1:
-					mlCount++;
-					// 毫秒数
-					int msec = (int) (mlCount % 1000);
-
-					// 总共多少秒
-					int totalSec = (int) (mlCount / 1000);
-					int min = (totalSec / 60);
-					if (min >= 60) {
-						// 如果超过60分钟，重置计时器
-						reset(resetBtn);
-					}
-
-					int sec = (totalSec % 60);
-
 					try {
+						tvTime.setText(strTime_count);
 						// 设置指针转动动画
 						setAnimation();
-						// 设置时间显示变更
-						tvTime.setText(String.format("%1$02d分%2$02d秒%3$03d",
-								min, sec, msec));
 						predegree = (float) (0.006 * mlCount);
 						secondpredegree = (float) (0.36 * mlCount);
 						hourpredegree = (float) (mlCount / 10000);
 					} catch (Exception e) {
-						tvTime.setText("" + min + "分" + sec + "秒" + msec);
 						e.printStackTrace();
 					}
 					break;
@@ -291,6 +275,22 @@ public class TimerActivity extends Activity {
 		second_progress.startAnimation(secondrotateAnimation);
 		hour_progress_hand.startAnimation(hourrotateAnimation);
 		hour_progress.startAnimation(hourrotateAnimation);
+	}
+
+	protected String getStrTime() {
+		// 秒数
+		long time_count_s = mlCount / 1000;
+		// 小时数
+		long hour = time_count_s / 3600;
+		// 分
+		long min = time_count_s / 60 - hour * 60;
+		// 秒
+		long sec = time_count_s - hour * 3600 - min * 60;
+		// 毫秒
+		long msec = mlCount % 1000;
+
+		return strTime_count = String.format("%1$02d分%2$02d秒%3$03d", min, sec,
+				msec);
 	}
 
 	/**

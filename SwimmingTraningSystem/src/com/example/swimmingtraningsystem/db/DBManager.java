@@ -248,7 +248,6 @@ public class DBManager {
 
 	public Long getLatestPlanId() {
 		long id = DataSupport.max(Plan.class, "id", Long.class);
-		System.out.println("idddddd------>" + id);
 		return id;
 	}
 

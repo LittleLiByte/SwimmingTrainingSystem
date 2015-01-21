@@ -9,7 +9,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -21,7 +20,6 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -33,7 +31,6 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
-import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -42,6 +39,8 @@ import com.example.swimmingtraningsystem.activity.MyApplication;
 import com.example.swimmingtraningsystem.adapter.AddPlanListAdapter;
 import com.example.swimmingtraningsystem.adapter.ChoseAthleteAdapter;
 import com.example.swimmingtraningsystem.db.DBManager;
+import com.example.swimmingtraningsystem.effect.Effectstype;
+import com.example.swimmingtraningsystem.effect.NiftyDialogBuilder;
 import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.Plan;
@@ -52,7 +51,6 @@ import com.example.swimmingtraningsystem.util.XUtils;
 public class AddPlanFragment extends Fragment implements OnClickListener {
 	private MyApplication app;
 	private Activity activity;
-	private AlertDialog alertDialog;
 	private ListView listView;
 	private List<Athlete> athletes;
 	private ChoseAthleteAdapter adapter;
@@ -135,16 +133,13 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 		}
 	}
 
-	private void createDialog() {
-		alertDialog = new AlertDialog.Builder(activity).create();
-		alertDialog.setView(View.inflate(activity,
-				R.layout.dialog_choose_athlete, null));
-		alertDialog.show();
-	}
-
 	public void select() {
-		createDialog();
-		Window window = alertDialog.getWindow();
+		final NiftyDialogBuilder selectDialog = NiftyDialogBuilder
+				.getInstance(activity);
+		Effectstype effect = Effectstype.Fall;
+		selectDialog.setCustomView(R.layout.dialog_choose_athlete, activity);
+
+		Window window = selectDialog.getWindow();
 		listView = (ListView) window.findViewById(R.id.choose_list);
 		adapter = new ChoseAthleteAdapter(activity, athletes, map);
 		listView.setAdapter(adapter);
@@ -172,28 +167,27 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 				map.put(athletes.get(arg2).getId(), holder.cb.isChecked());
 			}
 		});
+		selectDialog.withTitle("选择运动员").withMessage(null)
+				.withIcon(getResources().getDrawable(R.drawable.ic_launcher))
+				.isCancelableOnTouchOutside(true).withDuration(500)
+				.withEffect(effect).withButton1Text("返回").withButton2Text("确定")
+				.setButton1Click(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						selectDialog.dismiss();
+					}
+				}).setButton2Click(new View.OnClickListener() {
 
-		Button back = (Button) window.findViewById(R.id.choose_back);
-		Button add_ok = (Button) window.findViewById(R.id.choose);
-		back.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						planAdapter = new AddPlanListAdapter(activity,
+								planList, map);
+						planlv.setAdapter(planAdapter);
+						selectDialog.dismiss();
+					}
 
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				alertDialog.dismiss();
-			}
-		});
-
-		add_ok.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				planAdapter = new AddPlanListAdapter(activity, planList, map);
-				planlv.setAdapter(planAdapter);
-				alertDialog.dismiss();
-			}
-		});
+				}).show();
 
 		adapter.notifyDataSetChanged();
 	}
@@ -219,10 +213,21 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 			p.setTime(distance);
 			p.setUser(us);
 			p.setAthlete(planList);
-			// 在存入数据库之前就生存Json字符串，否则会报错！
-			jsonStr = JsonTools.creatJsonString(p);
+			
+			List<Integer> idList = new ArrayList<Integer>();
+			for (int i = 0; i < planList.size(); i++) {
+				idList.add(planList.get(i).getAid());
+			}
+			
 			if ((Boolean) app.getMap().get("isConnect")) {
 				// 如果可以连接服务器，则提交请求
+				Map<String, Object> jsonMap = new HashMap<String, Object>();
+				jsonMap.put("name", pl_name);
+				jsonMap.put("pool", poolScale);
+				jsonMap.put("time", distance);
+				jsonMap.put("user", us.getUid());
+				jsonMap.put("athlete", idList);
+				jsonStr = JsonTools.creatJsonString(jsonMap);
 				addPlanRequest();
 			} else {
 				// 否则将数据保存本地使用
@@ -287,18 +292,10 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 				return map;
 			}
 
-			@Override
-			public RetryPolicy getRetryPolicy() {
-				// TODO Auto-generated method stub
-				// 超时设置
-				RetryPolicy retryPolicy = new DefaultRetryPolicy(
-						XUtils.SOCKET_TIMEOUT,
-						DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-						DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-				return retryPolicy;
-			}
 		};
-
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(1500,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);
 	}
 }

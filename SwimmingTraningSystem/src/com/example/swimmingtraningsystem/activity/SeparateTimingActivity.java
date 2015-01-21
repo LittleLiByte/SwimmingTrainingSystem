@@ -1,6 +1,8 @@
 package com.example.swimmingtraningsystem.activity;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -8,10 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import kankan.wheel.widget.OnWheelChangedListener;
 import kankan.wheel.widget.OnWheelScrollListener;
@@ -41,12 +39,11 @@ import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.RequestQueue;
-import com.android.volley.RetryPolicy;
-import com.android.volley.VolleyError;
 import com.android.volley.Request.Method;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
@@ -410,9 +407,10 @@ public class SeparateTimingActivity extends Activity {
 		Plan p = dbManager.queryPlan(planID);
 		long userid = (Long) app.getMap().get("CurrentUser");
 
+		List<Map<String, Object>> scoresJson = new ArrayList<Map<String, Object>>();
 		List<Score> sl = new ArrayList<Score>();
-		
 		for (int i = 0; i < COUNT_MAX; i++) {
+			Map<String, Object> scoreMap = new HashMap<String, Object>();
 			Score s = new Score();
 			String athName = tv_tips.get(i).getText().toString().substring(5);
 			Athlete ath = dbManager.getAthleteByName(userid, athName);
@@ -422,13 +420,27 @@ public class SeparateTimingActivity extends Activity {
 			s.setAthlete(ath);
 			s.setP(p);
 			sl.add(s);
+			scoreMap.put("score", tv_times.get(i).getText().toString());
+			scoreMap.put("date", date);
+			scoreMap.put("times", nowCurrent);
+			scoreMap.put("plan", p.getPid());
+			scoreMap.put("athlete", ath.getAid());
+			scoresJson.add(scoreMap);
 		}
-		String js = JsonTools.creatJsonString(sl);
+
+		Collections.sort(sl, new ScoreComparable());
 		for (Score s : sl) {
 			s.save();
 		}
 		XUtils.showToast(context, toast, "保存成功！");
-		createNewRequest(js);
+		
+		//如果处在联网状态，则发送至服务器
+				boolean isConnect = (Boolean) app.getMap().get("isConnect");
+				if (isConnect) {
+					// 发送至服务器
+					createNewRequest(JsonTools.creatJsonString(scoresJson));
+				}
+		
 		int swimTime = ((Integer) app.getMap().get("swimTime")) - 1;
 		if (swimTime != 0) {
 			app.getMap().put("swimTime", swimTime);
@@ -468,7 +480,7 @@ public class SeparateTimingActivity extends Activity {
 					@Override
 					public void onErrorResponse(VolleyError error) {
 						// TODO Auto-generated method stub
-						Log.e("addScores", error.getMessage());
+						Log.i("addScores", "访问失败");
 					}
 				}) {
 
@@ -479,19 +491,10 @@ public class SeparateTimingActivity extends Activity {
 				map.put("scoresJson", jsonString);
 				return map;
 			}
-
-			@Override
-			public RetryPolicy getRetryPolicy() {
-				// TODO Auto-generated method stub
-				// 超时设置
-				RetryPolicy retryPolicy = new DefaultRetryPolicy(
-						XUtils.SOCKET_TIMEOUT,
-						DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-						DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-				return retryPolicy;
-			}
 		};
-
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(1500,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);
 	}
 
@@ -549,5 +552,20 @@ public class SeparateTimingActivity extends Activity {
 		super.onDestroy();
 		app.getMap().put("current", 0);
 		timerStop();
+	}
+
+	class ScoreComparable implements Comparator<Score> {
+
+		@Override
+		public int compare(Score lhs, Score rhs) {
+			// TODO Auto-generated method stub
+			Score score1 = lhs;
+			Score score2 = rhs;
+			int num = score1.getScore().compareTo(score2.getScore());
+			if (num == 0)
+				return (int) (score1.getId() - score2.getId());
+			return num;
+		}
+
 	}
 }

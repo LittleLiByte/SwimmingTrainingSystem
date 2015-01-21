@@ -27,7 +27,6 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
-import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -84,7 +83,7 @@ public class LoginActivity extends Activity {
 			User defaulrUser = new User();
 			defaulrUser.setId(1L);
 			defaulrUser.setUsername("defaultUser");
-			defaulrUser.setPassword("123456");
+			defaulrUser.setPassword("123456asdjkl");
 			defaulrUser.save();
 			showSettingDialog(LoginActivity.this);
 			XUtils.SaveLoginInfo(LoginActivity.this, false);
@@ -152,7 +151,7 @@ public class LoginActivity extends Activity {
 					loadingDialog.show();
 					// 尝试连接服务器，如果连接成功则直接登录
 					loginRequest(loginString, passwordString);
-				} else {// 如果连接服务器失败，则会使用离线功能登录，可以保存数据但无法上传,只是功能试用
+				} else {// 如果连接服务器失败，则会使用离线功能登录，可以保存数据但暂时无法上传,只是功能试用
 
 					// 通过用户名查询密码，不匹配则提示
 					String result = dbManager.getPassword(loginString);
@@ -161,9 +160,7 @@ public class LoginActivity extends Activity {
 						return;
 					}
 					// 可以使用默认帐号和已经注册的帐号
-					if (loginString.equals("defaultUser")
-							|| passwordString.equals(result)) {
-
+					if (passwordString.equals(result)) {
 						XUtils.showToast(this, toast, "登陆成功");
 						// 将当前用户id保存为全局变量
 						User user = dbManager.getUserByName(loginString);
@@ -209,7 +206,7 @@ public class LoginActivity extends Activity {
 								User user = JsonTools.getObject(userJson,
 										User.class);
 
-								if (dbManager.getUserByName(user.getUsername()) != null) {
+								if (dbManager.getUserByName(user.getUsername()) == null) {
 									// 如果数据库中不存在该用户，则直接将该用户保存至数据库
 									user.save();
 									app.getMap().put("CurrentUser",
@@ -247,7 +244,7 @@ public class LoginActivity extends Activity {
 					@Override
 					public void onErrorResponse(VolleyError error) {
 						// TODO Auto-generated method stub
-						Log.e(TAG, error.getMessage());
+						// Log.e(TAG, error.getMessage());
 						loadingDialog.dismiss();
 						app.getMap().put("isConnect", false);
 						showUserSelectDialog();
@@ -263,17 +260,10 @@ public class LoginActivity extends Activity {
 				return map;
 			}
 
-			@Override
-			public RetryPolicy getRetryPolicy() {
-				// TODO Auto-generated method stub
-				// 超时设置
-				RetryPolicy retryPolicy = new DefaultRetryPolicy(3000,
-						DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-						DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-				return retryPolicy;
-			}
 		};
-
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(1500,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);
 	}
 
@@ -292,6 +282,7 @@ public class LoginActivity extends Activity {
 	 * @param context
 	 */
 	protected void showSettingDialog(Context context) {
+
 		final NiftyDialogBuilder settingDialog = NiftyDialogBuilder
 				.getInstance(this);
 		effect = Effectstype.Slit;
@@ -299,41 +290,43 @@ public class LoginActivity extends Activity {
 				.withIcon(getResources().getDrawable(R.drawable.ic_launcher))
 				.isCancelableOnTouchOutside(true).withDuration(700)
 				.withEffect(effect).withButton1Text("取消").withButton2Text("完成")
-				.setCustomView(R.layout.dialog_setting_host, context)
-				.setButton1Click(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						settingDialog.dismiss();
-					}
-				}).setButton2Click(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						Window window = settingDialog.getWindow();
-						final TextView ip = (TextView) window
-								.findViewById(R.id.tv_ip);
-						final TextView port = (TextView) window
-								.findViewById(R.id.tv_port);
-						String hostIp = ip.getText().toString().trim();
-						String hostPort = port.getText().toString().trim();
-						if (TextUtils.isEmpty(hostIp)
-								|| TextUtils.isEmpty(hostPort)) {
-							XUtils.showToast(LoginActivity.this, toast,
-									"ip与端口地址均不可为空！");
-						} else {
-							String hostUrl = "http://" + hostIp + ":"
-									+ hostPort
-									// +
-									// "/JsonProject1/servlet/JsonAction?action_flag=";
-									+ "/SWIMYES/httpPost.action?action_flag=";
-							// 保存服务器ip和端口地址到sp
-							XUtils.HOSTURL = hostUrl;
-							XUtils.SaveLoginInfo(LoginActivity.this, hostUrl);
+				.setCustomView(R.layout.dialog_setting_host, context);
+		SharedPreferences hostSp = getSharedPreferences("loginInfo",
+				Context.MODE_PRIVATE);
+		String ip = hostSp.getString("ip", "192.168.1.161");
+		String port = hostSp.getString("port", "8080");
+		Window window = settingDialog.getWindow();
+		final TextView tv_ip = (TextView) window.findViewById(R.id.tv_ip);
+		final TextView tv_port = (TextView) window.findViewById(R.id.tv_port);
+		tv_ip.setText(ip);
+		tv_port.setText(port);
 
-							XUtils.showToast(LoginActivity.this, toast, "设置成功!");
-							settingDialog.dismiss();
-						}
-					}
-				}).show();
+		settingDialog.setButton1Click(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				settingDialog.dismiss();
+			}
+		}).setButton2Click(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				String hostIp = tv_ip.getText().toString().trim();
+				String hostPort = tv_port.getText().toString().trim();
+				if (TextUtils.isEmpty(hostIp) || TextUtils.isEmpty(hostPort)) {
+					XUtils.showToast(LoginActivity.this, toast, "ip与端口地址均不可为空！");
+				} else {
+
+					String hostUrl = "http://" + hostIp + ":" + hostPort
+							+ "/SWIMYES/httpPost.action?action_flag=";
+					// 保存服务器ip和端口地址到sp
+					XUtils.HOSTURL = hostUrl;
+					XUtils.SaveLoginInfo(LoginActivity.this, hostUrl, hostIp,
+							hostPort);
+					XUtils.showToast(LoginActivity.this, toast, "设置成功!");
+					settingDialog.dismiss();
+				}
+			}
+		}).show();
 
 	}
 
@@ -361,7 +354,7 @@ public class LoginActivity extends Activity {
 					public void onClick(View v) {
 						etLogin.setText("defaultUser");
 						etLogin.setEnabled(false);
-						etPassword.setText("123456");
+						etPassword.setText("123456asdjkl");
 						etPassword.setEnabled(false);
 						userDialog.dismiss();
 					}

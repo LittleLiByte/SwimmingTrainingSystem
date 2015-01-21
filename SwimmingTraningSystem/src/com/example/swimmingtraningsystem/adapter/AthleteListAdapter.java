@@ -29,11 +29,11 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
-import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
+import com.example.swimmingtraningsystem.activity.MyApplication;
 import com.example.swimmingtraningsystem.db.DBManager;
 import com.example.swimmingtraningsystem.effect.Effectstype;
 import com.example.swimmingtraningsystem.effect.NiftyDialogBuilder;
@@ -54,12 +54,14 @@ public class AthleteListAdapter extends BaseAdapter {
 	private DBManager dbManager;
 	private long userID;
 	protected Toast toast;
+	protected MyApplication app;
 
-	public AthleteListAdapter(Context context, List<Athlete> athletes,
+	public AthleteListAdapter(Context context, MyApplication app,List<Athlete> athletes,
 			long userID) {
 		this.context = context;
 		this.athletes = athletes;
 		this.userID = userID;
+		this.app=app;
 		dbManager = DBManager.getInstance();
 		mQueue = Volley.newRequestQueue(context);
 	}
@@ -158,8 +160,13 @@ public class AthleteListAdapter extends BaseAdapter {
 									ath_name, ath_age, ath_phone, ath_extras);
 							setDatas(dbManager.getAthletes(userID));
 							notifyDataSetChanged();
-							// 同步服务器
-							modifyAthRequest(athletes, position);
+							
+							// 如果处在联网状态，则发送至服务器
+							boolean isConnect = (Boolean) app.getMap().get("isConnect");
+							if (isConnect) {
+								// 同步服务器
+								modifyAthRequest(athletes, position);
+							}
 						}
 						viewDialog.dismiss();
 					}
@@ -217,7 +224,12 @@ public class AthleteListAdapter extends BaseAdapter {
 								int result = dbManager.deleteAthlete(athletes,
 										position);
 								if (result != 0) {
-									deleteAthRequest(athletes.get(position));
+									// 如果处在联网状态，则发送至服务器
+									boolean isConnect = (Boolean) app.getMap().get("isConnect");
+									if (isConnect) {
+										// 同步服务器
+										deleteAthRequest(athletes.get(position));
+									}
 									setDatas(dbManager.getAthletes(userID));
 									notifyDataSetChanged();
 									XUtils.showToast(context, toast, "删除成功");
@@ -294,19 +306,10 @@ public class AthleteListAdapter extends BaseAdapter {
 				map.put("modifyAthleteJson", athleteJson);
 				return map;
 			}
-
-			@Override
-			public RetryPolicy getRetryPolicy() {
-				// TODO Auto-generated method stub
-				// 超时设置
-				RetryPolicy retryPolicy = new DefaultRetryPolicy(
-						XUtils.SOCKET_TIMEOUT,
-						DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-						DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-				return retryPolicy;
-			}
 		};
-
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(1500,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);
 	}
 
@@ -352,7 +355,9 @@ public class AthleteListAdapter extends BaseAdapter {
 				return map;
 			}
 		};
-
+		stringRequest2.setRetryPolicy(new DefaultRetryPolicy(1500,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest2);
 	}
 }

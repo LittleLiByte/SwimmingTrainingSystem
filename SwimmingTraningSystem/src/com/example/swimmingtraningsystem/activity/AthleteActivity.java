@@ -24,7 +24,6 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
-import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -69,7 +68,7 @@ public class AthleteActivity extends Activity {
 		us = dbManager.getUser(userId);
 		listView = (ListView) findViewById(R.id.lv);
 		list = dbManager.getAthletes(userId);
-		adapter = new AthleteListAdapter(this, list, userId);
+		adapter = new AthleteListAdapter(this, app, list, userId);
 		listView.setAdapter(adapter);
 		mQueue = Volley.newRequestQueue(this);
 		// getAthleteRequest();
@@ -163,10 +162,11 @@ public class AthleteActivity extends Activity {
 		boolean isConnect = (Boolean) app.getMap().get("isConnect");
 
 		if (isConnect) {
-			String json = JsonTools.creatJsonString(a);
-			addAthleteequest(json);
+
+			addAthleteequest(a);
 		} else {
 			a.save();
+			XUtils.showToast(AthleteActivity.this, toast, "添加成功");
 			list = dbManager.getAthletes(userId);
 			adapter.setDatas(list);
 			adapter.notifyDataSetChanged();
@@ -179,7 +179,8 @@ public class AthleteActivity extends Activity {
 	 * 
 	 * @param obj
 	 */
-	public void addAthleteequest(final String athleteJson) {
+	public void addAthleteequest(final Athlete a) {
+		final String athleteJson = JsonTools.creatJsonString(a);
 		StringRequest request = new StringRequest(Method.POST, XUtils.HOSTURL
 				+ "addAthlete", new Listener<String>() {
 
@@ -192,9 +193,8 @@ public class AthleteActivity extends Activity {
 					int resCode = (Integer) obj.get("resCode");
 					if (resCode == 1) {
 						XUtils.showToast(AthleteActivity.this, toast, "添加成功");
-						String userJson = obj.get("athlete").toString();
-						Athlete a = JsonTools
-								.getObject(userJson, Athlete.class);
+						int aid = (Integer) obj.get("athlete");
+						a.setAid(aid);
 						a.save();
 						list = dbManager.getAthletes(userId);
 						adapter.setDatas(list);
@@ -223,19 +223,10 @@ public class AthleteActivity extends Activity {
 				map.put("athleteJson", athleteJson);
 				return map;
 			}
-
-			@Override
-			public RetryPolicy getRetryPolicy() {
-				// TODO Auto-generated method stub
-				// 超时设置
-				RetryPolicy retryPolicy = new DefaultRetryPolicy(
-						XUtils.SOCKET_TIMEOUT,
-						DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-						DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-				return retryPolicy;
-			}
 		};
-
+		request.setRetryPolicy(new DefaultRetryPolicy(1500,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(request);
 	}
 
@@ -277,19 +268,10 @@ public class AthleteActivity extends Activity {
 				// TODO Auto-generated method stub
 				Log.e(TAG, error.getMessage());
 			}
-		}) {
-			@Override
-			public RetryPolicy getRetryPolicy() {
-				// TODO Auto-generated method stub
-				// 超时设置
-				RetryPolicy retryPolicy = new DefaultRetryPolicy(
-						XUtils.SOCKET_TIMEOUT,
-						DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-						DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-				return retryPolicy;
-			}
-		};
-
+		});
+		getrequest.setRetryPolicy(new DefaultRetryPolicy(1500,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(getrequest);
 	}
 

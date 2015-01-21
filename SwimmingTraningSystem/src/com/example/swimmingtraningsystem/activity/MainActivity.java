@@ -123,5 +123,6 @@ public class MainActivity extends Activity {
 		app.getMap().put("athIDList", null);
 		app.getMap().put("planID", 0);
 		app.getMap().put("testDate", "");
+		app.getMap().put("isConnect", true);
 	}
 }

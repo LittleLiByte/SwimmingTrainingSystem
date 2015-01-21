@@ -2,23 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#e2e2e2"
     android:orientation="vertical" >
-
-    <RelativeLayout
-        android:id="@+id/view_plan_dialog_title"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="#FF6633" >
-
-        <TextView
-            android:id="@+id/dispatch_athlete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="查看计划"
-            android:textColor="#fff"
-            android:textSize="20sp" />
-    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/clcokset_rl"
@@ -86,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
             android:layout_below="@id/view_plan_ll1"
-            android:background="#e2e2e2" />
+            android:background="#F0F0F0" />
 
         <ListView
             android:id="@+id/planlist_view"
@@ -98,25 +83,5 @@
             android:fastScrollEnabled="false" >
         </ListView>
     </RelativeLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#E0E0E0"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="5dp" >
-
-        <Button
-            android:id="@+id/view_plan_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/dialog_btn_selector"
-            android:paddingBottom="10dp"
-            android:paddingLeft="50dp"
-            android:paddingRight="50dp"
-            android:paddingTop="10dp"
-            android:text="返回" />
-    </LinearLayout>
 
 </LinearLayout>

@@ -17,15 +17,4 @@
         android:textColor="@color/black_black"
         android:textSize="20sp" />
 
-    <Button
-        android:id="@+id/plan_cancle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:background="@drawable/delete_selector"
-        android:text="删 除"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:visibility="gone" />
-
 </RelativeLayout>

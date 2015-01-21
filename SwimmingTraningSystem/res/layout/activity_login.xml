@@ -55,7 +55,8 @@
         android:text="立即登录"
         android:textColor="#fff"
         android:textSize="17sp" />
-    <TextView
+
+    <TextView
         android:id="@+id/forget_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

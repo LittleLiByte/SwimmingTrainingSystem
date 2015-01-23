@@ -285,9 +285,8 @@ int id plan_tv 0x7f0a006e
 int id planlist_view 0x7f0a0095
 int id pool_length 0x7f0a0098
 int id poolway 0x7f0a003e
-int id query_category 0x7f0a0039
-int id query_key 0x7f0a0038
-int id query_score 0x7f0a003a
+int id query_category 0x7f0a0038
+int id query_score 0x7f0a0039
 int id query_score_list 0x7f0a003b
 int id ranking 0x7f0a00aa
 int id regist_back 0x7f0a002b
@@ -309,6 +308,7 @@ int id setting_host 0x7f0a0017
 int id setting_illustration 0x7f0a0041
 int id sexangleView 0x7f0a0019
 int id show_back 0x7f0a0045
+int id show_details 0x7f0a003a
 int id show_headbar 0x7f0a0044
 int id show_list 0x7f0a004d
 int id show_name 0x7f0a00b8
@@ -398,6 +398,7 @@ int string action_settings 0x7f070001
 int string app_name 0x7f070000
 int string off 0x7f070003
 int string on 0x7f070002
+int string prompt 0x7f070004
 int style AppBaseTheme 0x7f080000
 int style AppTheme 0x7f080001
 int style AppThemeLight 0x7f08000c

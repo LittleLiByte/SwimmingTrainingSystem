@@ -24,7 +24,6 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="20dp"
-        android:text="计划1"
         android:textColor="@color/white"
         android:textSize="15sp" />
 

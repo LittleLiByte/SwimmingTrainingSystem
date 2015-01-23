@@ -23,24 +23,12 @@
             android:onClick="back"
             android:src="@drawable/btn_back" />
 
-        <EditText
-            android:id="@+id/query_key"
-            android:layout_width="0dp"
-            android:layout_height="35dp"
-            android:layout_marginLeft="10dp"
-            android:layout_weight="1.0"
-            android:background="@drawable/bg_edit"
-            android:ems="10"
-            android:hint="请输入关键字"
-            android:paddingLeft="5dp"
-            android:singleLine="true"
-            android:textSize="18sp" >
-        </EditText>
-
         <Spinner
             android:id="@+id/query_category"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content" />
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1.0" />
 
         <ImageButton
             android:id="@+id/query_score"
@@ -50,6 +38,19 @@
             android:background="@drawable/search"
             android:onClick="query" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/show_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/aliceblue"
+        android:paddingBottom="5dp"
+        android:paddingLeft="15dp"
+        android:paddingTop="5dp"
+        android:text="时间---计划详细"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:visibility="gone" />
 
     <ExpandableListView
         android:id="@+id/query_score_list"

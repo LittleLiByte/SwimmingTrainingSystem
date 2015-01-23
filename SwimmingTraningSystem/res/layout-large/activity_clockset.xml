@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/clockset_headbar"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:background="#3D8BFF"
+        android:gravity="center_vertical" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="选择训练计划"
+            android:textColor="#fff"
+            android:textSize="30sp" />
+
+        <ImageButton
+            android:id="@+id/plan_back"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@color/transparent"
+            android:onClick="clcokset_back"
+            android:src="@drawable/btn_back" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/bt_choose_plan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/startback"
+        android:onClick="choose"
+        android:paddingLeft="80dp"
+        android:paddingRight="80dp"
+        android:text="选择计划"
+        android:textSize="25sp" />
+
+    <RelativeLayout
+        android:id="@+id/clcokset_rl"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="visible" >
+
+        <LinearLayout
+            android:id="@+id/choose_plan_ll1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="10dp" >
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="泳池大小"
+                    android:textColor="@color/aliceblue"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/choose_plan_pool_length"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:text="1000米"
+                    android:textColor="@color/dark_orange"
+                    android:textSize="27sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="游泳趟数"
+                    android:textColor="@color/aliceblue"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/choose_plan_times"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:text="20趟"
+                    android:textColor="@color/dark_orange"
+                    android:textSize="27sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/list_choosed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/choose_plan_ll1"
+            android:cacheColorHint="#fff" >
+        </ListView>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#33000000"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp" >
+
+        <Button
+            android:id="@+id/start1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_reset"
+            android:onClick="start"
+            android:padding="10dp"
+            android:text="分泳道计时"
+            android:textColor="@color/aliceblue"
+            android:textSize="25sp" />
+
+        <Button
+            android:id="@+id/start2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_reset"
+            android:onClick="start"
+            android:padding="10dp"
+            android:text="手动匹配计时"
+            android:textColor="@color/aliceblue"
+            android:textSize="25sp" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -2,6 +2,7 @@ package com.example.swimmingtraningsystem.db;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.litepal.crud.DataSupport;
@@ -14,7 +15,6 @@ import com.example.swimmingtraningsystem.model.Score;
 import com.example.swimmingtraningsystem.model.Temp;
 import com.example.swimmingtraningsystem.model.Upid;
 import com.example.swimmingtraningsystem.model.User;
-import com.example.swimmingtraningsystem.util.MyComparable;
 import com.example.swimmingtraningsystem.util.XUtils;
 
 /**
@@ -88,12 +88,6 @@ public class DBManager {
 	 */
 	public void addAthlete(Athlete a) {
 		a.save();
-	}
-
-	public Athlete getLatestAthlete() {
-		Athlete a = DataSupport.findLast(Athlete.class, true);
-		return a;
-
 	}
 
 	/**
@@ -342,9 +336,8 @@ public class DBManager {
 	public List<Score> getScoreByDateAndTimes(String date, int times) {
 		String str = String.valueOf(times);
 		List<Score> scores = DataSupport.where("date=? and times=?", date, str)
-				.find(Score.class);
+				.find(Score.class, true);
 		return scores;
-
 	}
 
 	public List<List<Score>> getScoreByDate(List<String> date, long athId) {
@@ -357,14 +350,19 @@ public class DBManager {
 		return s;
 	}
 
-	public List<String> getPlanInScoreByDate(List<String> date) {
-		List<String> planNames = new ArrayList<String>();
-		for (String str : date) {
-			List<Score> list = DataSupport.where("date=?", str).find(
-					Score.class, true);
-			planNames.add(list.get(0).getP().getName());
+	/**
+	 * 通过日期获取关联成绩的计划，然后获取其趟数
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public Plan getPlanInScoreByDate(String date) {
+		List<Score> scores = DataSupport.where("date=?", date).find(
+				Score.class, true);
+		if (scores.size() != 0) {
+			return scores.get(0).getP();
 		}
-		return planNames;
+		return null;
 	}
 
 	public List<Long> getPlanInScoreByDate(List<String> date, long athId) {
@@ -418,6 +416,51 @@ public class DBManager {
 		}
 		Collections.sort(temps, new MyComparable());
 		return temps;
+	}
+
+	public List<String> getScoresByAthleteId(List<Long> athIDs) {
+		List<String> dates = new ArrayList<String>();
+		List<Score> scores = new ArrayList<Score>();
+		for (long athId : athIDs) {
+			scores.addAll(DataSupport.where("athlete_id=?",
+					String.valueOf(athId)).find(Score.class, true));
+		}
+		for (Score s : scores) {
+			if (!dates.contains(s.getDate()))
+				dates.add(s.getDate());
+		}
+		Collections.sort(dates, new DateComparable());
+		dates.add(0, "-- 请选择查询时间 --");
+		return dates;
+
+	}
+
+	class MyComparable implements Comparator<Temp> {
+
+		@Override
+		public int compare(Temp lhs, Temp rhs) {
+			// TODO Auto-generated method stub
+			Temp temp1 = lhs;
+			Temp temp2 = rhs;
+			int num = temp1.getScore().compareTo(temp2.getScore());
+			if (num == 0)
+				return temp1.getAthleteName().compareTo(temp2.getAthleteName());
+			return num;
+		}
+
+	}
+
+	class DateComparable implements Comparator<String> {
+
+		@Override
+		public int compare(String lhs, String rhs) {
+			// TODO Auto-generated method stub
+			String s1 = lhs;
+			String s2 = rhs;
+			int num = s2.compareTo(s1);
+			return num;
+		}
+
 	}
 
 }

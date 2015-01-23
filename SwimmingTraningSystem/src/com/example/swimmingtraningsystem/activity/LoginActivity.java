@@ -176,7 +176,7 @@ public class LoginActivity extends Activity {
 								finish();
 							}
 						};
-						handler.postDelayed(updateThread, 100);
+						handler.postDelayed(updateThread, 200);
 					} else {
 						XUtils.showToast(this, toast, "ÃÜÂë´íÎó£¡");
 					}

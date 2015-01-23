@@ -111,13 +111,12 @@ public class SexangleImageViews extends ImageView {
 		float b = (float) (mLenght * Math.cos(radian30));
 		float c = (mHeight - 2 * b) / 2;
 
-		if (null == paint) {
-			paint = new Paint();
-			paint.setAntiAlias(true);
-			paint.setStyle(Style.FILL);
-			paint.setColor(color);
-			paint.setAlpha(100);
-		}
+		paint = new Paint();
+		paint.setAntiAlias(true);
+		paint.setStyle(Style.FILL);
+		paint.setColor(color);
+		paint.setAlpha(100);
+
 		// »­Áù±ßÐÎ
 		Path path = new Path();
 		path.moveTo(getWidth(), getHeight() / 2);
@@ -129,7 +128,6 @@ public class SexangleImageViews extends ImageView {
 		path.close();
 		canvas.drawPath(path, paint);
 
-		Paint paint = new Paint();
 		paint.setColor(Color.WHITE);
 		paint.setTextSize(textsize);
 		// È¥¾â³Ý

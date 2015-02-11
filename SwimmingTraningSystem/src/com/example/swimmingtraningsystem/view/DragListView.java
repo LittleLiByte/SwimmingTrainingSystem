@@ -15,6 +15,12 @@ import android.widget.TextView;
 import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.adapter.DragListAdapter;
 
+/**
+ * 可拖拽listview
+ * 
+ * @author LittleByte
+ * 
+ */
 public class DragListView extends ListView {
 
 	private TextView dragTextView;// 被拖拽的项，其实就是一个ImageView

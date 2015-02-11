@@ -41,7 +41,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.example.swimmingtraningsystem.activity.ClockSettingActivity"
+            android:name="com.example.swimmingtraningsystem.activity.TimerSettingActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
@@ -59,7 +59,7 @@
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:name="com.example.swimmingtraningsystem.activity.ScoreActivity"
+            android:name="com.example.swimmingtraningsystem.activity.QueryScoreActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity

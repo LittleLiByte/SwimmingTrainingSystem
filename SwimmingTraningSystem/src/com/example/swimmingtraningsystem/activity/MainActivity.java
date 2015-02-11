@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.model.ViewBean;
+import com.example.swimmingtraningsystem.util.Constants;
 import com.example.swimmingtraningsystem.view.SexangleImageViews;
 import com.example.swimmingtraningsystem.view.SexangleImageViews.OnSexangleImageClickListener;
 import com.example.swimmingtraningsystem.view.SexangleViewGroup;
@@ -18,6 +19,8 @@ public class MainActivity extends Activity {
 	private SexangleViewGroup sexangleViewGroup;
 	private ViewBean viewBean;
 	private SexangleImageViews imageViews;
+	// 退出程序
+	private long mExitTime;
 	private static final int ID = 0x10000;
 
 	OnSexangleImageClickListener listener = new OnSexangleImageClickListener() {
@@ -33,10 +36,10 @@ public class MainActivity extends Activity {
 				i.setClass(MainActivity.this, PlanActivity.class);
 				break;
 			case ID + 2:
-				i.setClass(MainActivity.this, ClockSettingActivity.class);
+				i.setClass(MainActivity.this, TimerSettingActivity.class);
 				break;
 			case ID + 3:
-				i.setClass(MainActivity.this, ScoreActivity.class);
+				i.setClass(MainActivity.this, QueryScoreActivity.class);
 				break;
 			default:
 				i.setClass(MainActivity.this, SettingActivity.class);
@@ -73,6 +76,12 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	/**
+	 * 设置六边形对应名字
+	 * 
+	 * @param i
+	 * @return
+	 */
 	public String setName(int i) {
 		if (i == 0) {
 			return "运动员";
@@ -87,9 +96,6 @@ public class MainActivity extends Activity {
 		}
 		return "";
 	}
-
-	// 退出程序
-	private long mExitTime;
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -117,12 +123,14 @@ public class MainActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onDestroy();
 		MyApplication app = (MyApplication) getApplication();
-		app.getMap().put("swimTime", 1);
-		app.getMap().put("current", 0);
-		app.getMap().put("athleteCount", 0);
-		app.getMap().put("athIDList", null);
-		app.getMap().put("planID", 0);
-		app.getMap().put("testDate", "");
-		app.getMap().put("isConnect", true);
+		app.getMap().put(Constants.SWIM_TIME, 1);
+		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
+		app.getMap().put(Constants.ATHLETE_NUMBER, 0);
+		app.getMap().put(Constants.ATHLTE_ID_LIST, null);
+		app.getMap().put(Constants.PLAN_ID, 0);
+		app.getMap().put(Constants.TEST_DATE, "");
+		app.getMap().put(Constants.DRAG_NAME_LIST, null);
+		app.getMap().put(Constants.CURRENT_USER_ID, "");
+		app.getMap().put(Constants.IS_CONNECT_SERVICE, true);
 	}
 }

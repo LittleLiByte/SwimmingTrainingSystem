@@ -11,6 +11,12 @@ import android.widget.TextView;
 import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.model.Athlete;
 
+/**
+ * 运动员名字拖拽列表数据适配器
+ * 
+ * @author LittleByte
+ * 
+ */
 public class DragListAdapter extends BaseAdapter {
 
 	private Context context;

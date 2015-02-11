@@ -15,6 +15,12 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+/**
+ * 选择计划数据适配器
+ * 
+ * @author LittleByte
+ * 
+ */
 public class ChosePlanAdapter extends BaseAdapter {
 	private Context context;
 	private List<Plan> list;

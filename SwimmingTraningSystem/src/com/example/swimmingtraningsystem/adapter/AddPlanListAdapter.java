@@ -5,10 +5,7 @@ import java.util.Map;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -17,6 +14,12 @@ import android.widget.TextView;
 import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.model.Athlete;
 
+/**
+ * 添加计划数据适配器
+ * 
+ * @author LittleByte
+ * 
+ */
 public class AddPlanListAdapter extends BaseAdapter {
 	private Context context;
 	private List<Athlete> list;

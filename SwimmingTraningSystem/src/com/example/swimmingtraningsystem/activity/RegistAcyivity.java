@@ -28,10 +28,13 @@ import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.User;
+import com.example.swimmingtraningsystem.util.Constants;
 import com.example.swimmingtraningsystem.util.XUtils;
 import com.example.swimmingtraningsystem.view.LoadingDialog;
 
 /**
+ * 注册Activity
+ * 
  * @author LittleByte
  * 
  */
@@ -89,7 +92,7 @@ public class RegistAcyivity extends Activity {
 				XUtils.showToast(this, toast, "两次输入密码不一致");
 			} else {
 				// 如果处在联网状态，则发送至服务器
-				boolean isConnect = (Boolean) app.getMap().get("isConnect");
+				boolean isConnect = (Boolean) app.getMap().get(Constants.IS_CONNECT_SERVICE);
 				if (isConnect) {
 					User newUser = new User();
 					newUser.setUsername(user);
@@ -99,7 +102,7 @@ public class RegistAcyivity extends Activity {
 					String jsonInfo = JsonTools.creatJsonString(newUser);
 					// 发送至服务器
 					registRequest(jsonInfo);
-				}else{
+				} else {
 					XUtils.showToast(this, toast, "无法连接服务器，注册失败！");
 				}
 			}
@@ -108,7 +111,7 @@ public class RegistAcyivity extends Activity {
 	}
 
 	/**
-	 * 登录请求
+	 * 注册请求
 	 * 
 	 * @param jsonString
 	 */
@@ -172,7 +175,8 @@ public class RegistAcyivity extends Activity {
 			}
 
 		};
-		stringRequest.setRetryPolicy(new DefaultRetryPolicy(1500,
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);

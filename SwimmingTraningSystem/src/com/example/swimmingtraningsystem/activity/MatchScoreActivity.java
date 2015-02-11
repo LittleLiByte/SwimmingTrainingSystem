@@ -33,6 +33,7 @@ import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.Plan;
 import com.example.swimmingtraningsystem.model.Score;
+import com.example.swimmingtraningsystem.util.Constants;
 import com.example.swimmingtraningsystem.util.XUtils;
 import com.example.swimmingtraningsystem.view.DragListView;
 
@@ -70,10 +71,12 @@ public class MatchScoreActivity extends Activity {
 		app = (MyApplication) getApplication();
 		Intent result = getIntent();
 		scores = result.getStringArrayExtra("SCORES");
-		planID = (Long) app.getMap().get("planID");
-		athID = (List<Long>) app.getMap().get("athIDList");
-		dragDatas = (List<String>) app.getMap().get("dragList");
-		int current = (Integer) app.getMap().get("current");
+		planID = (Long) app.getMap().get(Constants.PLAN_ID);
+		athID = (List<Long>) app.getMap().get(Constants.ATHLTE_ID_LIST);
+		dragDatas = (List<String>) app.getMap()
+				.get(Constants.DRAG_NAME_LIST);
+		int current = (Integer) app.getMap()
+				.get(Constants.CURRENT_SWIM_TIME);
 		athletes = DBManager.getInstance().getAthletes(athID);
 		mQueue = Volley.newRequestQueue(getApplicationContext());
 		listView = (ListView) findViewById(R.id.matchscore_list);
@@ -96,10 +99,16 @@ public class MatchScoreActivity extends Activity {
 		dragListView.setAdapter(dragAdapter);
 	}
 
+	/**
+	 * 点击成绩保存事件
+	 * 
+	 * @param v
+	 */
 	public void matchDone(View v) {
-		String date = (String) app.getMap().get("testDate");
+		String date = (String) app.getMap().get(Constants.TEST_DATE);
 		List<Athlete> athletes = dragAdapter.getList();
-		int nowCurrent = (Integer) app.getMap().get("current");
+		int nowCurrent = (Integer) app.getMap().get(
+				Constants.CURRENT_SWIM_TIME);
 		p = DBManager.getInstance().queryPlan(planID);
 		List<String> names = new ArrayList<String>();
 
@@ -123,41 +132,42 @@ public class MatchScoreActivity extends Activity {
 			scoresJson.add(scoreMap);
 		}
 		XUtils.showToast(this, toast, "保存成功！");
-		
-		//如果处在联网状态，则发送至服务器
-		boolean isConnect = (Boolean) app.getMap().get("isConnect");
+
+		// 如果处在联网状态，则发送至服务器
+		boolean isConnect = (Boolean) app.getMap().get(
+				Constants.IS_CONNECT_SERVICE);
 		if (isConnect) {
 			// 发送至服务器
 			createNewRequest(JsonTools.creatJsonString(scoresJson));
 		}
 
-		int swimTime = ((Integer) app.getMap().get("swimTime")) - 1;
+		int swimTime = ((Integer) app.getMap().get(Constants.SWIM_TIME)) - 1;
 		if (swimTime != 0) {
-			app.getMap().put("swimTime", swimTime);
-			app.getMap().put("dragList", names);
+			app.getMap().put(Constants.SWIM_TIME, swimTime);
+			app.getMap().put(Constants.DRAG_NAME_LIST, names);
 			Intent i = new Intent(this, TimerActivity.class);
 			startActivity(i);
 		} else {
 			Intent i = new Intent(this, ShowScoreActivity.class);
-			i.putExtra("testDate", (String) app.getMap().get("testDate"));
+			i.putExtra(Constants.TEST_DATE,
+					(String) app.getMap().get(Constants.TEST_DATE));
 			i.putExtra("Plan", p.getName() + "--" + p.getPool());
 			startActivity(i);
-			app.getMap().put("dragList", null);
-			app.getMap().put("swimTime", 1);
-			app.getMap().put("athleteCount", 0);
-			app.getMap().put("testDate", "");
+			app.getMap().put(Constants.DRAG_NAME_LIST, null);
+			app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
+			app.getMap().put(Constants.ATHLETE_NUMBER, 0);
+			app.getMap().put(Constants.TEST_DATE, "");
 		}
 		finish();
 	}
 
+	/**
+	 * 退出当前窗体事件
+	 * 
+	 * @param v
+	 */
 	public void matchBack(View v) {
 		finish();
-	}
-
-	@Override
-	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		super.onDestroy();
 	}
 
 	private class MyScrollListener implements OnScrollListener {
@@ -195,6 +205,12 @@ public class MatchScoreActivity extends Activity {
 
 	}
 
+	/**
+	 * 创建保存本轮计时成绩的请求
+	 * 
+	 * @param jsonString
+	 *            本轮所有成绩的json字符串
+	 */
 	public void createNewRequest(final String jsonString) {
 
 		StringRequest stringRequest = new StringRequest(Method.POST,
@@ -226,7 +242,8 @@ public class MatchScoreActivity extends Activity {
 				return map;
 			}
 		};
-		stringRequest.setRetryPolicy(new DefaultRetryPolicy(1500,
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);

@@ -39,8 +39,15 @@ import com.example.swimmingtraningsystem.effect.Effectstype;
 import com.example.swimmingtraningsystem.effect.NiftyDialogBuilder;
 import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.Athlete;
+import com.example.swimmingtraningsystem.util.Constants;
 import com.example.swimmingtraningsystem.util.XUtils;
 
+/**
+ * 运动员列表数据适配器
+ * 
+ * @author LittleByte
+ * 
+ */
 public class AthleteListAdapter extends BaseAdapter {
 
 	private Context context;
@@ -56,12 +63,12 @@ public class AthleteListAdapter extends BaseAdapter {
 	protected Toast toast;
 	protected MyApplication app;
 
-	public AthleteListAdapter(Context context, MyApplication app,List<Athlete> athletes,
-			long userID) {
+	public AthleteListAdapter(Context context, MyApplication app,
+			List<Athlete> athletes, long userID) {
 		this.context = context;
 		this.athletes = athletes;
 		this.userID = userID;
-		this.app=app;
+		this.app = app;
 		dbManager = DBManager.getInstance();
 		mQueue = Volley.newRequestQueue(context);
 	}
@@ -125,53 +132,23 @@ public class AthleteListAdapter extends BaseAdapter {
 				.withIcon(
 						context.getResources().getDrawable(
 								R.drawable.ic_launcher))
-				.isCancelableOnTouchOutside(true).withDuration(500)
-				.withEffect(effect).withButton1Text("修改").withButton2Text("提交")
+				.isCancelableOnTouchOutside(false).withDuration(500)
+				.withEffect(effect).withButton1Text("修改")
+				.withButton2Text(Constants.OK_STRING)
 				.setCustomView(R.layout.add_athlete_dialog, context)
 				.setButton1Click(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						editable = true;
-						athleteName.setBackgroundResource(R.drawable.bg_edit);
-						athleteAge.setBackgroundResource(R.drawable.bg_edit);
-						athleteContact
-								.setBackgroundResource(R.drawable.bg_edit);
-						others.setBackgroundResource(R.drawable.bg_edit);
-						athleteName.setEnabled(true);
-						athleteAge.setEnabled(true);
-						athleteContact.setEnabled(true);
-						others.setEnabled(true);
+						enableModification();
 					}
+
 				}).setButton2Click(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						if (editable) {
-							editable = false;
-							String ath_name = athleteName.getText().toString()
-									.trim();
-							String ath_age = athleteAge.getText().toString()
-									.trim();
-							String ath_phone = athleteContact.getText()
-									.toString().trim();
-							String ath_extras = others.getText().toString()
-									.trim();
-
-							dbManager.updateAthlete(athletes, position,
-									ath_name, ath_age, ath_phone, ath_extras);
-							setDatas(dbManager.getAthletes(userID));
-							notifyDataSetChanged();
-							
-							// 如果处在联网状态，则发送至服务器
-							boolean isConnect = (Boolean) app.getMap().get("isConnect");
-							if (isConnect) {
-								// 同步服务器
-								modifyAthRequest(athletes, position);
-							}
-						}
-						viewDialog.dismiss();
+						updateModification(position, viewDialog);
 					}
-				}).show();
 
+				}).show();
 		Window window = viewDialog.getWindow();
 		athleteName = (EditText) window.findViewById(R.id.add_et_user);
 		athleteAge = (EditText) window.findViewById(R.id.add_et_age);
@@ -189,12 +166,57 @@ public class AthleteListAdapter extends BaseAdapter {
 
 	}
 
+	/**
+	 * 使得运动员信息可以修改
+	 */
+	private void enableModification() {
+		editable = true;
+		athleteName.setBackgroundResource(R.drawable.bg_edit);
+		athleteAge.setBackgroundResource(R.drawable.bg_edit);
+		athleteContact.setBackgroundResource(R.drawable.bg_edit);
+		others.setBackgroundResource(R.drawable.bg_edit);
+		athleteName.setEnabled(true);
+		athleteAge.setEnabled(true);
+		athleteContact.setEnabled(true);
+		others.setEnabled(true);
+	}
+
+	/**
+	 * 提交修改，更新数据库数据，如果处于联网状态则将更新请求发送至服务器
+	 * 
+	 * @param position
+	 * @param viewDialog
+	 */
+	private void updateModification(final int position,
+			final NiftyDialogBuilder viewDialog) {
+		if (editable) {
+			editable = false;
+			String ath_name = athleteName.getText().toString().trim();
+			String ath_age = athleteAge.getText().toString().trim();
+			String ath_phone = athleteContact.getText().toString().trim();
+			String ath_extras = others.getText().toString().trim();
+
+			dbManager.updateAthlete(athletes, position, ath_name, ath_age,
+					ath_phone, ath_extras);
+			setDatas(dbManager.getAthletes(userID));
+			notifyDataSetChanged();
+			XUtils.showToast(context, toast, "修改成功");
+			// 如果处在联网状态，则发送至服务器
+			boolean isConnect = (Boolean) app.getMap().get(
+					Constants.IS_CONNECT_SERVICE);
+			if (isConnect) {
+				// 同步服务器
+				modifyAthRequest(athletes, position);
+			}
+		}
+		viewDialog.dismiss();
+	}
+
 	final class ViewHolder {
 		private TextView id;
 		private TextView name;
 		private ImageButton details;
 		private ImageButton delete;
-
 	}
 
 	class OnClick implements OnClickListener {
@@ -212,43 +234,47 @@ public class AthleteListAdapter extends BaseAdapter {
 				createDialog(position);
 				break;
 			case R.id.delete:
-				AlertDialog.Builder build = new AlertDialog.Builder(context);
-				build.setTitle("系统提示").setMessage(
-						"确定要删除[ " + athletes.get(position).getName()
-								+ " ]的信息吗？");
-				build.setPositiveButton("确定",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								int result = dbManager.deleteAthlete(athletes,
-										position);
-								if (result != 0) {
-									// 如果处在联网状态，则发送至服务器
-									boolean isConnect = (Boolean) app.getMap().get("isConnect");
-									if (isConnect) {
-										// 同步服务器
-										deleteAthRequest(athletes.get(position));
-									}
-									setDatas(dbManager.getAthletes(userID));
-									notifyDataSetChanged();
-									XUtils.showToast(context, toast, "删除成功");
-								}
-							}
-						});
-				build.setNegativeButton("取消",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								dialog.dismiss();
-							}
-						}).show();
-
+				deleteAthlete();
 				break;
 			default:
 				break;
 			}
+		}
+
+		/**
+		 * 响应删除运动员事件
+		 */
+		private void deleteAthlete() {
+			AlertDialog.Builder build = new AlertDialog.Builder(context);
+			build.setTitle("系统提示").setMessage(
+					"确定要删除[ " + athletes.get(position).getName() + " ]的信息吗？");
+			build.setPositiveButton(Constants.OK_STRING,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							int result = dbManager.deleteAthlete(athletes,
+									position);
+							if (result != 0) {
+								// 如果处在联网状态，则发送至服务器
+								boolean isConnect = (Boolean) app.getMap().get(
+										Constants.IS_CONNECT_SERVICE);
+								if (isConnect) {
+									// 同步服务器
+									deleteAthRequest(athletes.get(position));
+								}
+								setDatas(dbManager.getAthletes(userID));
+								notifyDataSetChanged();
+								XUtils.showToast(context, toast, "删除成功");
+							}
+						}
+					});
+			build.setNegativeButton(Constants.CANCLE_STRING,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+						}
+					}).show();
 		}
 	}
 
@@ -258,7 +284,7 @@ public class AthleteListAdapter extends BaseAdapter {
 	}
 
 	/**
-	 * 修改运动员信息
+	 * 修改运动员信息请求
 	 * 
 	 * @param obj
 	 */
@@ -307,12 +333,19 @@ public class AthleteListAdapter extends BaseAdapter {
 				return map;
 			}
 		};
-		stringRequest.setRetryPolicy(new DefaultRetryPolicy(1500,
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);
 	}
 
+	/**
+	 * 删除运动员信息请求
+	 * 
+	 * @param a
+	 *            运动员对象
+	 */
 	public void deleteAthRequest(Athlete a) {
 
 		final String jsonString = JsonTools.creatJsonString(a);
@@ -323,7 +356,6 @@ public class AthleteListAdapter extends BaseAdapter {
 					public void onResponse(String response) {
 						// TODO Auto-generated method stub
 						Log.i("AthleteListAdapter", response);
-
 						JSONObject obj;
 						try {
 							obj = new JSONObject(response);
@@ -355,7 +387,8 @@ public class AthleteListAdapter extends BaseAdapter {
 				return map;
 			}
 		};
-		stringRequest2.setRetryPolicy(new DefaultRetryPolicy(1500,
+		stringRequest2.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest2);

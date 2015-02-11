@@ -3,7 +3,9 @@ package com.example.swimmingtraningsystem.activity;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.R.integer;
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,16 +19,28 @@ import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.db.DBManager;
 import com.example.swimmingtraningsystem.model.Score;
 import com.example.swimmingtraningsystem.model.Temp;
+import com.example.swimmingtraningsystem.util.Constants;
+import com.example.swimmingtraningsystem.view.LoadingDialog;
 
+/**
+ * 计时完毕后展示成绩的Activity
+ * 
+ * @author LittleByte
+ * 
+ */
 public class ShowScoreActivity extends Activity {
-	private MyApplication app;
-	private DBManager dbManager;
-	private ExpandableListView listView;
+	private MyApplication mApplication;
+	private DBManager mDbManager;
+	private ExpandableListView mExpandableListView;
 	private List<String> listTag = new ArrayList<String>();
-	private List<Temp> all;
+	private List<Temp> mScoreSum = new ArrayList<Temp>();
 	private List<List<Score>> list = new ArrayList<List<Score>>();
-	private int athleteCount = 0;
-	private TextView planName;
+	private int mAthleteCount = 0;
+	private TextView mPlanName;
+	private LoadingDialog mLoadingDialog;
+	private MyAdapter adapter;
+	private int times;
+	private String date;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,41 +48,27 @@ public class ShowScoreActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_showscore);
-		app = (MyApplication) getApplication();
-		dbManager=DBManager.getInstance();
-		listView = (ExpandableListView) findViewById(R.id.show_list);
-		planName = (TextView) findViewById(R.id.show_the_plan);
-		int times = (Integer) app.getMap().get("current");
-		String date = getIntent().getStringExtra("testDate");
+		init();
+	}
+
+	/**
+	 * 初始化界面
+	 */
+	private void init() {
+		mApplication = (MyApplication) getApplication();
+		mDbManager = DBManager.getInstance();
+		mExpandableListView = (ExpandableListView) findViewById(R.id.show_list);
+		mPlanName = (TextView) findViewById(R.id.show_the_plan);
+		times = (Integer) mApplication.getMap().get(Constants.SWIM_TIME);
+		date = getIntent().getStringExtra(Constants.TEST_DATE);
 		String planString = getIntent().getStringExtra("Plan");
-		planName.setText(planString);
-		List<Score> athScores =dbManager.getAthleteNumberInScoreByDate(date);
-		athleteCount = athScores.size();
-
-		List<Long> athIds = new ArrayList<Long>();
-		for (Score s : athScores) {
-			athIds.add(s.getAthlete().getId());
-		}
-		all = dbManager.getAthleteIdInScoreByDate(date, athIds);
-		for (int i = 1; i <= times + 1; i++) {
-			if (i <= times) {
-				listTag.add("第" + i + "趟");
-				List<Score> ls = dbManager.getScoreByDateAndTimes(date, i);
-				list.add(ls);
-			} else {
-				listTag.add("合计");
-			}
-		}
-
-		MyAdapter adapter = new MyAdapter();
-		listView.setAdapter(adapter);
-
-		// 默认展开
-		for (int i = 0; i < adapter.getGroupCount(); i++) {
-			listView.expandGroup(i);
-		}
+		mPlanName.setText(planString);
+		adapter = new MyAdapter();
+		mExpandableListView.setAdapter(adapter);
+		//启动查询异步任务
+		new MyTask().execute();
 		// 屏蔽收缩
-		listView.setOnGroupClickListener(new OnGroupClickListener() {
+		mExpandableListView.setOnGroupClickListener(new OnGroupClickListener() {
 
 			@Override
 			public boolean onGroupClick(ExpandableListView parent, View v,
@@ -80,6 +80,64 @@ public class ShowScoreActivity extends Activity {
 
 	public void showBack(View v) {
 		finish();
+	}
+
+	/**
+	 * 数据库查询异步任务，防止ANR
+	 * 
+	 * @author LittleByte
+	 * 
+	 */
+	class MyTask extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			super.onPreExecute();
+			if (mLoadingDialog == null) {
+				mLoadingDialog = LoadingDialog
+						.createDialog(ShowScoreActivity.this);
+				mLoadingDialog.setMessage("正在生成本次计时结果...");
+				mLoadingDialog.setCanceledOnTouchOutside(false);
+			}
+			mLoadingDialog.show();
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			// TODO Auto-generated method stub
+			List<Score> athScores = mDbManager
+					.getAthleteNumberInScoreByDate(date);
+			mAthleteCount = athScores.size();
+			List<Long> athIds = new ArrayList<Long>();
+			for (Score s : athScores) {
+				athIds.add(s.getAthlete().getId());
+			}
+			mScoreSum = mDbManager.getAthleteIdInScoreByDate(date, athIds);
+			for (int i = 1; i <= times + 1; i++) {
+				if (i <= times) {
+					listTag.add("第" + i + "趟");
+					List<Score> ls = mDbManager.getScoreByDateAndTimes(date, i);
+					list.add(ls);
+				} else {
+					listTag.add("合计");
+				}
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			adapter.notifyDataSetChanged();
+			// 默认展开
+			for (int i = 0; i < adapter.getGroupCount(); i++) {
+				mExpandableListView.expandGroup(i);
+			}
+			mLoadingDialog.dismiss();
+
+		}
 	}
 
 	class MyAdapter extends BaseExpandableListAdapter {
@@ -107,10 +165,10 @@ public class ShowScoreActivity extends Activity {
 			if (groupPosition < getGroupCount() - 1) {
 				Score s = list.get(groupPosition).get(childPosition);
 				tv2.setText(s.getScore());
-				tv3.setText(dbManager.getAthleteNameByScoreID(s.getId()));
+				tv3.setText(mDbManager.getAthleteNameByScoreID(s.getId()));
 			} else {
-				tv2.setText(all.get(childPosition).getScore());
-				tv3.setText(all.get(childPosition).getAthleteName());
+				tv2.setText(mScoreSum.get(childPosition).getScore());
+				tv3.setText(mScoreSum.get(childPosition).getAthleteName());
 			}
 
 			return convertView;
@@ -118,7 +176,7 @@ public class ShowScoreActivity extends Activity {
 
 		@Override
 		public int getChildrenCount(int groupPosition) {
-			return athleteCount;
+			return mAthleteCount;
 		}
 
 		@Override
@@ -149,7 +207,6 @@ public class ShowScoreActivity extends Activity {
 			} else {
 				tv1.setText("成绩总计");
 			}
-
 			return convertView;
 		}
 
@@ -171,8 +228,8 @@ public class ShowScoreActivity extends Activity {
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		app.getMap().put("current", 0);
-		app.getMap().put("planID", 0);
+		mApplication.getMap().put(Constants.SWIM_TIME, 0);
+		mApplication.getMap().put(Constants.PLAN_ID, 0);
 	}
 
 }

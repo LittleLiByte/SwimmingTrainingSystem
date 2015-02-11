@@ -21,6 +21,12 @@ import android.widget.ImageView;
 import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.model.ViewBean;
 
+/**
+ * 自定义六边形ImageView
+ * 
+ * @author LittleByte
+ * 
+ */
 public class SexangleImageViews extends ImageView {
 
 	private int mWidth;
@@ -176,28 +182,33 @@ public class SexangleImageViews extends ImageView {
 					+ (event.getY() - getHeight() / 2)
 					* (event.getY() - getHeight() / 2);
 			if (dist <= radiusSquare) {// 点中六边形区域
-				paint.setColor(Color.GREEN);
-				paint.setAlpha(50);
-				invalidate();
+				if (paint != null) {
+					paint.setColor(Color.GREEN);
+					paint.setAlpha(50);
+					invalidate();
+				}
 			}
 
 			break;
 
 		case MotionEvent.ACTION_UP:
-			this.startAnimation(endAnimation);
-			paint.setColor(Color.BLACK);
-			paint.setAlpha(100);
-			if (listener != null) {
-				listener.onClick(this);
+			if (paint != null) {
+				this.startAnimation(endAnimation);
+				paint.setColor(Color.BLACK);
+				paint.setAlpha(100);
+				if (listener != null) {
+					listener.onClick(this);
+				}
+				invalidate();
 			}
-			invalidate();
-
 			break;
 		// 滑动出去不会调用action_up,调用action_cancel
 		case MotionEvent.ACTION_CANCEL:
-			this.startAnimation(endAnimation);
-			paint.setColor(getResources().getColor(R.color.transparent));
-			invalidate();
+			if (paint != null) {
+				this.startAnimation(endAnimation);
+				paint.setColor(getResources().getColor(R.color.transparent));
+				invalidate();
+			}
 			break;
 		}
 		return true;

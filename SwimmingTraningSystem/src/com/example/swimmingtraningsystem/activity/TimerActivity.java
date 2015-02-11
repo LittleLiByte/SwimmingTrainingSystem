@@ -6,6 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.example.swimmingtraningsystem.R;
+import com.example.swimmingtraningsystem.util.Constants;
 import com.example.swimmingtraningsystem.util.XUtils;
 
 import android.app.Activity;
@@ -27,7 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * 秒表界面
+ * 计时秒表界面
  * 
  * @author LittleByte
  * 
@@ -36,7 +37,7 @@ import android.widget.Toast;
 public class TimerActivity extends Activity {
 
 	private MyApplication app;
-	private int COUNT_MAX = 0;
+	private int count_max = 0;
 	/**
 	 * 点击表盘次数
 	 */
@@ -133,19 +134,19 @@ public class TimerActivity extends Activity {
 		match = (Button) findViewById(R.id.match_people);
 		clockView = (RelativeLayout) findViewById(R.id.clcokview);
 
-		int swimTime = ((Integer) app.getMap().get("current")) + 1;
+		int swimTime = ((Integer) app.getMap().get(Constants.CURRENT_SWIM_TIME)) + 1;
 		time_title.setText("第" + swimTime + "次计时");
-		app.getMap().put("current", swimTime);
+		app.getMap().put(Constants.CURRENT_SWIM_TIME, swimTime);
 
-		COUNT_MAX = (Integer) app.getMap().get("athleteCount");
+		count_max = (Integer) app.getMap().get(Constants.ATHLETE_NUMBER);
 
-		time = new String[COUNT_MAX];
+		time = new String[count_max];
 		clockView.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				clickCount++;
-				if (athletes <= COUNT_MAX) {
+				if (athletes <= count_max) {
 					// 开始计时
 					if (clickCount == 1) {
 						okclear = false;
@@ -169,7 +170,7 @@ public class TimerActivity extends Activity {
 					} else {
 						tvTip.setVisibility(View.GONE);
 						setlistview();
-						if (athletes == (COUNT_MAX + 1)) {
+						if (athletes == (count_max + 1)) {
 							timerStop();
 							match.setVisibility(View.VISIBLE);
 							XUtils.showToast(TimerActivity.this, toast,
@@ -211,6 +212,9 @@ public class TimerActivity extends Activity {
 
 	}
 
+	/**
+	 * 生存listview
+	 */
 	private void setlistview() {
 		// TODO Auto-generated method stub
 		okclear = true;
@@ -237,10 +241,13 @@ public class TimerActivity extends Activity {
 	}
 
 	public void back(View v) {
-		app.getMap().put("current", 0);
+		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
 		finish();
 	}
 
+	/**
+	 * 设置动画
+	 */
 	public void setAnimation() {
 		rotateAnimation = new RotateAnimation(predegree,
 				(float) (0.006 * mlCount), Animation.RELATIVE_TO_SELF, 0.5f,
@@ -266,6 +273,10 @@ public class TimerActivity extends Activity {
 		hour_progress.startAnimation(hourrotateAnimation);
 	}
 
+	/**
+	 * 生成固定格式的时间字符串
+	 * @return
+	 */
 	protected String getStrTime() {
 		// 秒数
 		long time_count_s = mlCount / 1000;
@@ -342,7 +353,7 @@ public class TimerActivity extends Activity {
 		// TODO Auto-generated method stub
 		// 进入计时界面却不进行成绩匹配而直接返回,要将当前第几次计时置0
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			app.getMap().put("current", 0);
+			app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
 			finish();
 			return true;
 		}

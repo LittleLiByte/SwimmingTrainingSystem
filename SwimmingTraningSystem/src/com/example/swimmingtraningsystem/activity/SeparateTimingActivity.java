@@ -53,9 +53,16 @@ import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.Plan;
 import com.example.swimmingtraningsystem.model.Score;
+import com.example.swimmingtraningsystem.util.Constants;
 import com.example.swimmingtraningsystem.util.ScreenUtils;
 import com.example.swimmingtraningsystem.util.XUtils;
 
+/**
+ * 分泳道计时Activity
+ * 
+ * @author LittleByte
+ * 
+ */
 public class SeparateTimingActivity extends Activity {
 
 	private MyApplication app;
@@ -142,11 +149,11 @@ public class SeparateTimingActivity extends Activity {
 		int height = ScreenUtils.getScreenHeight(this)
 				- ScreenUtils.dip2px(this, 50);
 		tv_clock = (TextView) findViewById(R.id.tv_clcok);
-		athID = (List<Long>) app.getMap().get("athIDList");
-		planID = (Long) app.getMap().get("planID");
-		int swimTime = ((Integer) app.getMap().get("current")) + 1;
+		athID = (List<Long>) app.getMap().get(Constants.ATHLTE_ID_LIST);
+		planID = (Long) app.getMap().get(Constants.PLAN_ID);
+		int swimTime = ((Integer) app.getMap().get(Constants.CURRENT_SWIM_TIME)) + 1;
 		XUtils.showToast(context, toast, "第" + swimTime + "次计时");
-		app.getMap().put("current", swimTime);
+		app.getMap().put(Constants.CURRENT_SWIM_TIME, swimTime);
 		athletes = dbManager.getAthletes(athID);
 		COUNT_MAX = athletes.size();
 		poolwidth = height / COUNT_MAX;
@@ -319,7 +326,8 @@ public class SeparateTimingActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				String pickPool = XUtils.countries[poolwheel.getCurrentItem()];
+				String pickPool = Constants.countries[poolwheel
+						.getCurrentItem()];
 				String pickName = aths.get(athletewheel.getCurrentItem());
 				txt.setText(pickPool + "——" + pickName);
 				alertDialog.cancel();
@@ -399,13 +407,16 @@ public class SeparateTimingActivity extends Activity {
 
 	}
 
+	/**
+	 * 保存本轮计时成绩
+	 */
 	private void saveScores() {
 		// 获取本次记录测试的日期
-		String date = (String) app.getMap().get("testDate");
+		String date = (String) app.getMap().get(Constants.TEST_DATE);
 		// 第几趟测试
-		int nowCurrent = (Integer) app.getMap().get("current");
+		int nowCurrent = (Integer) app.getMap().get(Constants.CURRENT_SWIM_TIME);
 		Plan p = dbManager.queryPlan(planID);
-		long userid = (Long) app.getMap().get("CurrentUser");
+		long userid = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 
 		List<Map<String, Object>> scoresJson = new ArrayList<Map<String, Object>>();
 		List<Score> sl = new ArrayList<Score>();
@@ -433,34 +444,39 @@ public class SeparateTimingActivity extends Activity {
 			s.save();
 		}
 		XUtils.showToast(context, toast, "保存成功！");
-		
-		//如果处在联网状态，则发送至服务器
-				boolean isConnect = (Boolean) app.getMap().get("isConnect");
-				if (isConnect) {
-					// 发送至服务器
-					createNewRequest(JsonTools.creatJsonString(scoresJson));
-				}
-		
-		int swimTime = ((Integer) app.getMap().get("swimTime")) - 1;
+
+		// 如果处在联网状态，则发送至服务器
+		boolean isConnect = (Boolean) app.getMap().get(Constants.IS_CONNECT_SERVICE);
+		if (isConnect) {
+			// 发送至服务器
+			createNewRequest(JsonTools.creatJsonString(scoresJson));
+		}
+
+		int swimTime = ((Integer) app.getMap().get(Constants.SWIM_TIME)) - 1;
 		if (swimTime != 0) {
-			app.getMap().put("swimTime", swimTime);
+			app.getMap().put(Constants.SWIM_TIME, swimTime);
 			reset();
-			swimTime = ((Integer) app.getMap().get("current")) + 1;
+			swimTime = ((Integer) app.getMap().get(Constants.CURRENT_SWIM_TIME)) + 1;
 			XUtils.showToast(context, toast, "第" + swimTime + "次计时");
-			app.getMap().put("current", swimTime);
+			app.getMap().put(Constants.CURRENT_SWIM_TIME, swimTime);
 		} else {
 			Intent i = new Intent(this, ShowScoreActivity.class);
-			i.putExtra("testDate", (String) app.getMap().get("testDate"));
+			i.putExtra(Constants.TEST_DATE, (String) app.getMap().get(Constants.TEST_DATE));
 			i.putExtra("Plan", p.getName() + "--" + p.getPool());
 			startActivity(i);
-			app.getMap().put("swimTime", 1);
-			app.getMap().put("athleteCount", 0);
-			app.getMap().put("testDate", "");
+			app.getMap().put(Constants.SWIM_TIME, 1);
+			app.getMap().put(Constants.ATHLETE_NUMBER, 0);
+			app.getMap().put(Constants.TEST_DATE, "");
 			((Activity) context).finish();
 		}
 
 	}
 
+	/**
+	 * 创建保存本轮计时的请求
+	 * 
+	 * @param jsonString
+	 */
 	public void createNewRequest(final String jsonString) {
 
 		StringRequest stringRequest = new StringRequest(Method.POST,
@@ -492,12 +508,16 @@ public class SeparateTimingActivity extends Activity {
 				return map;
 			}
 		};
-		stringRequest.setRetryPolicy(new DefaultRetryPolicy(1500,
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);
 	}
 
+	/**
+	 * 开始计时
+	 */
 	private void startTimer() {
 		if (isBegin) {
 			timer = new Timer(true);
@@ -520,6 +540,9 @@ public class SeparateTimingActivity extends Activity {
 
 	}
 
+	/**
+	 * 重置计时器
+	 */
 	private void reset() {
 		chooseAthletes.clear();
 		for (int i = 1; i <= tv_times.size(); i++) {
@@ -550,10 +573,16 @@ public class SeparateTimingActivity extends Activity {
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		app.getMap().put("current", 0);
+		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
 		timerStop();
 	}
 
+	/**
+	 * 成绩比较器
+	 * 
+	 * @author LittleByte
+	 * 
+	 */
 	class ScoreComparable implements Comparator<Score> {
 
 		@Override

@@ -46,8 +46,15 @@ import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.Plan;
 import com.example.swimmingtraningsystem.model.PlanHolder;
 import com.example.swimmingtraningsystem.model.User;
+import com.example.swimmingtraningsystem.util.Constants;
 import com.example.swimmingtraningsystem.util.XUtils;
 
+/**
+ * 添加计划Fragment
+ * 
+ * @author LittleByte
+ * 
+ */
 public class AddPlanFragment extends Fragment implements OnClickListener {
 	private MyApplication app;
 	private Activity activity;
@@ -113,7 +120,7 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 		adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		distanceSpinner.setAdapter(adapter2);
 
-		long userID = (Long) app.getMap().get("CurrentUser");
+		long userID = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		us = dbManager.getUser(userID);
 		planlv = (ListView) activity.findViewById(R.id.plan_lsit);
 		athletes = dbManager.getAthletes(userID);
@@ -126,14 +133,19 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 		mQueue = Volley.newRequestQueue(activity);
 	}
 
-	// 初始化Map的数据
+	/**
+	 * 初始化是否选中Map的数据
+	 */
 	private void initData() {
 		for (int i = 0; i < athletes.size(); i++) {
 			map.put(athletes.get(i).getId(), false);
 		}
 	}
 
-	public void select() {
+	/**
+	 * 选择运动员加入到新建的计划当中
+	 */
+	public void selectAthletes() {
 		final NiftyDialogBuilder selectDialog = NiftyDialogBuilder
 				.getInstance(activity);
 		Effectstype effect = Effectstype.Fall;
@@ -170,7 +182,8 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 		selectDialog.withTitle("选择运动员").withMessage(null)
 				.withIcon(getResources().getDrawable(R.drawable.ic_launcher))
 				.isCancelableOnTouchOutside(true).withDuration(500)
-				.withEffect(effect).withButton1Text("返回").withButton2Text("确定")
+				.withEffect(effect).withButton1Text("返回")
+				.withButton2Text(Constants.OK_STRING)
 				.setButton1Click(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -192,7 +205,10 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 		adapter.notifyDataSetChanged();
 	}
 
-	public void save() {
+	/**
+	 * 保存新建的计划到数据库
+	 */
+	public void savePlan() {
 		String pl_name = planName.getText().toString().trim();
 		String poolScale = (String) poolSpinner.getSelectedItem();
 		int distance = distanceSpinner.getSelectedItemPosition() + 1;
@@ -213,13 +229,13 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 			p.setTime(distance);
 			p.setUser(us);
 			p.setAthlete(planList);
-			
+
 			List<Integer> idList = new ArrayList<Integer>();
 			for (int i = 0; i < planList.size(); i++) {
 				idList.add(planList.get(i).getAid());
 			}
-			
-			if ((Boolean) app.getMap().get("isConnect")) {
+
+			if ((Boolean) app.getMap().get(Constants.IS_CONNECT_SERVICE)) {
 				// 如果可以连接服务器，则提交请求
 				Map<String, Object> jsonMap = new HashMap<String, Object>();
 				jsonMap.put("name", pl_name);
@@ -244,16 +260,19 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 		// TODO Auto-generated method stub
 		switch (v.getId()) {
 		case R.id.select_ath:
-			select();
+			selectAthletes();
 			break;
 		case R.id.save_plan:
-			save();
+			savePlan();
 			break;
 		default:
 			break;
 		}
 	}
 
+	/**
+	 * 将新增计划请求发送至服务器
+	 */
 	public void addPlanRequest() {
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				XUtils.HOSTURL + "addPlan", new Listener<String>() {
@@ -264,7 +283,8 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 							JSONObject obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
 							if (resCode == 1) {
-								XUtils.showToast(activity, toast, "添加成功");
+								XUtils.showToast(activity, toast,
+										Constants.ADD_SUCCESS_STRING);
 								String userJson = obj.get("plan").toString();
 								Plan pl = JsonTools.getObject(userJson,
 										Plan.class);
@@ -293,7 +313,8 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 			}
 
 		};
-		stringRequest.setRetryPolicy(new DefaultRetryPolicy(1500,
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);

@@ -5,6 +5,13 @@ import java.util.List;
 
 import org.litepal.crud.DataSupport;
 
+/**
+ * 计划实体类
+ * 
+ * @author LittleByte
+ * 
+ */
+
 public class Plan extends DataSupport {
 	private long id;
 	private int pid;
@@ -21,6 +28,10 @@ public class Plan extends DataSupport {
 	 */
 	private int time;
 
+	
+	/**
+	 * 创建计划的用户
+	 */
 	private User user;
 
 	/**

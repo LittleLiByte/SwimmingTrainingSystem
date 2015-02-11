@@ -1,5 +1,11 @@
 package com.example.swimmingtraningsystem.model;
 
+/**
+ * ม๙ฑ฿ะฮสตฬๅ
+ * 
+ * @author LittleByte
+ * 
+ */
 public class ViewBean {
 	private int color;
 	private float textsize;

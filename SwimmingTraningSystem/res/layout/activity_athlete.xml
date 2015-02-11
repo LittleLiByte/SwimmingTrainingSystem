@@ -39,7 +39,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
             android:background="@drawable/add"
-            android:onClick="add"
+            android:onClick="addAthlete"
             android:padding="20dp" />
     </RelativeLayout>
 

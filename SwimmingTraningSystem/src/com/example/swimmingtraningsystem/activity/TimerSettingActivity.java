@@ -26,9 +26,16 @@ import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.db.DBManager;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.Plan;
+import com.example.swimmingtraningsystem.util.Constants;
 import com.example.swimmingtraningsystem.util.XUtils;
 
-public class ClockSettingActivity extends Activity {
+/**
+ * 开始计时前设定Activity，即选择计划并开始计时
+ * 
+ * @author LittleByte
+ * 
+ */
+public class TimerSettingActivity extends Activity {
 
 	private MyApplication app;
 	private List<String> plans;
@@ -70,7 +77,7 @@ public class ClockSettingActivity extends Activity {
 		clcokset_rl = (RelativeLayout) findViewById(R.id.clcokset_rl);
 		plans = new ArrayList<String>();
 		athleteName = new ArrayList<String>();
-		long userid = (Long) app.getMap().get("CurrentUser");
+		long userid = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		ps = dbManager.getUserPlans(userid);
 		for (int i = 0; i < ps.size(); i++) {
 			plans.add(ps.get(i).getName());
@@ -78,8 +85,16 @@ public class ClockSettingActivity extends Activity {
 
 	}
 
-	public void choose(View v) {
-		createDialog();
+	/**
+	 * 选择计划
+	 * 
+	 * @param v
+	 */
+	public void choosePlan(View v) {
+		alertDialog = new AlertDialog.Builder(this).create();
+		alertDialog.setView(View.inflate(this, R.layout.dialog_choose_plan,
+				null));
+		alertDialog.show();
 		Window window = alertDialog.getWindow();
 		dialog_listview = (ListView) window.findViewById(R.id.choose_plan_list);
 		adapter = new ArrayAdapter<String>(this,
@@ -105,21 +120,21 @@ public class ClockSettingActivity extends Activity {
 
 				swimTime = p.getTime();
 				// 将游泳趟数保存
-				app.getMap().put("swimTime", swimTime);
+				app.getMap().put(Constants.SWIM_TIME, swimTime);
 				// 将选中计划的运动员的人数保存
-				app.getMap().put("athleteCount", athletes.size());
+				app.getMap().put(Constants.ATHLETE_NUMBER, athletes.size());
 
 				List<Long> athIDList = new ArrayList<Long>();
 				for (Athlete a : athletes) {
 					athIDList.add(a.getId());
 				}
 				// 保存选中计划中的运动员ID列
-				app.getMap().put("athIDList", athIDList);
-				app.getMap().put("planID", plan_id);
+				app.getMap().put(Constants.ATHLTE_ID_LIST, athIDList);
+				app.getMap().put(Constants.PLAN_ID, plan_id);
 
 				count.setText(swimTime + "趟");
 
-				adapter2 = new ArrayAdapter<String>(ClockSettingActivity.this,
+				adapter2 = new ArrayAdapter<String>(TimerSettingActivity.this,
 						android.R.layout.simple_list_item_1, athleteName);
 				athleteListView.setAdapter(adapter2);
 				clcokset_rl.setVisibility(View.VISIBLE);
@@ -139,14 +154,12 @@ public class ClockSettingActivity extends Activity {
 
 	}
 
-	private void createDialog() {
-		alertDialog = new AlertDialog.Builder(this).create();
-		alertDialog.setView(View.inflate(this, R.layout.dialog_choose_plan,
-				null));
-		alertDialog.show();
-	}
-
-	public void start(View v) {
+	/**
+	 * 开始计时,有分泳道计时和手动匹配计时
+	 * 
+	 * @param v
+	 */
+	public void startTiming(View v) {
 		switch (v.getId()) {
 		case R.id.start1:
 			if (athleteName.size() != 0) {
@@ -157,7 +170,7 @@ public class ClockSettingActivity extends Activity {
 				SimpleDateFormat sdf = new SimpleDateFormat(
 						"yyyy-MM-dd  HH:mm:ss");
 				String date = sdf.format(new Date());
-				app.getMap().put("testDate", date);
+				app.getMap().put(Constants.TEST_DATE, date);
 				Intent i = new Intent(this, SeparateTimingActivity.class);
 				startActivity(i);
 				finish();
@@ -170,7 +183,7 @@ public class ClockSettingActivity extends Activity {
 				SimpleDateFormat sdf = new SimpleDateFormat(
 						"yyyy-MM-dd  HH:mm:ss");
 				String date = sdf.format(new Date());
-				app.getMap().put("testDate", date);
+				app.getMap().put(Constants.TEST_DATE, date);
 				Intent i = new Intent(this, TimerActivity.class);
 				startActivity(i);
 				finish();
@@ -187,10 +200,9 @@ public class ClockSettingActivity extends Activity {
 
 	public void clcokset_back(View v) {
 		finish();
-		overridePendingTransition(R.anim.slide_bottom_in,
-				R.anim.slide_top_out);
+		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {

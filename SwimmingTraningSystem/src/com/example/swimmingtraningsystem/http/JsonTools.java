@@ -7,6 +7,12 @@ import java.util.Map;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+/**
+ * Gson相关工具类
+ * 
+ * @author LittleByte
+ * 
+ */
 public class JsonTools {
 
 	/**
@@ -22,6 +28,8 @@ public class JsonTools {
 	}
 
 	/**
+	 * 将Json字符串转化为一个对象
+	 * 
 	 * @param jsonString
 	 * @param cls
 	 * @return
@@ -37,6 +45,13 @@ public class JsonTools {
 		return t;
 	}
 
+	/**
+	 * 将Json字符串转化为多个对象的list
+	 * 
+	 * @param jsonString
+	 * @param cls
+	 * @return
+	 */
 	public static <T> List<T> getObjects(String jsonString, Class cls) {
 		List<T> list = new ArrayList<T>();
 		try {
@@ -50,6 +65,12 @@ public class JsonTools {
 		return list;
 	}
 
+	/**
+	 * 将Json字符串转化为多个Map的list
+	 * 
+	 * @param jsonString
+	 * @return
+	 */
 	public static List<Map<String, Object>> getObjectMaps(String jsonString) {
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		try {

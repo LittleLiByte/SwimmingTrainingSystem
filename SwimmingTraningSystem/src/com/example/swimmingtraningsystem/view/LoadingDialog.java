@@ -9,6 +9,12 @@ import android.widget.TextView;
 
 import com.example.swimmingtraningsystem.R;
 
+/**
+ * 自定义正在加载对话框
+ * 
+ * @author LittleByte
+ * 
+ */
 public class LoadingDialog extends Dialog {
 	private static LoadingDialog customProgressDialog = null;
 

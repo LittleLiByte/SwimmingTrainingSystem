@@ -9,6 +9,12 @@ import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
+/**
+ * …¡π‚TextView
+ * 
+ * @author LittleByte
+ * 
+ */
 public class MyTextView extends TextView {
 
 	private LinearGradient mLinearGradient;

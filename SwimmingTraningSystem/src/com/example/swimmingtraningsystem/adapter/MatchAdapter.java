@@ -9,6 +9,13 @@ import android.widget.TextView;
 
 import com.example.swimmingtraningsystem.R;
 
+
+/**
+ * 成绩列表匹配数据适配器
+ * 
+ * @author LittleByte
+ * 
+ */
 public class MatchAdapter extends BaseAdapter {
 	private Context context;
 	private String[] scores;

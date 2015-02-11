@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:background="@drawable/startback"
-        android:onClick="choose"
+        android:onClick="choosePlan"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:text="选择计划" />
@@ -130,7 +130,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/bg_reset"
-            android:onClick="start"
+            android:onClick="startTiming"
             android:padding="10dp"
             android:text="分泳道计时"
             android:textColor="@color/aliceblue" />
@@ -142,7 +142,7 @@
             android:layout_marginLeft="20dp"
             android:layout_weight="1"
             android:background="@drawable/bg_reset"
-            android:onClick="start"
+            android:onClick="startTiming"
             android:padding="10dp"
             android:text="手动匹配计时"
             android:textColor="@color/aliceblue" />

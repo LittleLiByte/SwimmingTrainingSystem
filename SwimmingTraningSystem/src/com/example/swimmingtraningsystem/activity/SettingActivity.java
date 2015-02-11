@@ -10,7 +10,14 @@ import android.view.View;
 import android.view.Window;
 
 import com.example.swimmingtraningsystem.R;
+import com.example.swimmingtraningsystem.util.Constants;
 
+/**
+ * 设置Activity
+ * 
+ * @author LittleByte
+ * 
+ */
 public class SettingActivity extends Activity {
 	MyApplication app;
 
@@ -26,22 +33,24 @@ public class SettingActivity extends Activity {
 	public void createDialog() {
 		AlertDialog.Builder build = new AlertDialog.Builder(this);
 		build.setTitle("系统提示").setMessage("确定退出？");
-		build.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				Intent i = new Intent();
-				i.setClass(SettingActivity.this, LoginActivity.class);
-				startActivity(i);
-				finish();
-				app.exit();
-			}
-		});
-		build.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		}).show();
+		build.setPositiveButton(Constants.OK_STRING,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Intent i = new Intent();
+						i.setClass(SettingActivity.this, LoginActivity.class);
+						startActivity(i);
+						finish();
+						app.exit();
+					}
+				});
+		build.setNegativeButton(Constants.CANCLE_STRING,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				}).show();
 	}
 
 	public void setting_back(View v) {
@@ -49,6 +58,11 @@ public class SettingActivity extends Activity {
 		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);
 	}
 
+	/**
+	 * 响应设置选项
+	 * 
+	 * @param v
+	 */
 	public void setting(View v) {
 
 		switch (v.getId()) {

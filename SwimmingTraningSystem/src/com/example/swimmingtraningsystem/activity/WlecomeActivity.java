@@ -10,6 +10,11 @@ import android.view.animation.Animation.AnimationListener;
 
 import com.example.swimmingtraningsystem.R;
 
+/**
+ * »¶Ó­µ¼º½Activity
+ * @author LittleByte
+ *
+ */
 public class WlecomeActivity extends Activity {
 	private AlphaAnimation start_anima;
 	private View view;
@@ -56,6 +61,9 @@ public class WlecomeActivity extends Activity {
 		});
 	}
 
+	/**
+	 * Ìø×ªÖÁµÇÂ¼Ò³Ãæ
+	 */
 	private void redirectTo() {
 		startActivity(new Intent(getApplicationContext(), LoginActivity.class));
 		finish();

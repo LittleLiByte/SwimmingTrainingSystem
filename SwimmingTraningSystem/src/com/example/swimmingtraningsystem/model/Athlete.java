@@ -6,7 +6,7 @@ import java.util.List;
 import org.litepal.crud.DataSupport;
 
 /**
- * 运动员类
+ * 运动员实体类
  * 
  * @author LittleByte
  * 
@@ -14,13 +14,35 @@ import org.litepal.crud.DataSupport;
 
 public class Athlete extends DataSupport {
 
+	/**
+	 * 运动员id
+	 */
 	private long id;
+	
 	private int aid;
+	/**
+	 * 运动员名字
+	 */
 	private String name;
+	/**
+	 * 运动员年龄
+	 */
 	private int age;
+	/**
+	 * 运动员性别
+	 */
 	private String gender;
+	/**
+	 * 运动员电话
+	 */
 	private String phone;
+	/**
+	 * 运动员备注
+	 */
 	private String extras;
+	/**
+	 * 运动员所属的教练
+	 */
 	private User user;
 	private int uid;
 	private List<Plan> plans = new ArrayList<Plan>();

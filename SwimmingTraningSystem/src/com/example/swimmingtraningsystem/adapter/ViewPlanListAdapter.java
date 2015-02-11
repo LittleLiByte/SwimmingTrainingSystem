@@ -14,6 +14,12 @@ import android.widget.TextView;
 import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.model.Plan;
 
+/**
+ * 查看计划列表数据适配器
+ * 
+ * @author LittleByte
+ * 
+ */
 public class ViewPlanListAdapter extends BaseAdapter {
 	private Context context;
 	private List<Plan> lists;

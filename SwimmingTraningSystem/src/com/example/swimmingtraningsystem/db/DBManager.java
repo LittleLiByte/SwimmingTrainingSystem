@@ -39,6 +39,13 @@ public class DBManager {
 		return dbManager;
 	}
 
+	/**
+	 * 根据id获取用户
+	 * 
+	 * @param id
+	 *            用户id
+	 * @return
+	 */
 	public User getUser(long id) {
 		return DataSupport.find(User.class, id);
 	}
@@ -74,20 +81,19 @@ public class DBManager {
 		return user;
 	}
 
+	/**
+	 * 修改该id的登录密码
+	 * 
+	 * @param id
+	 *            用户id
+	 * @param newPassword
+	 *            新密码
+	 * @return
+	 */
 	public int modifyUserPassword(long id, String newPassword) {
 		ContentValues values = new ContentValues();
 		values.put("password", newPassword);
 		return DataSupport.update(User.class, values, id);
-	}
-
-	/**
-	 * 添加一名运动员的信息到数据库
-	 * 
-	 * @param a
-	 *            运动员
-	 */
-	public void addAthlete(Athlete a) {
-		a.save();
 	}
 
 	/**
@@ -120,6 +126,13 @@ public class DBManager {
 		return null;
 	}
 
+	/**
+	 * 根据名字数据获取对应的运动员对象
+	 * 
+	 * @param names
+	 *            运动员名字
+	 * @return 运动员对象列表
+	 */
 	public List<Athlete> getAthleteByNames(List<String> names) {
 		List<Athlete> lists = new ArrayList<Athlete>();
 		for (String name : names) {
@@ -130,6 +143,13 @@ public class DBManager {
 		return lists;
 	}
 
+	/**
+	 * 通过关联查询，根据成绩id查找运动员名字
+	 * 
+	 * @param id
+	 *            成绩id
+	 * @return 运动员名字
+	 */
 	public String getAthleteNameByScoreID(long id) {
 		String name = DataSupport.find(Score.class, id, true).getAthlete()
 				.getName();
@@ -174,10 +194,6 @@ public class DBManager {
 		DataSupport.update(Athlete.class, values, id);
 	}
 
-	public void updateAthlete(Athlete a, int postion) {
-		a.update(postion);
-	}
-
 	public int deleteAthlete(List<Athlete> list, int position) {
 		String userID = String.valueOf(list.get(position).getId());
 		return DataSupport.deleteAll(Athlete.class, "id=?", userID);
@@ -204,15 +220,6 @@ public class DBManager {
 	}
 
 	/**
-	 * 添加计划
-	 * 
-	 * @param p
-	 */
-	public void addPlan(Plan p) {
-		p.save();
-	}
-
-	/**
 	 * 删除选定的计划
 	 * 
 	 * @param plans
@@ -223,6 +230,11 @@ public class DBManager {
 		}
 	}
 
+	/**
+	 * 获取数据库中当前用户所新建的所有计划
+	 * 
+	 * @return 计划列表
+	 */
 	public List<Plan> getAllPlans() {
 		List<Plan> plans = DataSupport.findAll(Plan.class);
 		return plans;
@@ -231,7 +243,7 @@ public class DBManager {
 	/**
 	 * 查找table_plan中当前用户的所有计划
 	 * 
-	 * @return
+	 * @return 计划列表
 	 */
 	public List<Plan> getUserPlans(long userID) {
 		String user = String.valueOf(userID);
@@ -240,6 +252,11 @@ public class DBManager {
 		return plans;
 	}
 
+	/**
+	 * 获取最新的计划ID
+	 * 
+	 * @return 最新的计划id
+	 */
 	public Long getLatestPlanId() {
 		long id = DataSupport.max(Plan.class, "id", Long.class);
 		return id;
@@ -288,6 +305,13 @@ public class DBManager {
 
 	}
 
+	/**
+	 * 通过计划名字获取计划对象
+	 * 
+	 * @param name
+	 *            计划名字
+	 * @return 计划对象
+	 */
 	public List<Plan> getPlanByPName(String name) {
 		List<Plan> plans = DataSupport.where("name=?", name).find(Plan.class,
 				true);
@@ -307,7 +331,12 @@ public class DBManager {
 		return athletes;
 	}
 
-	// 找出成绩表中指定运动员id的成绩数据集
+	/**
+	 * 找出成绩表中指定运动员id的成绩数据集
+	 * 
+	 * @param id
+	 * @return
+	 */
 	public List<Score> getScoreByAth(Long id) {
 		String ids = String.valueOf(id);
 		List<Score> s = DataSupport.where("athlete_id=?", ids)
@@ -340,6 +369,13 @@ public class DBManager {
 		return scores;
 	}
 
+	/**
+	 * 通过日期查找成绩
+	 * 
+	 * @param date
+	 * @param athId
+	 * @return
+	 */
 	public List<List<Score>> getScoreByDate(List<String> date, long athId) {
 		String athleteID = String.valueOf(athId);
 		List<List<Score>> s = new ArrayList<List<Score>>();
@@ -365,6 +401,15 @@ public class DBManager {
 		return null;
 	}
 
+	/**
+	 * 通过查找成绩表中的日期获得对应计划id
+	 * 
+	 * @param date
+	 *            测试日期
+	 * @param athId
+	 *            运动员id
+	 * @return 计划id
+	 */
 	public List<Long> getPlanInScoreByDate(List<String> date, long athId) {
 		String athleteID = String.valueOf(athId);
 		List<Long> plans = new ArrayList<Long>();
@@ -382,6 +427,12 @@ public class DBManager {
 
 	}
 
+	/**
+	 * 查找特定日期中一轮测试有多少运动员
+	 * 
+	 * @param date
+	 * @return
+	 */
 	public List<Score> getAthleteNumberInScoreByDate(String date) {
 
 		List<Score> list = DataSupport.select("athlete_id")
@@ -414,10 +465,16 @@ public class DBManager {
 			p.setScore(XUtils.scoreSum(sum));
 			temps.add(p);
 		}
-		Collections.sort(temps, new MyComparable());
+		Collections.sort(temps, new ScoreComparable());
 		return temps;
 	}
 
+	/**
+	 * 通过运动员ID查找对应成绩
+	 * 
+	 * @param athIDs
+	 * @return
+	 */
 	public List<String> getScoresByAthleteId(List<Long> athIDs) {
 		List<String> dates = new ArrayList<String>();
 		List<Score> scores = new ArrayList<Score>();
@@ -430,12 +487,18 @@ public class DBManager {
 				dates.add(s.getDate());
 		}
 		Collections.sort(dates, new DateComparable());
-		dates.add(0, "-- 请选择查询时间 --");
+		dates.add(0, "-- 请选择查询时间  --");
 		return dates;
 
 	}
 
-	class MyComparable implements Comparator<Temp> {
+	/**
+	 * 成绩比较
+	 * 
+	 * @author LittleByte
+	 * 
+	 */
+	class ScoreComparable implements Comparator<Temp> {
 
 		@Override
 		public int compare(Temp lhs, Temp rhs) {
@@ -450,6 +513,12 @@ public class DBManager {
 
 	}
 
+	/**
+	 * 日期比较
+	 * 
+	 * @author LittleByte
+	 * 
+	 */
 	class DateComparable implements Comparator<String> {
 
 		@Override

@@ -3,6 +3,10 @@ package com.example.swimmingtraningsystem.util;
 import android.content.Context;
 import android.util.DisplayMetrics;
 
+/**
+ * ÆÁÄ»³ß´ç×ª»»Àà
+ * 
+ */
 public class ScreenUtils {
 
 	public static int getScreenWidth(Context context) {

@@ -14,17 +14,16 @@ import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.RequestQueue;
-import com.android.volley.RetryPolicy;
-import com.android.volley.VolleyError;
 import com.android.volley.Request.Method;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.db.DBManager;
-import com.example.swimmingtraningsystem.http.JsonTools;
+import com.example.swimmingtraningsystem.util.Constants;
 import com.example.swimmingtraningsystem.util.XUtils;
 
 public class ModifyPassActivity extends Activity {
@@ -50,30 +49,35 @@ public class ModifyPassActivity extends Activity {
 		mQueue = Volley.newRequestQueue(this);
 	}
 
+	/**
+	 * 响应修改密码事件
+	 * 
+	 * @param v
+	 */
 	public void modify(View v) {
 		String oldPassword = modify_oldpass.getText().toString().trim();
 		String newPassword = modify_newpass.getText().toString().trim();
 		String comfPassword = modify_comfirmpass.getText().toString().trim();
-		long userId = (Long) app.getMap().get("CurrentUser");
-		String name=dbManager.getUser(userId).getUsername();
-		String userPass=dbManager.getUser(userId).getPassword();
+		long userId = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
+		String name = dbManager.getUser(userId).getUsername();
+		String userPass = dbManager.getUser(userId).getPassword();
 		if (TextUtils.isEmpty(oldPassword)) {
 			XUtils.showToast(this, toast, "原密码不能为空！");
 		} else if (TextUtils.isEmpty(newPassword)) {
 			XUtils.showToast(this, toast, "新密码不能为空！");
 		} else if (TextUtils.isEmpty(comfPassword)) {
 			XUtils.showToast(this, toast, "确认密码不能为空！");
-		}else if(!userPass.equals(oldPassword)){
+		} else if (!userPass.equals(oldPassword)) {
 			XUtils.showToast(this, toast, "原密码错误！");
-		}else if(userPass.equals(newPassword)){
+		} else if (userPass.equals(newPassword)) {
 			XUtils.showToast(this, toast, "原密码与新密码相同，无需修改！");
-		}else if(name.equals("defaultUser")){
+		} else if (name.equals("defaultUser")) {
 			XUtils.showToast(this, toast, "当前为系统默认帐号，不能修改密码！");
-		}else {
+		} else {
 			dbManager.modifyUserPassword(userId, comfPassword);
 			XUtils.showToast(this, toast, "修改密码成功！");
 			// 如果处在联网状态，则发送至服务器
-			boolean isConnect = (Boolean) app.getMap().get("isConnect");
+			boolean isConnect = (Boolean) app.getMap().get(Constants.IS_CONNECT_SERVICE);
 			if (isConnect) {
 				// 发送至服务器
 				modifyRequest(oldPassword, newPassword, comfPassword);
@@ -82,6 +86,16 @@ public class ModifyPassActivity extends Activity {
 		}
 	}
 
+	/**
+	 * 创建修改密码请求
+	 * 
+	 * @param oldPassword
+	 *            旧密码
+	 * @param newPassword
+	 *            新密码
+	 * @param comfPassword
+	 *            确认新密码
+	 */
 	public void modifyRequest(final String oldPassword,
 			final String newPassword, final String comfPassword) {
 		StringRequest stringRequest = new StringRequest(Method.POST,
@@ -112,20 +126,19 @@ public class ModifyPassActivity extends Activity {
 				return map;
 			}
 
-			@Override
-			public RetryPolicy getRetryPolicy() {
-				// TODO Auto-generated method stub
-				// 超时设置
-				RetryPolicy retryPolicy = new DefaultRetryPolicy(
-						XUtils.SOCKET_TIMEOUT,
-						DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-						DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-				return retryPolicy;
-			}
 		};
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);
 	}
 
+	/**
+	 * 退出当前窗体
+	 * 
+	 * @param v
+	 */
 	public void getback(View v) {
 		finish();
 	}

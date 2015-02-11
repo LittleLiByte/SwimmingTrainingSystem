@@ -5,13 +5,35 @@ import java.util.List;
 
 import org.litepal.crud.DataSupport;
 
+/**
+ * 用户实体类
+ * 
+ * @author LittleByte
+ * 
+ */
 public class User extends DataSupport {
+	/**
+	 * 用户id
+	 */
 	private long id;
 	private int uid;
+	/**
+	 * 用户名
+	 */
 	private String username;
+	/**
+	 * 用户密码
+	 */
 	private String password;
+	/**
+	 * 用户邮箱
+	 */
 	private String Email;
+	/**
+	 * 用户手机
+	 */
 	private String phone;
+	
 	private List<Athlete> athletes = new ArrayList<Athlete>();
 	private List<Plan> plans = new ArrayList<Plan>();
 

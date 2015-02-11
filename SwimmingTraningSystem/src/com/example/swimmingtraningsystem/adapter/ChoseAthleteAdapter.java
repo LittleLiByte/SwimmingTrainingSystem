@@ -15,6 +15,12 @@ import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.PlanHolder;
 
+/**
+ * 选择运动员数据适配器
+ * 
+ * @author LittleByte
+ * 
+ */
 public class ChoseAthleteAdapter extends BaseAdapter {
 	private Context context;
 	private List<Athlete> list;

@@ -35,25 +35,51 @@ import com.example.swimmingtraningsystem.effect.NiftyDialogBuilder;
 import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.User;
+import com.example.swimmingtraningsystem.util.Constants;
 import com.example.swimmingtraningsystem.util.XUtils;
 import com.example.swimmingtraningsystem.view.Switch;
 
+/**
+ * 运动员管理Activity
+ * 
+ * @author LittleByte
+ * 
+ */
 public class AthleteActivity extends Activity {
-	private MyApplication app;
-	private ListView listView;
-	private Toast toast;
-	private AthleteListAdapter adapter;
-	private List<Athlete> list;
+	// 该对象保存全局变量
+	private MyApplication mApplication;
+	// 展示所有运动员信息的列表控件
+	private ListView mListView;
+	private Toast mToast;
+	// 运动员信息列表的数据适配器
+	private AthleteListAdapter mAthleteListAdapter;
+	// 运动员信息数据集
+	private List<Athlete> mAthletes;
+	// Volley请求队列
 	private RequestQueue mQueue;
-	private DBManager dbManager;
-	protected String TAG = "com.example.swimmingtraningsystem";
-	private User us;
-	private Long userId;
-	private EditText athleteName;
-	private EditText athleteAge;
-	private EditText athleteContact;
-	private EditText others;
-	private Switch toggleButton;
+	// 数据库管理类
+	private DBManager mDbManager;
+	// 当前用户对象
+	private User mUser;
+	// 当前用户对象id
+	private Long mUserId;
+	// 运动员名字编辑框
+	private EditText mAthleteName;
+	// 运动员年龄编辑框
+	private EditText mAthleteAge;
+	// 运动员联系电话编辑框
+	private EditText mAthleteContact;
+	// 运动员备注编辑框
+	private EditText mOthers;
+	// 运动员性别切换按钮
+	private Switch mGenderSwitch;
+
+	private static final String ADD_ATHLETE_TITLE_STRING = "添加运动员";
+	private static final String NAME_CANNOT_BE_EMPTY_STRING = "运动员名字不能为空";
+	private static final String NAME_CANNOT_BE_REPEATE_STRING = "存在运动员名字重复，请更改";
+	private static final String AGE_CANNOT_BE_EMPTY_STRING = "年龄不能为空";
+	private static final String ADDATHLETE = "addAthlete";
+	private static final String GETATHLETES = "getAthletes";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -62,38 +88,45 @@ public class AthleteActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_athlete);
-		app = (MyApplication) getApplication();
-		dbManager = DBManager.getInstance();
-		userId = (Long) app.getMap().get("CurrentUser");
-		us = dbManager.getUser(userId);
-		listView = (ListView) findViewById(R.id.lv);
-		list = dbManager.getAthletes(userId);
-		adapter = new AthleteListAdapter(this, app, list, userId);
-		listView.setAdapter(adapter);
+		init();
+	}
+
+	/**
+	 * 界面初始化
+	 */
+	private void init() {
+		mApplication = (MyApplication) getApplication();
+		mDbManager = DBManager.getInstance();
+		mUserId = (Long) mApplication.getMap().get(Constants.CURRENT_USER_ID);
+		mUser = mDbManager.getUser(mUserId);
+		mListView = (ListView) findViewById(R.id.lv);
+		mAthletes = mDbManager.getAthletes(mUserId);
+		mAthleteListAdapter = new AthleteListAdapter(this, mApplication,
+				mAthletes, mUserId);
+		mListView.setAdapter(mAthleteListAdapter);
 		mQueue = Volley.newRequestQueue(this);
 		// getAthleteRequest();
 	}
 
 	/**
-	 * 添加运动员按钮
+	 * 弹出对话框并添加一个运动员信息
 	 * 
 	 * @param v
 	 */
-	public void add(View v) {
-
+	public void addAthlete(View v) {
 		final NiftyDialogBuilder addDialog = NiftyDialogBuilder
 				.getInstance(this);
 		Effectstype effect = Effectstype.RotateLeft;
 		Window window = addDialog.getWindow();
 		addDialog
-				.withTitle("添加运动员")
+				.withTitle(ADD_ATHLETE_TITLE_STRING)
 				.withMessage(null)
 				.withIcon(getResources().getDrawable(R.drawable.ic_launcher))
 				.isCancelableOnTouchOutside(false)
 				.withDuration(700)
 				.withEffect(effect)
-				.withButton1Text("取消")
-				.withButton2Text("确定")
+				.withButton1Text(Constants.CANCLE_STRING)
+				.withButton2Text(Constants.OK_STRING)
 				.setButton1Click(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -104,24 +137,24 @@ public class AthleteActivity extends Activity {
 					@Override
 					public void onClick(View v) {
 
-						String name = athleteName.getText().toString().trim();
-						String ageString = athleteAge.getText().toString()
+						String name = mAthleteName.getText().toString().trim();
+						String ageString = mAthleteAge.getText().toString()
 								.trim();
-						String phone = athleteContact.getText().toString()
+						String phone = mAthleteContact.getText().toString()
 								.trim();
-						String other = others.getText().toString().trim();
-						String gender = toggleButton.getPrivateImeOptions();
-						boolean isExit = dbManager.isAthleteNameExsit(userId,
+						String other = mOthers.getText().toString().trim();
+						String gender = mGenderSwitch.getPrivateImeOptions();
+						boolean isExit = mDbManager.isAthleteNameExsit(mUserId,
 								name);
 						if (TextUtils.isEmpty(name)) {
-							XUtils.showToast(AthleteActivity.this, toast,
-									"名字不能为空");
+							XUtils.showToast(AthleteActivity.this, mToast,
+									NAME_CANNOT_BE_EMPTY_STRING);
 						} else if (isExit) {
-							XUtils.showToast(AthleteActivity.this, toast,
-									"存在运动员名字重复，请更改！");
+							XUtils.showToast(AthleteActivity.this, mToast,
+									NAME_CANNOT_BE_REPEATE_STRING);
 						} else if (TextUtils.isEmpty(ageString)) {
-							XUtils.showToast(AthleteActivity.this, toast,
-									"年龄不能为空");
+							XUtils.showToast(AthleteActivity.this, mToast,
+									AGE_CANNOT_BE_EMPTY_STRING);
 						} else {
 							int age = Integer.parseInt(ageString);
 							addAthlete(name, age, gender, phone, other);
@@ -130,22 +163,26 @@ public class AthleteActivity extends Activity {
 					}
 				}).setCustomView(R.layout.add_athlete_dialog, v.getContext())
 				.show();
-
-		athleteName = (EditText) window.findViewById(R.id.add_et_user);
-		athleteAge = (EditText) window.findViewById(R.id.add_et_age);
-		athleteContact = (EditText) window.findViewById(R.id.add_et_contact);
-		others = (EditText) window.findViewById(R.id.add_et_extra);
-		toggleButton = (Switch) window.findViewById(R.id.toggle_gender);
+		mAthleteName = (EditText) window.findViewById(R.id.add_et_user);
+		mAthleteAge = (EditText) window.findViewById(R.id.add_et_age);
+		mAthleteContact = (EditText) window.findViewById(R.id.add_et_contact);
+		mOthers = (EditText) window.findViewById(R.id.add_et_extra);
+		mGenderSwitch = (Switch) window.findViewById(R.id.toggle_gender);
 	}
 
 	/**
-	 * 保存一个运动员信息
+	 * 保存一个运动员信息，如果无法联网则直接保存到数据库， 如果成功连接至服务器则将运动员信息发送至服务器
 	 * 
-	 * @param number
 	 * @param name
+	 *            运动员姓名
 	 * @param age
+	 *            运动员年龄
+	 * @param gender
+	 *            运动员性别
 	 * @param contact
+	 *            运动员手机号码
 	 * @param others
+	 *            运动员其他信息
 	 */
 	public void addAthlete(String name, int age, String gender, String contact,
 			String others) {
@@ -156,49 +193,50 @@ public class AthleteActivity extends Activity {
 		a.setGender(gender);
 		a.setPhone(contact);
 		a.setExtras(others);
-		a.setUser(us);
+		a.setUser(mUser);
 
 		// 根据是否能够连接服务器来操作，如果能够连接服务器，则使用服务返回的数据，否则将数据保存到本地使用
-		boolean isConnect = (Boolean) app.getMap().get("isConnect");
+		boolean isConnect = (Boolean) mApplication.getMap().get(Constants.IS_CONNECT_SERVICE);
 
 		if (isConnect) {
-
 			addAthleteequest(a);
 		} else {
 			a.save();
-			XUtils.showToast(AthleteActivity.this, toast, "添加成功");
-			list = dbManager.getAthletes(userId);
-			adapter.setDatas(list);
-			adapter.notifyDataSetChanged();
+			XUtils.showToast(AthleteActivity.this, mToast,
+					Constants.ADD_SUCCESS_STRING);
+			mAthletes = mDbManager.getAthletes(mUserId);
+			mAthleteListAdapter.setDatas(mAthletes);
+			mAthleteListAdapter.notifyDataSetChanged();
 		}
 
 	}
 
 	/**
-	 * 将对象转换成json字符串，提交到服务器
+	 * 将需要保存的对象转换成json字符串，提交到服务器
 	 * 
 	 * @param obj
 	 */
 	public void addAthleteequest(final Athlete a) {
 		final String athleteJson = JsonTools.creatJsonString(a);
 		StringRequest request = new StringRequest(Method.POST, XUtils.HOSTURL
-				+ "addAthlete", new Listener<String>() {
+				+ ADDATHLETE, new Listener<String>() {
 
 			@Override
 			public void onResponse(String response) {
 				// TODO Auto-generated method stub
-				Log.i(TAG, response);
+				Log.i(Constants.TAG, response);
 				try {
 					JSONObject obj = new JSONObject(response);
 					int resCode = (Integer) obj.get("resCode");
 					if (resCode == 1) {
-						XUtils.showToast(AthleteActivity.this, toast, "添加成功");
+						XUtils.showToast(AthleteActivity.this, mToast,
+								Constants.ADD_SUCCESS_STRING);
 						int aid = (Integer) obj.get("athlete");
 						a.setAid(aid);
 						a.save();
-						list = dbManager.getAthletes(userId);
-						adapter.setDatas(list);
-						adapter.notifyDataSetChanged();
+						mAthletes = mDbManager.getAthletes(mUserId);
+						mAthleteListAdapter.setDatas(mAthletes);
+						mAthleteListAdapter.notifyDataSetChanged();
 					}
 
 				} catch (JSONException e) {
@@ -212,7 +250,7 @@ public class AthleteActivity extends Activity {
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				// TODO Auto-generated method stub
-				Log.e(TAG, error.getMessage());
+				Log.e(Constants.TAG, error.getMessage());
 			}
 		}) {
 
@@ -224,7 +262,8 @@ public class AthleteActivity extends Activity {
 				return map;
 			}
 		};
-		request.setRetryPolicy(new DefaultRetryPolicy(1500,
+		request.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(request);
@@ -235,12 +274,12 @@ public class AthleteActivity extends Activity {
 	 */
 	private void getAthleteRequest() {
 		StringRequest getrequest = new StringRequest(Method.GET, XUtils.HOSTURL
-				+ "getAthletes", new Listener<String>() {
+				+ GETATHLETES, new Listener<String>() {
 
 			@Override
 			public void onResponse(String response) {
 				// TODO Auto-generated method stub
-				Log.i(TAG, response);
+				Log.i(Constants.TAG, response);
 				if (response.equals("1")) {
 					try {
 						JSONObject jsonObject = new JSONObject(response);
@@ -266,15 +305,23 @@ public class AthleteActivity extends Activity {
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				// TODO Auto-generated method stub
-				Log.e(TAG, error.getMessage());
+				if (error != null) {
+					Log.e(Constants.TAG, error.getMessage());
+				}
 			}
 		});
-		getrequest.setRetryPolicy(new DefaultRetryPolicy(1500,
+		getrequest.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(getrequest);
 	}
 
+	/**
+	 * 退出当前活动窗体
+	 * 
+	 * @param v
+	 */
 	public void back(View v) {
 		finish();
 		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);

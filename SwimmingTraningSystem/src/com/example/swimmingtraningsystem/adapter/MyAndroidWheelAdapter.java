@@ -6,13 +6,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.swimmingtraningsystem.R;
-import com.example.swimmingtraningsystem.util.XUtils;
+import com.example.swimmingtraningsystem.util.Constants;
 
 /**
- * Adapter for Wheel
+ * androidWheel ˝æ›  ≈‰∆˜
+ * 
+ * @author LittleByte
  */
 public class MyAndroidWheelAdapter extends AbstractWheelTextAdapter {
-	private String countries[] = XUtils.countries;
+	private String countries[] = Constants.countries;
 
 	public MyAndroidWheelAdapter(Context context) {
 		super(context, R.layout.drag_list_item, NO_RESOURCE);

@@ -11,14 +11,15 @@ import android.widget.Toast;
 
 import com.example.swimmingtraningsystem.R;
 
+/**
+ * 其他工具类
+ * 
+ * @author Littleyte
+ * 
+ */
 public class XUtils {
 
-	public static String IpAdress = "192.168.1.235";
-	public static String port = "8080";
-	public final static String countries[] = new String[] { "第1道", "第2道",
-			"第3道", "第4道", "第5道", "第6道", "第7道", "第8道", };
 	public static String HOSTURL = "";
-	public static final int SOCKET_TIMEOUT = 5000;
 
 	/**
 	 * 是否第一次启动
@@ -27,8 +28,8 @@ public class XUtils {
 	 * @param isFirst
 	 */
 	public static void SaveLoginInfo(Context context, boolean isFirst) {
-		SharedPreferences sp = context.getSharedPreferences("loginInfo",
-				context.MODE_PRIVATE);
+		SharedPreferences sp = context.getSharedPreferences(
+				Constants.LOGININFO, context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putBoolean("isFirst", isFirst);
 		editor.commit();
@@ -95,6 +96,13 @@ public class XUtils {
 				millisecond);
 	}
 
+	/**
+	 * 自定义显示Toast
+	 * 
+	 * @param context
+	 * @param mToast
+	 * @param text
+	 */
 	public static void showToast(Context context, Toast mToast, String text) {
 		if (mToast == null) {
 			mToast = Toast.makeText(context, text, Toast.LENGTH_SHORT);

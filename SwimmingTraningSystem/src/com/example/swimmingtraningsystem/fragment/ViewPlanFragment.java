@@ -42,8 +42,15 @@ import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.Plan;
 import com.example.swimmingtraningsystem.model.Upid;
+import com.example.swimmingtraningsystem.util.Constants;
 import com.example.swimmingtraningsystem.util.XUtils;
 
+/**
+ * 查看计划Fragment
+ * 
+ * @author LittleByte
+ * 
+ */
 public class ViewPlanFragment extends Fragment implements OnClickListener {
 	private MyApplication app;
 	private Activity activity;
@@ -71,7 +78,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 		super.onActivityCreated(savedInstanceState);
 		activity = getActivity();
 		app = (MyApplication) activity.getApplication();
-		long userID = (Long) app.getMap().get("CurrentUser");
+		long userID = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		dbManager = DBManager.getInstance();
 		listView = (ListView) activity.findViewById(R.id.view_plan_list);
 		relative = (RelativeLayout) activity.findViewById(R.id.relative);
@@ -106,9 +113,9 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 			// 在数据库中删除之前获取计划对应的uid和pid
 			List<Upid> upids = dbManager.getdeletePlanId(selectid);
 			dbManager.deletePlans(selectid);
-			
+
 			// 如果处在联网状态，则发送至服务器
-			boolean isConnect = (Boolean) app.getMap().get("isConnect");
+			boolean isConnect = (Boolean) app.getMap().get(Constants.IS_CONNECT_SERVICE);
 			if (isConnect) {
 				// 发送至服务器
 				deletePlanRequest(upids);
@@ -304,7 +311,8 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 			}
 
 		};
-		stringRequest.setRetryPolicy(new DefaultRetryPolicy(1500,
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);

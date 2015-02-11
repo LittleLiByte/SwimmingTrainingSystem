@@ -26,6 +26,12 @@ import com.example.swimmingtraningsystem.R;
 import com.example.swimmingtraningsystem.fragment.AddPlanFragment;
 import com.example.swimmingtraningsystem.fragment.ViewPlanFragment;
 
+/**
+ * 计划界面
+ * 
+ * @author LittleByte
+ * 
+ */
 public class PlanActivity extends FragmentActivity implements OnClickListener {
 
 	private ViewPager viewpager;
@@ -85,7 +91,7 @@ public class PlanActivity extends FragmentActivity implements OnClickListener {
 			public void onPageSelected(int arg0) {
 				// TODO Auto-generated method stub
 				select(viewpager.getCurrentItem());
-				
+
 			}
 
 			@Override
@@ -101,6 +107,11 @@ public class PlanActivity extends FragmentActivity implements OnClickListener {
 		});
 	}
 
+	/**
+	 * 初始化游标
+	 * 
+	 * @param size
+	 */
 	private void initCursor(int size) {
 		cursorWidth = BitmapFactory.decodeResource(getResources(),
 				R.drawable.cursor1).getWidth();
@@ -128,6 +139,11 @@ public class PlanActivity extends FragmentActivity implements OnClickListener {
 		}
 	}
 
+	/**
+	 * 选择对应碎片
+	 * 
+	 * @param index
+	 */
 	public void select(int index) {
 		int one = 2 * offset + cursorWidth;
 		switch (index) {
@@ -168,7 +184,7 @@ public class PlanActivity extends FragmentActivity implements OnClickListener {
 		}
 
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {

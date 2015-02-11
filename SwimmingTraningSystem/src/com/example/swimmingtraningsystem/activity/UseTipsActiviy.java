@@ -3,7 +3,6 @@ package com.example.swimmingtraningsystem.activity;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +15,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.swimmingtraningsystem.R;
-import com.example.swimmingtraningsystem.util.ConstantVars;
+import com.example.swimmingtraningsystem.util.Constants;
 
+/**
+ * 使用说明Activity
+ * 
+ * @author LittleByte
+ * 
+ */
 public class UseTipsActiviy extends Activity {
 
 	private ExpandableListView expandableListView;
@@ -48,7 +53,7 @@ public class UseTipsActiviy extends Activity {
 			@Override
 			public int getGroupCount() {
 				// TODO Auto-generated method stub
-				return ConstantVars.titles.length;
+				return Constants.TITLES.length;
 			}
 
 			@Override
@@ -60,13 +65,13 @@ public class UseTipsActiviy extends Activity {
 			@Override
 			public Object getGroup(int groupPosition) {
 				// TODO Auto-generated method stub
-				return ConstantVars.titles[groupPosition];
+				return Constants.TITLES[groupPosition];
 			}
 
 			@Override
 			public Object getChild(int groupPosition, int childPosition) {
 				// TODO Auto-generated method stub
-				return ConstantVars.contents[groupPosition][childPosition];
+				return Constants.CONTENTS[groupPosition][childPosition];
 			}
 
 			@Override

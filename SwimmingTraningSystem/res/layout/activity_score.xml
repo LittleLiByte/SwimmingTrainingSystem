@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_query_score"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusable="true"
@@ -17,18 +18,38 @@
 
         <ImageButton
             android:id="@+id/scroe_back"
-            android:layout_width="30dp"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:background="@color/transparent"
             android:onClick="back"
             android:src="@drawable/btn_back" />
 
-        <Spinner
-            android:id="@+id/query_category"
+        <LinearLayout
+            android:id="@+id/total_category"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_weight="1.0" />
+            android:layout_weight="1.0"
+            android:background="@drawable/bg_query_score_pressed"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/text_category"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:padding="5dp"
+                android:text="请选择日期进行查询"
+                android:textColor="@color/huise"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|right"
+                android:background="@drawable/selector_arrow_dropdown" />
+        </LinearLayout>
 
         <ImageButton
             android:id="@+id/query_score"

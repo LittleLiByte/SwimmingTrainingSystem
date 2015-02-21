@@ -1,5 +1,11 @@
 package com.example.swimmingtraningsystem.model;
 
+/**
+ * 这是存储运动员多趟成绩的临时对象
+ * 
+ * @author LittleByte
+ * 
+ */
 public class Temp {
 
 	private String score;

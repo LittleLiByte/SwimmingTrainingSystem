@@ -487,7 +487,6 @@ public class DBManager {
 				dates.add(s.getDate());
 		}
 		Collections.sort(dates, new DateComparable());
-		dates.add(0, "-- 请选择查询时间  --");
 		return dates;
 
 	}

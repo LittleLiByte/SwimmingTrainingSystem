@@ -5,17 +5,24 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnGroupClickListener;
-import android.widget.Spinner;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,20 +44,25 @@ import com.example.swimmingtraningsystem.view.LoadingDialog;
  */
 public class QueryScoreActivity extends Activity {
 
-	private MyApplication mApplication;
-	private Spinner mSpinner;
+	private LinearLayout totalDates, containLayout;
 	private ExpandableListView mExpandableListView;
 	private TextView details;
+	private TextView dateTextView;
 	private DBManager dbManager;
-	private List<List<Score>> scoreList = new ArrayList<List<Score>>();;
-	private NameScoreListAdapter scoreListAdapter;
 	private long userid;
-	private Toast toast;
 	private int time = 0;
 	private Plan plan;
 	private List<Temp> sumList = new ArrayList<Temp>();
 	private LoadingDialog mLoadingDialog;
 	private List<String> dateList = new ArrayList<String>();
+	private DatesAdapter adapter;
+	private ListView dateListView;
+	private View headView;
+	private PopupWindow mPopWin;
+	private Toast mToast;
+	private final static String NO_SUCH_RECORDS_STRING = "没有关于该查询条件的记录！";
+	private final static String PLEASE_SELECT_RIGHT_TIME_STRING = "请选择正确的查询时间！";
+	private final static String GENERATING_RESULT_STRING = "正在生成查询结果...";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,25 +77,23 @@ public class QueryScoreActivity extends Activity {
 	 * 初始化Activity
 	 */
 	private void init() {
-		mApplication = (MyApplication) getApplication();
+		MyApplication mApplication = (MyApplication) getApplication();
 		dbManager = DBManager.getInstance();
 		userid = (Long) mApplication.getMap().get(Constants.CURRENT_USER_ID);
-		mSpinner = (Spinner) findViewById(R.id.query_category);
+		totalDates = (LinearLayout) findViewById(R.id.total_category);
+		containLayout = (LinearLayout) findViewById(R.id.ll_query_score);
 		details = (TextView) findViewById(R.id.show_details);
+		dateTextView = (TextView) findViewById(R.id.text_category);
 		mExpandableListView = (ExpandableListView) findViewById(R.id.query_score_list);
 
-		List<Athlete> aths = dbManager.getAthletes(userid);
-		List<Long> aids = new ArrayList<Long>();
-		for (Athlete a : aths) {
-			aids.add(a.getId());
-		}
-		dateList.add("-- 请选择查询时间  --");
-		// List<String> dates = dbManager.getScoresByAthleteId(aids);
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_spinner_item, dateList);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		mSpinner.setAdapter(adapter);
+		dateTextView.setOnClickListener(new OnClickListener() {
 
+			@Override
+			public void onClick(View v) {
+				showPopupWindow(LinearLayout.LayoutParams.WRAP_CONTENT,
+						LinearLayout.LayoutParams.WRAP_CONTENT);
+			}
+		});
 		// 屏蔽收缩
 		mExpandableListView.setOnGroupClickListener(new OnGroupClickListener() {
 
@@ -92,6 +102,46 @@ public class QueryScoreActivity extends Activity {
 					int groupPosition, long id) {
 				// TODO Auto-generated method stub
 				return true;
+			}
+		});
+	}
+
+	/**
+	 * 弹出popupWindow显示可查看的日期列表
+	 * 
+	 * @param wrapContent
+	 * @param wrapContent2
+	 */
+	private void showPopupWindow(int wrapContent, int wrapContent2) {
+		// TODO Auto-generated method stub
+		LinearLayout layout = (LinearLayout) LayoutInflater.from(
+				QueryScoreActivity.this)
+				.inflate(R.layout.query_date_list, null);
+		dateListView = (ListView) layout.findViewById(R.id.date_list);
+		headView = View.inflate(this, R.layout.query_score_header, null);
+		dateListView.addHeaderView(headView);
+		adapter = new DatesAdapter(this, dateList);
+		dateListView.setAdapter(adapter);
+		mPopWin = new PopupWindow(layout, totalDates.getWidth(),
+				containLayout.getHeight() / 3, true);
+		// 这句是为了防止弹出菜单获取焦点之后，点击activity的其他组件没有响应
+		mPopWin.setBackgroundDrawable(new BitmapDrawable());
+		mPopWin.showAsDropDown(totalDates, 0, 1);
+		mPopWin.update();
+		if (dateList.size() == 0) {
+			new QueryDatesTask().execute();
+		} else {
+			dateListView.removeHeaderView(headView);
+		}
+
+		dateListView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				// TODO Auto-generated method stub
+				dateTextView.setText(dateList.get(position));
+				mPopWin.dismiss();
 			}
 		});
 	}
@@ -113,11 +163,11 @@ public class QueryScoreActivity extends Activity {
 	 */
 	public void queryScore(View v) {
 		details.setVisibility(View.GONE);
-		String condition = (String) mSpinner.getSelectedItem();
-		if (!condition.equals("-- 请选择查询时间  --")) {
+		String condition = dateTextView.getText().toString().trim();
+		if (!condition.equals("请选择日期进行查询")) {
 			new QueryScoreTask().execute(condition);
 		} else {
-			XUtils.showToast(this, toast, "请选择正确的查询时间！");
+			XUtils.showToast(this, mToast, PLEASE_SELECT_RIGHT_TIME_STRING);
 		}
 
 	}
@@ -137,7 +187,7 @@ public class QueryScoreActivity extends Activity {
 			if (mLoadingDialog == null) {
 				mLoadingDialog = LoadingDialog
 						.createDialog(QueryScoreActivity.this);
-				mLoadingDialog.setMessage("正在生成查询结果...");
+				mLoadingDialog.setMessage(GENERATING_RESULT_STRING);
 				mLoadingDialog.setCanceledOnTouchOutside(false);
 			}
 			mLoadingDialog.show();
@@ -147,44 +197,50 @@ public class QueryScoreActivity extends Activity {
 		protected List<List<Score>> doInBackground(String... params) {
 			// TODO Auto-generated method stub
 			plan = dbManager.getPlanInScoreByDate(params[0]);
-			time = plan.getTime();
-			sumList.clear();
-			scoreList.clear();
-			// 根据时间查询成绩
-			for (int t = 1; t <= time; t++) {
-				List<Score> sco = dbManager
-						.getScoreByDateAndTimes(params[0], t);
-				if (t == 1) {
-					List<Long> athIds = new ArrayList<Long>();
-					for (Score s : sco) {
-						athIds.add(s.getAthlete().getId());
+			// 如果输入的条件无法查询出成绩
+			if (plan != null) {
+				time = plan.getTime();
+				List<List<Score>> listss = new ArrayList<List<Score>>();
+				// 根据时间查询成绩
+				for (int t = 1; t <= time; t++) {
+					List<Score> sco = dbManager.getScoreByDateAndTimes(
+							params[0], t);
+					if (t == 1) {
+						List<Long> athIds = new ArrayList<Long>();
+						for (Score s : sco) {
+							athIds.add(s.getAthlete().getId());
+						}
+						sumList = dbManager.getAthleteIdInScoreByDate(
+								params[0], athIds);
 					}
-					sumList = dbManager.getAthleteIdInScoreByDate(params[0],
-							athIds);
+					listss.add(sco);
 				}
-				scoreList.add(sco);
+				return listss;
 			}
-			return scoreList;
+			return null;
 		}
 
 		@Override
 		protected void onPostExecute(List<List<Score>> result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
-			details.setVisibility(View.VISIBLE);
-			details.setText(mSpinner.getSelectedItem() + "----"
-					+ plan.getPool() + " " + time + "趟");
-
-			scoreListAdapter = new NameScoreListAdapter(
-					QueryScoreActivity.this, result, sumList, time + 1);
-			mExpandableListView.setAdapter(scoreListAdapter);
-			// 默认展开
-			for (int i = 0; i <= time; i++) {
-				mExpandableListView.expandGroup(i);
+			if (result != null) {
+				details.setVisibility(View.VISIBLE);
+				details.setText(dateTextView.getText().toString() + "----"
+						+ plan.getPool() + " " + time + "趟");
+				NameScoreListAdapter scoreListAdapter = new NameScoreListAdapter(
+						QueryScoreActivity.this, result, sumList, time + 1);
+				mExpandableListView.setAdapter(scoreListAdapter);
+				// 默认展开
+				for (int i = 0; i <= time; i++) {
+					mExpandableListView.expandGroup(i);
+				}
+			} else {
+				XUtils.showToast(QueryScoreActivity.this, mToast,
+						NO_SUCH_RECORDS_STRING);
 			}
 			mLoadingDialog.dismiss();
 		}
-
 	}
 
 	class NameScoreListAdapter extends BaseExpandableListAdapter {
@@ -318,6 +374,78 @@ public class QueryScoreActivity extends Activity {
 			private TextView rank;
 			private TextView score;
 			private TextView name;
+		}
+
+	}
+
+	class QueryDatesTask extends AsyncTask<Void, Void, List<String>> {
+
+		@Override
+		protected List<String> doInBackground(Void... params) {
+			// TODO Auto-generated method stub
+			List<Athlete> aths = dbManager.getAthletes(userid);
+			List<Long> aids = new ArrayList<Long>();
+			for (Athlete a : aths) {
+				aids.add(a.getId());
+			}
+			dateList = dbManager.getScoresByAthleteId(aids);
+			return dateList;
+		}
+
+		@Override
+		protected void onPostExecute(List<String> result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			dateList = result;
+			dateListView.removeHeaderView(headView);
+			adapter.setDatas(result);
+			adapter.notifyDataSetChanged();
+		}
+	}
+
+	class DatesAdapter extends BaseAdapter {
+		private Context mContext;
+		private List<String> list = new ArrayList<String>();
+
+		public DatesAdapter(Context mContext, List<String> list) {
+			this.mContext = mContext;
+			this.list = list;
+		}
+
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return list.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			// TODO Auto-generated method stub
+			if (convertView == null) {
+				convertView = View.inflate(mContext,
+						android.R.layout.simple_list_item_1, null);
+			}
+			TextView tView = (TextView) convertView
+					.findViewById(android.R.id.text1);
+			tView.setText(list.get(position));
+			return convertView;
+		}
+
+		public void setDatas(List<String> list) {
+			this.list.clear();
+			this.list.addAll(list);
 		}
 
 	}

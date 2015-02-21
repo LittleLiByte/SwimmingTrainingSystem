@@ -573,7 +573,7 @@ public class SeparateTimingActivity extends Activity {
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
+		
 		timerStop();
 	}
 

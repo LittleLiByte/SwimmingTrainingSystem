@@ -154,7 +154,6 @@ public class MatchScoreActivity extends Activity {
 			i.putExtra("Plan", p.getName() + "--" + p.getPool());
 			startActivity(i);
 			app.getMap().put(Constants.DRAG_NAME_LIST, null);
-			app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
 			app.getMap().put(Constants.ATHLETE_NUMBER, 0);
 			app.getMap().put(Constants.TEST_DATE, "");
 		}

@@ -155,7 +155,8 @@ public class LoginActivity extends Activity {
 			} else {
 				// 保存密码
 				XUtils.SaveLoginInfo(this, loginString, passwordString);
-				boolean tryConnect = (Boolean) app.getMap().get(Constants.IS_CONNECT_SERVICE);
+				boolean tryConnect = (Boolean) app.getMap().get(
+						Constants.IS_CONNECT_SERVICE);
 				if (tryConnect) {
 					if (loadingDialog == null) {
 						loadingDialog = LoadingDialog.createDialog(this);
@@ -165,35 +166,8 @@ public class LoginActivity extends Activity {
 					loadingDialog.show();
 					// 尝试连接服务器，如果连接成功则直接登录
 					loginRequest(loginString, passwordString);
-				} else {// 如果连接服务器失败，则会使用离线功能登录，可以保存数据但暂时无法上传,只是功能试用
+				} else {
 
-					// 通过用户名查询密码，不匹配则提示
-					String result = dbManager.getPassword(loginString);
-					if ("".equals(result)) {
-						XUtils.showToast(this, toast, "用户名不存在");
-						return;
-					}
-					// 可以使用默认帐号和已经注册的帐号
-					if (passwordString.equals(result)) {
-						XUtils.showToast(this, toast, "登陆成功");
-						// 将当前用户id保存为全局变量
-						User user = dbManager.getUserByName(loginString);
-						app.getMap().put(Constants.CURRENT_USER_ID, user.getId());
-						Handler handler = new Handler();
-						Runnable updateThread = new Runnable() {
-							public void run() {
-								Intent intent = new Intent(LoginActivity.this,
-										MainActivity.class);
-								LoginActivity.this.startActivity(intent);
-								overridePendingTransition(R.anim.push_right_in,
-										R.anim.push_left_out);
-								finish();
-							}
-						};
-						handler.postDelayed(updateThread, 200);
-					} else {
-						XUtils.showToast(this, toast, "密码错误！");
-					}
 				}
 			}
 		}
@@ -236,7 +210,8 @@ public class LoginActivity extends Activity {
 									// 如果该用户信息已存在本地数据库，则取出当前id作为全局变量
 									long currentId = dbManager.getUserByName(
 											user.getUsername()).getId();
-									app.getMap().put(Constants.CURRENT_USER_ID, currentId);
+									app.getMap().put(Constants.CURRENT_USER_ID,
+											currentId);
 								}
 							} else if (resCode == 2) {
 								XUtils.showToast(LoginActivity.this, toast,
@@ -380,6 +355,24 @@ public class LoginActivity extends Activity {
 						etPassword.setText("123456asdjkl");
 						etPassword.setEnabled(false);
 						userDialog.dismiss();
+						// 连接服务器失败，则会使用离线功能登录，可以保存数据但暂时无法上传,只是功能试用
+						XUtils.showToast(LoginActivity.this, toast, "登陆成功,立即跳转");
+						// 将当前用户id保存为全局变量
+						User user = dbManager.getUserByName("defaultUser");
+						app.getMap().put(Constants.CURRENT_USER_ID,
+								user.getId());
+						Handler handler = new Handler();
+						Runnable updateThread = new Runnable() {
+							public void run() {
+								Intent intent = new Intent(LoginActivity.this,
+										MainActivity.class);
+								LoginActivity.this.startActivity(intent);
+								overridePendingTransition(R.anim.push_right_in,
+										R.anim.push_left_out);
+								finish();
+							}
+						};
+						handler.postDelayed(updateThread, 1000);
 					}
 				}).show();
 

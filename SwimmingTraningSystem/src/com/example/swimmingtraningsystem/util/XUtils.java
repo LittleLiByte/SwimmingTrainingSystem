@@ -64,6 +64,34 @@ public class XUtils {
 	}
 
 	/**
+	 * 记录是否第一次打开应用的运动员Activity
+	 * 
+	 * @param context
+	 * @param isFirst
+	 */
+	public static void initAthletes(Context context, boolean isFirst) {
+		SharedPreferences sp = context.getSharedPreferences("loginInfo",
+				context.MODE_PRIVATE);
+		Editor editor = sp.edit();
+		editor.putBoolean(Constants.FISRTOPENATHLETE, isFirst);
+		editor.commit();
+	}
+
+	/**
+	 * 记录是否第一次打开应用的运动员Activity
+	 * 
+	 * @param context
+	 * @param isFirst
+	 */
+	public static void initPlans(Context context, boolean isFirst) {
+		SharedPreferences sp = context.getSharedPreferences("loginInfo",
+				context.MODE_PRIVATE);
+		Editor editor = sp.edit();
+		editor.putBoolean(Constants.FISRTOPENPLAN, isFirst);
+		editor.commit();
+	}
+
+	/**
 	 * 将一个运动员的多次成绩综合统计
 	 * 
 	 * @param list

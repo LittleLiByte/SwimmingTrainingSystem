@@ -84,6 +84,10 @@ public class Constants {
 
 	public final static String countries[] = new String[] { "第1道", "第2道",
 			"第3道", "第4道", "第5道", "第6道", "第7道", "第8道", };
+	
+	public static final String FISRTOPENATHLETE="fisrtOpenAthlete";
+	
+	public static final String FISRTOPENPLAN = "fisrtOpenPlan";
 	/**
 	 * 使用说明标题
 	 */

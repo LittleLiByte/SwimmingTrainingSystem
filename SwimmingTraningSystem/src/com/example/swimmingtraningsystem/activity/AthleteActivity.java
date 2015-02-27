@@ -73,6 +73,7 @@ public class AthleteActivity extends Activity {
 	private EditText mOthers;
 	// 运动员性别切换按钮
 	private Switch mGenderSwitch;
+	private Boolean isConnect;
 
 	private static final String ADD_ATHLETE_TITLE_STRING = "添加运动员";
 	private static final String NAME_CANNOT_BE_EMPTY_STRING = "运动员名字不能为空";
@@ -105,7 +106,14 @@ public class AthleteActivity extends Activity {
 				mAthletes, mUserId);
 		mListView.setAdapter(mAthleteListAdapter);
 		mQueue = Volley.newRequestQueue(this);
-		// getAthleteRequest();
+		// 根据是否能够连接服务器来操作，如果能够连接服务器，则使用服务返回的数据，否则将数据保存到本地使用
+		isConnect = (Boolean) mApplication.getMap().get(
+				Constants.IS_CONNECT_SERVICE);
+		
+		if (isConnect) {
+			getAthleteRequest();
+		}
+
 	}
 
 	/**
@@ -201,10 +209,6 @@ public class AthleteActivity extends Activity {
 		a.setPhone(contact);
 		a.setExtras(others);
 		a.setUser(mUser);
-
-		// 根据是否能够连接服务器来操作，如果能够连接服务器，则使用服务返回的数据，否则将数据保存到本地使用
-		boolean isConnect = (Boolean) mApplication.getMap().get(
-				Constants.IS_CONNECT_SERVICE);
 
 		if (isConnect) {
 			addAthleteequest(a);

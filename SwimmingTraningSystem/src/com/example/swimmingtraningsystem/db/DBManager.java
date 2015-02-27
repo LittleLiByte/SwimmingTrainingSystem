@@ -183,12 +183,13 @@ public class DBManager {
 	 * @param extras
 	 */
 	public void updateAthlete(List<Athlete> list, int postion, String name,
-			String age, String phone, String extras) {
+			String age, String gender, String phone, String extras) {
 
 		Long id = list.get(postion).getId();
 		ContentValues values = new ContentValues();
 		values.put("name", name);
 		values.put("age", Integer.parseInt(age));
+		values.put("gender", gender);
 		values.put("phone", phone);
 		values.put("extras", extras);
 		DataSupport.update(Athlete.class, values, id);

@@ -92,7 +92,8 @@ public class RegistAcyivity extends Activity {
 				XUtils.showToast(this, toast, "两次输入密码不一致");
 			} else {
 				// 如果处在联网状态，则发送至服务器
-				boolean isConnect = (Boolean) app.getMap().get(Constants.IS_CONNECT_SERVICE);
+				boolean isConnect = (Boolean) app.getMap().get(
+						Constants.IS_CONNECT_SERVICE);
 				if (isConnect) {
 					User newUser = new User();
 					newUser.setUsername(user);
@@ -102,8 +103,6 @@ public class RegistAcyivity extends Activity {
 					String jsonInfo = JsonTools.creatJsonString(newUser);
 					// 发送至服务器
 					registRequest(jsonInfo);
-				} else {
-					XUtils.showToast(this, toast, "无法连接服务器，注册失败！");
 				}
 			}
 		}
@@ -161,7 +160,8 @@ public class RegistAcyivity extends Activity {
 					public void onErrorResponse(VolleyError error) {
 						// TODO Auto-generated method stub
 						loadingDialog.dismiss();
-						XUtils.showToast(RegistAcyivity.this, toast, "无法连接服务器！");
+						XUtils.showToast(RegistAcyivity.this, toast,
+								"无法连接服务器！请使用默认账号试用");
 
 					}
 				}) {

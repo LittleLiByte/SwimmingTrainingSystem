@@ -143,7 +143,14 @@ public class AthleteActivity extends Activity {
 						String phone = mAthleteContact.getText().toString()
 								.trim();
 						String other = mOthers.getText().toString().trim();
-						String gender = mGenderSwitch.getPrivateImeOptions();
+
+						boolean isCheck = mGenderSwitch.isChecked();
+
+						System.out.println("isCheck--->" + isCheck);
+						String gender = "男";
+						if (!isCheck) {
+							gender = "女";
+						}
 						boolean isExit = mDbManager.isAthleteNameExsit(mUserId,
 								name);
 						if (TextUtils.isEmpty(name)) {
@@ -196,7 +203,8 @@ public class AthleteActivity extends Activity {
 		a.setUser(mUser);
 
 		// 根据是否能够连接服务器来操作，如果能够连接服务器，则使用服务返回的数据，否则将数据保存到本地使用
-		boolean isConnect = (Boolean) mApplication.getMap().get(Constants.IS_CONNECT_SERVICE);
+		boolean isConnect = (Boolean) mApplication.getMap().get(
+				Constants.IS_CONNECT_SERVICE);
 
 		if (isConnect) {
 			addAthleteequest(a);
@@ -262,8 +270,7 @@ public class AthleteActivity extends Activity {
 				return map;
 			}
 		};
-		request.setRetryPolicy(new DefaultRetryPolicy(
-				Constants.SOCKET_TIMEOUT,
+		request.setRetryPolicy(new DefaultRetryPolicy(Constants.SOCKET_TIMEOUT,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(request);

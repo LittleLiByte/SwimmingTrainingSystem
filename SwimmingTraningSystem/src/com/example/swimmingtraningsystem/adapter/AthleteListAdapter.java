@@ -41,6 +41,7 @@ import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.util.Constants;
 import com.example.swimmingtraningsystem.util.XUtils;
+import com.example.swimmingtraningsystem.view.Switch;
 
 /**
  * 运动员列表数据适配器
@@ -56,6 +57,7 @@ public class AthleteListAdapter extends BaseAdapter {
 	private boolean editable = false;
 	private EditText athleteName;
 	private EditText athleteAge;
+	private Switch mGenderSwitch;
 	private EditText athleteContact;
 	private EditText others;
 	private DBManager dbManager;
@@ -154,8 +156,18 @@ public class AthleteListAdapter extends BaseAdapter {
 		athleteAge = (EditText) window.findViewById(R.id.add_et_age);
 		athleteContact = (EditText) window.findViewById(R.id.add_et_contact);
 		others = (EditText) window.findViewById(R.id.add_et_extra);
+		mGenderSwitch = (Switch) window.findViewById(R.id.toggle_gender);
+
 		athleteName.setText(athletes.get(position).getName());
 		athleteAge.setText(athletes.get(position).getAge() + "");
+
+		String gender = athletes.get(position).getGender();
+		System.out.println("gender------->" + gender);
+		if (gender.equals("男")) {
+			mGenderSwitch.setChecked(true);
+		} else {
+			mGenderSwitch.setChecked(false);
+		}
 		athleteContact.setText(athletes.get(position).getPhone());
 		others.setText(athletes.get(position).getExtras());
 		// 禁用编辑框
@@ -163,6 +175,7 @@ public class AthleteListAdapter extends BaseAdapter {
 		athleteAge.setEnabled(false);
 		athleteContact.setEnabled(false);
 		others.setEnabled(false);
+		mGenderSwitch.setFocusable(false);
 
 	}
 
@@ -179,6 +192,7 @@ public class AthleteListAdapter extends BaseAdapter {
 		athleteAge.setEnabled(true);
 		athleteContact.setEnabled(true);
 		others.setEnabled(true);
+		mGenderSwitch.setFocusable(true);
 	}
 
 	/**
@@ -195,9 +209,12 @@ public class AthleteListAdapter extends BaseAdapter {
 			String ath_age = athleteAge.getText().toString().trim();
 			String ath_phone = athleteContact.getText().toString().trim();
 			String ath_extras = others.getText().toString().trim();
-
+			String ath_gender = "男";
+			if (!mGenderSwitch.isChecked()) {
+				ath_gender = "女";
+			}
 			dbManager.updateAthlete(athletes, position, ath_name, ath_age,
-					ath_phone, ath_extras);
+					ath_gender, ath_phone, ath_extras);
 			setDatas(dbManager.getAthletes(userID));
 			notifyDataSetChanged();
 			XUtils.showToast(context, toast, "修改成功");

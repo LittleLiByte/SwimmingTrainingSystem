@@ -153,7 +153,7 @@ public class LoginActivity extends Activity {
 					|| TextUtils.isEmpty(passwordString)) {
 				XUtils.showToast(this, toast, "用户名或密码不能为空");
 			} else {
-				// 保存密码
+				// 保存登录信息
 				XUtils.SaveLoginInfo(this, loginString, passwordString);
 				boolean tryConnect = (Boolean) app.getMap().get(
 						Constants.IS_CONNECT_SERVICE);
@@ -166,8 +166,6 @@ public class LoginActivity extends Activity {
 					loadingDialog.show();
 					// 尝试连接服务器，如果连接成功则直接登录
 					loginRequest(loginString, passwordString);
-				} else {
-
 				}
 			}
 		}
@@ -183,6 +181,7 @@ public class LoginActivity extends Activity {
 	 *            密码
 	 */
 	public void loginRequest(final String s1, final String s2) {
+
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				XUtils.HOSTURL + "login", new Listener<String>() {
 
@@ -355,26 +354,33 @@ public class LoginActivity extends Activity {
 						etPassword.setText("123456asdjkl");
 						etPassword.setEnabled(false);
 						userDialog.dismiss();
-						// 连接服务器失败，则会使用离线功能登录，可以保存数据但暂时无法上传,只是功能试用
-						XUtils.showToast(LoginActivity.this, toast, "登陆成功,立即跳转");
-						// 将当前用户id保存为全局变量
-						User user = dbManager.getUserByName("defaultUser");
-						app.getMap().put(Constants.CURRENT_USER_ID,
-								user.getId());
-						Handler handler = new Handler();
-						Runnable updateThread = new Runnable() {
-							public void run() {
-								Intent intent = new Intent(LoginActivity.this,
-										MainActivity.class);
-								LoginActivity.this.startActivity(intent);
-								overridePendingTransition(R.anim.push_right_in,
-										R.anim.push_left_out);
-								finish();
-							}
-						};
-						handler.postDelayed(updateThread, 1000);
+						offlineLogin();
 					}
 				}).show();
 
 	}
+
+	/**
+	 * 离线登录
+	 */
+	private void offlineLogin() {
+		// 连接服务器失败，则会使用离线功能登录，可以保存数据但暂时无法上传,只是功能试用
+		XUtils.showToast(LoginActivity.this, toast, "登陆成功,立即跳转");
+		// 将当前用户id保存为全局变量
+		User user = dbManager.getUserByName("defaultUser");
+		app.getMap().put(Constants.CURRENT_USER_ID, user.getId());
+		Handler handler = new Handler();
+		Runnable updateThread = new Runnable() {
+			public void run() {
+				Intent intent = new Intent(LoginActivity.this,
+						MainActivity.class);
+				LoginActivity.this.startActivity(intent);
+				overridePendingTransition(R.anim.push_right_in,
+						R.anim.push_left_out);
+				finish();
+			}
+		};
+		handler.postDelayed(updateThread, 1000);
+	}
+
 }

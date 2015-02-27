@@ -8,6 +8,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -109,8 +111,13 @@ public class AthleteActivity extends Activity {
 		// 根据是否能够连接服务器来操作，如果能够连接服务器，则使用服务返回的数据，否则将数据保存到本地使用
 		isConnect = (Boolean) mApplication.getMap().get(
 				Constants.IS_CONNECT_SERVICE);
-		
-		if (isConnect) {
+		SharedPreferences sp = getSharedPreferences(Constants.LOGININFO,
+				Context.MODE_PRIVATE);
+		boolean isFirst = sp.getBoolean(Constants.FISRTOPENATHLETE, true);
+		if (isFirst) {
+			XUtils.initAthletes(this, false);
+		}
+		if (isConnect && isFirst) {
 			getAthleteRequest();
 		}
 

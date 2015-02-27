@@ -44,8 +44,8 @@ public class XUtils {
 	 */
 	public static void SaveLoginInfo(Context context, String username,
 			String password) {
-		SharedPreferences sp = context.getSharedPreferences("loginInfo",
-				context.MODE_PRIVATE);
+		SharedPreferences sp = context.getSharedPreferences(
+				Constants.LOGININFO, context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putString("username", username);
 		editor.putString("password", password);
@@ -54,8 +54,8 @@ public class XUtils {
 
 	public static void SaveLoginInfo(Context context, String host, String ip,
 			String port) {
-		SharedPreferences sp = context.getSharedPreferences("loginInfo",
-				context.MODE_PRIVATE);
+		SharedPreferences sp = context.getSharedPreferences(
+				Constants.LOGININFO, context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putString("hostInfo", host);
 		editor.putString("ip", ip);
@@ -70,8 +70,8 @@ public class XUtils {
 	 * @param isFirst
 	 */
 	public static void initAthletes(Context context, boolean isFirst) {
-		SharedPreferences sp = context.getSharedPreferences("loginInfo",
-				context.MODE_PRIVATE);
+		SharedPreferences sp = context.getSharedPreferences(
+				Constants.LOGININFO, context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putBoolean(Constants.FISRTOPENATHLETE, isFirst);
 		editor.commit();
@@ -84,8 +84,8 @@ public class XUtils {
 	 * @param isFirst
 	 */
 	public static void initPlans(Context context, boolean isFirst) {
-		SharedPreferences sp = context.getSharedPreferences("loginInfo",
-				context.MODE_PRIVATE);
+		SharedPreferences sp = context.getSharedPreferences(
+				Constants.LOGININFO, context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putBoolean(Constants.FISRTOPENPLAN, isFirst);
 		editor.commit();

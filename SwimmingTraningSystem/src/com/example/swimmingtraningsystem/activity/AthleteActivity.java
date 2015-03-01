@@ -39,6 +39,7 @@ import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.User;
 import com.example.swimmingtraningsystem.util.Constants;
 import com.example.swimmingtraningsystem.util.XUtils;
+import com.example.swimmingtraningsystem.view.LoadingDialog;
 import com.example.swimmingtraningsystem.view.Switch;
 
 /**
@@ -48,6 +49,15 @@ import com.example.swimmingtraningsystem.view.Switch;
  * 
  */
 public class AthleteActivity extends Activity {
+	private static final String UNKNOW_ERROR = "服务器错误";
+	private static final String SYNCHRONOUS_SUCCESS = "同步成功！";
+	private static final String ADD_ATHLETE_TITLE_STRING = "添加运动员";
+	private static final String NAME_CANNOT_BE_EMPTY_STRING = "运动员名字不能为空";
+	private static final String NAME_CANNOT_BE_REPEATE_STRING = "存在运动员名字重复，请更改";
+	private static final String AGE_CANNOT_BE_EMPTY_STRING = "年龄不能为空";
+	private static final String ADDATHLETE = "addAthlete";
+	private static final String GETATHLETES = "getAthletes";
+
 	// 该对象保存全局变量
 	private MyApplication mApplication;
 	// 展示所有运动员信息的列表控件
@@ -75,14 +85,9 @@ public class AthleteActivity extends Activity {
 	private EditText mOthers;
 	// 运动员性别切换按钮
 	private Switch mGenderSwitch;
+	// 是否能连接服务器
 	private Boolean isConnect;
-
-	private static final String ADD_ATHLETE_TITLE_STRING = "添加运动员";
-	private static final String NAME_CANNOT_BE_EMPTY_STRING = "运动员名字不能为空";
-	private static final String NAME_CANNOT_BE_REPEATE_STRING = "存在运动员名字重复，请更改";
-	private static final String AGE_CANNOT_BE_EMPTY_STRING = "年龄不能为空";
-	private static final String ADDATHLETE = "addAthlete";
-	private static final String GETATHLETES = "getAthletes";
+	private LoadingDialog loadingDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +122,14 @@ public class AthleteActivity extends Activity {
 		if (isFirst) {
 			XUtils.initAthletes(this, false);
 		}
+		// 如果第一次打开应用并且可以连接服务器，就会尝试从服务器获取运动员信息
 		if (isConnect && isFirst) {
+			if (loadingDialog == null) {
+				loadingDialog = LoadingDialog.createDialog(this);
+				loadingDialog.setMessage("正在同步...");
+				loadingDialog.setCanceledOnTouchOutside(false);
+			}
+			loadingDialog.show();
 			getAthleteRequest();
 		}
 
@@ -270,6 +282,7 @@ public class AthleteActivity extends Activity {
 			public void onErrorResponse(VolleyError error) {
 				// TODO Auto-generated method stub
 				Log.e(Constants.TAG, error.getMessage());
+
 			}
 		}) {
 
@@ -288,7 +301,7 @@ public class AthleteActivity extends Activity {
 	}
 
 	/**
-	 * 获取运动员信息
+	 * 获取服务器上的运动员信息
 	 */
 	private void getAthleteRequest() {
 		StringRequest getrequest = new StringRequest(Method.GET, XUtils.HOSTURL
@@ -297,25 +310,30 @@ public class AthleteActivity extends Activity {
 			@Override
 			public void onResponse(String response) {
 				// TODO Auto-generated method stub
-				Log.i(Constants.TAG, response);
-				if (response.equals("1")) {
-					try {
-						JSONObject jsonObject = new JSONObject(response);
-						int resCode = (Integer) jsonObject.get("resCode");
-						if (resCode == 1) {
-							String jsonString = jsonObject.get("athlete")
-									.toString();
-							List<Athlete> athltes = JsonTools.getObjects(
-									jsonString, Athlete.class);
+				loadingDialog.dismiss();
+				try {
+					JSONObject jsonObject = new JSONObject(response);
+					int resCode = (Integer) jsonObject.get("resCode");
+					if (resCode == 1) {
+						String jsonString = jsonObject.get("athlete")
+								.toString();
+						List<Athlete> athletes = JsonTools.getObjects(
+								jsonString, Athlete.class);
+						// 将从服务器获取的运动员信息保存到本地数据库
+						for (Athlete a : athletes) {
+							a.save();
 						}
-
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					} else if (resCode == 2) {
+						XUtils.showToast(AthleteActivity.this, mToast,
+								SYNCHRONOUS_SUCCESS);
+					} else {
+						XUtils.showToast(AthleteActivity.this, mToast,
+								UNKNOW_ERROR);
 					}
 
-				} else {
-
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		}, new ErrorListener() {
@@ -323,9 +341,8 @@ public class AthleteActivity extends Activity {
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				// TODO Auto-generated method stub
-				if (error != null) {
-					Log.e(Constants.TAG, error.getMessage());
-				}
+				loadingDialog.dismiss();
+				Log.e(Constants.TAG, error.getMessage());
 			}
 		});
 		getrequest.setRetryPolicy(new DefaultRetryPolicy(

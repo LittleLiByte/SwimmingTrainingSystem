@@ -308,7 +308,6 @@ public class AthleteListAdapter extends BaseAdapter {
 	public void modifyAthRequest(List<Athlete> athletes, int position) {
 
 		Athlete obj = athletes.get(position);
-
 		obj = DataSupport.find(Athlete.class, obj.getId(), true);
 		final String athleteJson = JsonTools.creatJsonString(obj);
 		StringRequest stringRequest = new StringRequest(Method.POST,

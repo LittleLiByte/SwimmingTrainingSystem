@@ -5,8 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -23,6 +27,7 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -34,6 +39,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
+import com.example.swimmingtraningsystem.activity.AthleteActivity;
 import com.example.swimmingtraningsystem.activity.MyApplication;
 import com.example.swimmingtraningsystem.db.DBManager;
 import com.example.swimmingtraningsystem.effect.Effectstype;
@@ -44,6 +50,7 @@ import com.example.swimmingtraningsystem.model.Plan;
 import com.example.swimmingtraningsystem.model.Upid;
 import com.example.swimmingtraningsystem.util.Constants;
 import com.example.swimmingtraningsystem.util.XUtils;
+import com.example.swimmingtraningsystem.view.LoadingDialog;
 
 /**
  * 查看计划Fragment
@@ -52,6 +59,8 @@ import com.example.swimmingtraningsystem.util.XUtils;
  * 
  */
 public class ViewPlanFragment extends Fragment implements OnClickListener {
+	private static final String UNKNOW_ERROR = "服务器错误";
+	private static final String SYNCHRONOUS_SUCCESS = "同步成功！";
 	private MyApplication app;
 	private Activity activity;
 	private DBManager dbManager;
@@ -64,6 +73,9 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 	private TextView tips;
 	private boolean isMulChoice = false; // 是否多选
 	private RequestQueue mQueue;
+	private LoadingDialog loadingDialog;
+	private Boolean isConnect;
+	private Toast mToast;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -92,6 +104,25 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 		adapter = new ViewPlanAdapter(activity, tips);
 		listView.setAdapter(adapter);
 		mQueue = Volley.newRequestQueue(activity);
+		// 如果处在联网状态，则发送至服务器
+		isConnect = (Boolean) app.getMap().get(Constants.IS_CONNECT_SERVICE);
+
+		SharedPreferences sp = activity.getSharedPreferences(
+				Constants.LOGININFO, Context.MODE_PRIVATE);
+		boolean isFirst = sp.getBoolean(Constants.FISRTOPENPLAN, true);
+		if (isFirst) {
+			XUtils.initAthletes(activity, false);
+		}
+		if (isConnect && isFirst) {
+			if (loadingDialog == null) {
+				loadingDialog = LoadingDialog.createDialog(activity);
+				loadingDialog.setMessage("正在同步...");
+				loadingDialog.setCanceledOnTouchOutside(false);
+			}
+			loadingDialog.show();
+			// 发送至服务器
+			getPlansRequest();
+		}
 	}
 
 	@Override
@@ -114,8 +145,6 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 			List<Upid> upids = dbManager.getdeletePlanId(selectid);
 			dbManager.deletePlans(selectid);
 
-			// 如果处在联网状态，则发送至服务器
-			boolean isConnect = (Boolean) app.getMap().get(Constants.IS_CONNECT_SERVICE);
 			if (isConnect) {
 				// 发送至服务器
 				deletePlanRequest(upids);
@@ -276,6 +305,66 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 		}
 	}
 
+	public void getPlansRequest() {
+		StringRequest getAthRequest = new StringRequest(Method.POST,
+				XUtils.HOSTURL + "getPlans", new Listener<String>() {
+
+					@Override
+					public void onResponse(String response) {
+						// TODO Auto-generated method stub
+						Log.i("getPlans", response);
+						loadingDialog.dismiss();
+						try {
+							JSONObject jsonObject = new JSONObject(response);
+							int resCode = (Integer) jsonObject.get("resCode");
+							if (resCode == 1) {
+								String jsonString = jsonObject.get("plan")
+										.toString();
+								List<Plan> plans = JsonTools.getObjects(
+										jsonString, Athlete.class);
+								// 将从服务器获取的运动员信息保存到本地数据库
+								for (Plan plan : plans) {
+									plan.save();
+								}
+							} else if (resCode == 2) {
+								XUtils.showToast(activity, mToast,
+										SYNCHRONOUS_SUCCESS);
+							} else {
+								XUtils.showToast(activity, mToast, UNKNOW_ERROR);
+							}
+
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}, new ErrorListener() {
+
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						// TODO Auto-generated method stub
+						loadingDialog.dismiss();
+						Log.e("ViewPlan", error.getMessage());
+					}
+				}) {
+
+			// @Override
+			// protected Map<String, String> getParams() throws AuthFailureError
+			// {
+			// // 设置请求参数
+			// Map<String, String> map = new HashMap<String, String>();
+			// map.put("deletePlansJson", jsonString);
+			// return map;
+			// }
+
+		};
+		getAthRequest.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+		mQueue.add(getAthRequest);
+	}
+
 	public void deletePlanRequest(List<Upid> upids) {
 		// 数据查询出该计划的uid和pid;
 		final String jsonString = JsonTools.creatJsonString(upids);
@@ -317,4 +406,5 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);
 	}
+
 }

@@ -52,7 +52,7 @@ public class JsonTools {
 	 * @param cls
 	 * @return
 	 */
-	public static <T> List<T> getObjects(String jsonString, Class cls) {
+	public static <T> List<T> getObjects(String jsonString, @SuppressWarnings("rawtypes") Class cls) {
 		List<T> list = new ArrayList<T>();
 		try {
 			Gson gson = new Gson();

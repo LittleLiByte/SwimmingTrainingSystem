@@ -14,6 +14,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -39,7 +41,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
-import com.example.swimmingtraningsystem.activity.AthleteActivity;
 import com.example.swimmingtraningsystem.activity.MyApplication;
 import com.example.swimmingtraningsystem.db.DBManager;
 import com.example.swimmingtraningsystem.effect.Effectstype;
@@ -162,8 +163,8 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 	class ViewPlanAdapter extends BaseAdapter {
 		private Context context;
 		private LayoutInflater inflater = null;
-		public HashMap<Integer, Integer> visiblecheck;// 用来记录是否显示checkBox
-		public HashMap<Integer, Boolean> ischeck;
+		public SparseIntArray visiblecheck;// 用来记录是否显示checkBox
+		public SparseBooleanArray ischeck;
 		private TextView tips;
 		private List<String> athleteName = new ArrayList<String>();
 
@@ -172,9 +173,8 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 			this.tips = tips;
 			inflater = (LayoutInflater) context
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			visiblecheck = new HashMap<Integer, Integer>();
-			ischeck = new HashMap<Integer, Boolean>();
-
+			visiblecheck = new SparseIntArray();
+			ischeck = new SparseBooleanArray();
 		}
 
 		public int getCount() {

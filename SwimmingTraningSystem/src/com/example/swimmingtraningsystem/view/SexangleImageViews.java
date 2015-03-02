@@ -31,7 +31,6 @@ public class SexangleImageViews extends ImageView {
 
 	private int mWidth;
 	private int mHeight;
-	@SuppressWarnings("unused")
 	private int centreX;
 	private int centreY;
 	private int mLenght;

@@ -3,7 +3,6 @@ package com.example.swimmingtraningsystem.activity;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -41,7 +40,6 @@ public class ShowScoreActivity extends Activity {
 	private String date;
 	private Integer times;
 	private static final String GENERATING_THE_SCORES = "正在生成本次计时结果...";
-	private static final String TOTAL_SCORES = "本轮合计";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

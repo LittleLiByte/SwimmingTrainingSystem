@@ -355,7 +355,7 @@ public class SeparateTimingActivity extends Activity {
 				null);
 		final Dialog dialog = new Dialog(this,
 				R.style.transparentFrameWindowStyle);
-		dialog.setContentView(view, new LayoutParams(LayoutParams.FILL_PARENT,
+		dialog.setContentView(view, new LayoutParams(LayoutParams.MATCH_PARENT,
 				LayoutParams.WRAP_CONTENT));
 		Window window = dialog.getWindow();
 		// …Ë÷√œ‘ æ∂Øª≠

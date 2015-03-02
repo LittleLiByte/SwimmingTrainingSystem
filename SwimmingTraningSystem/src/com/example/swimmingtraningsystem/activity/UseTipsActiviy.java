@@ -40,7 +40,7 @@ public class UseTipsActiviy extends Activity {
 			// 自己定义一个获得文字信息的方法
 			TextView getTextView() {
 				AbsListView.LayoutParams lp = new AbsListView.LayoutParams(
-						ViewGroup.LayoutParams.FILL_PARENT, 64);
+						ViewGroup.LayoutParams.MATCH_PARENT, 64);
 				TextView textView = new TextView(UseTipsActiviy.this);
 				textView.setLayoutParams(lp);
 				textView.setGravity(Gravity.CENTER_VERTICAL);

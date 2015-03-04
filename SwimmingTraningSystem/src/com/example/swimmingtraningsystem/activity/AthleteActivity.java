@@ -262,7 +262,7 @@ public class AthleteActivity extends Activity {
 					if (resCode == 1) {
 						XUtils.showToast(AthleteActivity.this, mToast,
 								Constants.ADD_SUCCESS_STRING);
-						int aid = (Integer) obj.get("athlete");
+						int aid = (Integer) obj.get("aid");
 						a.setAid(aid);
 						a.save();
 						mAthletes = mDbManager.getAthletes(mUserId);

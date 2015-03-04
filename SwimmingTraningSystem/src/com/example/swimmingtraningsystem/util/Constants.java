@@ -1,5 +1,6 @@
 package com.example.swimmingtraningsystem.util;
 
+
 /**
  * 保存系统所需常量类
  * 
@@ -84,9 +85,9 @@ public class Constants {
 
 	public final static String countries[] = new String[] { "第1道", "第2道",
 			"第3道", "第4道", "第5道", "第6道", "第7道", "第8道", };
-	
-	public static final String FISRTOPENATHLETE="fisrtOpenAthlete";
-	
+
+	public static final String FISRTOPENATHLETE = "fisrtOpenAthlete";
+
 	public static final String FISRTOPENPLAN = "fisrtOpenPlan";
 	/**
 	 * 使用说明标题
@@ -111,4 +112,5 @@ public class Constants {
 					+ "全部运动员到达终点后，点击底部的运动员成绩匹配按钮跳转到匹配页面。在成绩匹配页面，拖动运动员名字到对应的成绩的行，"
 					+ "最后按下保存按钮即可保存本次计时。同样，计时完成后会显示每次的成绩和综合成绩。" },
 			{ "现阶段可以进行按运动员名字查出成绩，待服务器建立后可以进行联网查询。" } };
+
 }

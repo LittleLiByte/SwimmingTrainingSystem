@@ -100,9 +100,9 @@ public class RegistAcyivity extends Activity {
 					newUser.setPassword(pass);
 					newUser.setEmail(Email);
 					newUser.setPhone(cellphone);
-					String jsonInfo = JsonTools.creatJsonString(newUser);
+
 					// 发送至服务器
-					registRequest(jsonInfo);
+					registRequest(newUser);
 				}
 			}
 		}
@@ -114,11 +114,14 @@ public class RegistAcyivity extends Activity {
 	 * 
 	 * @param jsonString
 	 */
-	private void registRequest(final String jsonString) {
+	private void registRequest(final User user) {
 		if (loadingDialog == null) {
 			loadingDialog = LoadingDialog.createDialog(this);
 		}
 		loadingDialog.show();
+
+		final String jsonInfo = JsonTools.creatJsonString(user);
+
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				XUtils.HOSTURL + "regist", new Listener<String>() {
 
@@ -133,9 +136,10 @@ public class RegistAcyivity extends Activity {
 							if (resCode == 1) {
 								XUtils.showToast(RegistAcyivity.this, toast,
 										"注册成功");
-								String userJson = obj.get("user").toString();
-								User user = JsonTools.getObject(userJson,
-										User.class);
+								String uid = obj.get("uid").toString();
+								// User user = JsonTools.getObject(userJson,
+								// User.class);
+								user.setUid(Integer.parseInt(uid));
 								user.save();
 								overridePendingTransition(R.anim.slide_up_in,
 										R.anim.slide_down_out);
@@ -170,7 +174,7 @@ public class RegistAcyivity extends Activity {
 			protected Map<String, String> getParams() throws AuthFailureError {
 				// 设置请求参数
 				Map<String, String> map = new HashMap<String, String>();
-				map.put("registJson", jsonString);
+				map.put("registJson", jsonInfo);
 				return map;
 			}
 

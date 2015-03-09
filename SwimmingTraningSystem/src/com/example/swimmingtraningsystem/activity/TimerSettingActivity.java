@@ -213,5 +213,4 @@ public class TimerSettingActivity extends Activity {
 		}
 		return false;
 	}
-
 }

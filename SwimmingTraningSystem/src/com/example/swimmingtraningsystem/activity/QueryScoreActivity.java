@@ -63,6 +63,7 @@ public class QueryScoreActivity extends Activity {
 	private final static String NO_SUCH_RECORDS_STRING = "没有关于该查询条件的记录！";
 	private final static String PLEASE_SELECT_RIGHT_TIME_STRING = "请选择正确的查询时间！";
 	private final static String GENERATING_RESULT_STRING = "正在生成查询结果...";
+	private static final String NOT_CORRECT_STRING = "本次计时成绩不完整，无法正确展示！";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -197,7 +198,7 @@ public class QueryScoreActivity extends Activity {
 		protected List<List<Score>> doInBackground(String... params) {
 			// TODO Auto-generated method stub
 			plan = dbManager.getPlanInScoreByDate(params[0]);
-			// 如果输入的条件无法查询出成绩
+			// 输入的条件查询确保能查询出对应的成绩
 			if (plan != null) {
 				time = plan.getTime();
 				List<List<Score>> listss = new ArrayList<List<Score>>();
@@ -213,7 +214,11 @@ public class QueryScoreActivity extends Activity {
 						sumList = dbManager.getAthleteIdInScoreByDate(
 								params[0], athIds);
 					}
-					listss.add(sco);
+					// 查询出来要确保该轮成绩是存在的
+					if (sco.size() != 0) {
+						listss.add(sco);
+					}
+
 				}
 				return listss;
 			}
@@ -224,7 +229,13 @@ public class QueryScoreActivity extends Activity {
 		protected void onPostExecute(List<List<Score>> result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
-			if (result != null) {
+			// 成绩是否完整，中途退出计时会导致计时成绩不完整
+			boolean isComplete = true;
+			System.out.println("result.size()--->" + result.size());
+			if (result.size() != time) {
+				isComplete = false;
+			}
+			if (result != null && isComplete) {
 				details.setVisibility(View.VISIBLE);
 				details.setText(dateTextView.getText().toString() + "----"
 						+ plan.getPool() + " " + time + "趟");
@@ -235,6 +246,9 @@ public class QueryScoreActivity extends Activity {
 				for (int i = 0; i <= time; i++) {
 					mExpandableListView.expandGroup(i);
 				}
+			} else if (!isComplete) {
+				XUtils.showToast(QueryScoreActivity.this, mToast,
+						NOT_CORRECT_STRING);
 			} else {
 				XUtils.showToast(QueryScoreActivity.this, mToast,
 						NO_SUCH_RECORDS_STRING);

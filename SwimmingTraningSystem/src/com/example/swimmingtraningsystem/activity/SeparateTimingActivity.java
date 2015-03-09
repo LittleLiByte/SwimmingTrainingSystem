@@ -78,7 +78,10 @@ public class SeparateTimingActivity extends Activity {
 	private List<Athlete> athletes;
 
 	private LinearLayout poolway;
+	private RelativeLayout rlStartCount;
 	private TextView tv_clock;
+	private TextView currentTimeTextView;
+
 	/**
 	 * 保存所有计时成绩
 	 */
@@ -133,7 +136,7 @@ public class SeparateTimingActivity extends Activity {
 		}
 	};
 	protected boolean scrolling = false;
-	private Toast toast;;
+	private Toast toast;
 
 	@SuppressLint("HandlerLeak")
 	@SuppressWarnings("unchecked")
@@ -149,16 +152,18 @@ public class SeparateTimingActivity extends Activity {
 		int height = ScreenUtils.getScreenHeight(this)
 				- ScreenUtils.dip2px(this, 50);
 		tv_clock = (TextView) findViewById(R.id.tv_clcok);
+		currentTimeTextView = (TextView) findViewById(R.id.number_tip);
+		rlStartCount = (RelativeLayout) findViewById(R.id.rl_clockview);
 		athID = (List<Long>) app.getMap().get(Constants.ATHLTE_ID_LIST);
 		planID = (Long) app.getMap().get(Constants.PLAN_ID);
 		int swimTime = ((Integer) app.getMap().get(Constants.CURRENT_SWIM_TIME)) + 1;
-		XUtils.showToast(context, toast, "第" + swimTime + "次计时");
+		currentTimeTextView.setText("第" + swimTime + "次计时");
 		app.getMap().put(Constants.CURRENT_SWIM_TIME, swimTime);
 		athletes = dbManager.getAthletes(athID);
 		COUNT_MAX = athletes.size();
 		poolwidth = height / COUNT_MAX;
 
-		tv_clock.setOnClickListener(new OnClickListener() {
+		rlStartCount.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -175,7 +180,7 @@ public class SeparateTimingActivity extends Activity {
 				} else {
 					isBegin = true;
 					startTimer();
-					tv_clock.setClickable(false);
+					rlStartCount.setClickable(false);
 				}
 
 			}
@@ -187,6 +192,7 @@ public class SeparateTimingActivity extends Activity {
 		// TODO Auto-generated method stub
 
 		poolway = (LinearLayout) findViewById(R.id.poolway);
+
 		// 计时成绩文本的大小属性,放置在布局中心
 		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -414,7 +420,8 @@ public class SeparateTimingActivity extends Activity {
 		// 获取本次记录测试的日期
 		String date = (String) app.getMap().get(Constants.TEST_DATE);
 		// 第几趟测试
-		int nowCurrent = (Integer) app.getMap().get(Constants.CURRENT_SWIM_TIME);
+		int nowCurrent = (Integer) app.getMap()
+				.get(Constants.CURRENT_SWIM_TIME);
 		Plan p = dbManager.queryPlan(planID);
 		long userid = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 
@@ -446,7 +453,8 @@ public class SeparateTimingActivity extends Activity {
 		XUtils.showToast(context, toast, "保存成功！");
 
 		// 如果处在联网状态，则发送至服务器
-		boolean isConnect = (Boolean) app.getMap().get(Constants.IS_CONNECT_SERVICE);
+		boolean isConnect = (Boolean) app.getMap().get(
+				Constants.IS_CONNECT_SERVICE);
 		if (isConnect) {
 			// 发送至服务器
 			saveScoreRequest(JsonTools.creatJsonString(scoresJson));
@@ -457,11 +465,12 @@ public class SeparateTimingActivity extends Activity {
 			app.getMap().put(Constants.SWIM_TIME, swimTime);
 			reset();
 			swimTime = ((Integer) app.getMap().get(Constants.CURRENT_SWIM_TIME)) + 1;
-			XUtils.showToast(context, toast, "第" + swimTime + "次计时");
+			currentTimeTextView.setText("第" + swimTime + "次计时");
 			app.getMap().put(Constants.CURRENT_SWIM_TIME, swimTime);
 		} else {
 			Intent i = new Intent(this, ShowScoreActivity.class);
-			i.putExtra(Constants.TEST_DATE, (String) app.getMap().get(Constants.TEST_DATE));
+			i.putExtra(Constants.TEST_DATE,
+					(String) app.getMap().get(Constants.TEST_DATE));
 			i.putExtra("Plan", p.getName() + "--" + p.getPool());
 			startActivity(i);
 			app.getMap().put(Constants.SWIM_TIME, 1);
@@ -487,9 +496,9 @@ public class SeparateTimingActivity extends Activity {
 						// TODO Auto-generated method stub
 						Log.i("addScores", response);
 						if (response.equals("1")) {
-							
+
 						} else {
-							
+
 						}
 					}
 				}, new ErrorListener() {
@@ -551,7 +560,7 @@ public class SeparateTimingActivity extends Activity {
 			relativelayouts.get(i - 1).setClickable(true);
 		}
 		tv_clock.setText("00分00秒000");
-		tv_clock.setClickable(true);
+		rlStartCount.setClickable(true);
 	}
 
 	protected String getStrTime() {
@@ -574,8 +583,9 @@ public class SeparateTimingActivity extends Activity {
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		
+		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
 		timerStop();
+
 	}
 
 	/**

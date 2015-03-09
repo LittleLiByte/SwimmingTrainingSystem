@@ -449,7 +449,7 @@ public class SeparateTimingActivity extends Activity {
 		boolean isConnect = (Boolean) app.getMap().get(Constants.IS_CONNECT_SERVICE);
 		if (isConnect) {
 			// 发送至服务器
-			createNewRequest(JsonTools.creatJsonString(scoresJson));
+			saveScoreRequest(JsonTools.creatJsonString(scoresJson));
 		}
 
 		int swimTime = ((Integer) app.getMap().get(Constants.SWIM_TIME)) - 1;
@@ -477,7 +477,7 @@ public class SeparateTimingActivity extends Activity {
 	 * 
 	 * @param jsonString
 	 */
-	public void createNewRequest(final String jsonString) {
+	public void saveScoreRequest(final String jsonString) {
 
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				XUtils.HOSTURL + "addScores", new Listener<String>() {
@@ -486,9 +486,10 @@ public class SeparateTimingActivity extends Activity {
 					public void onResponse(String response) {
 						// TODO Auto-generated method stub
 						Log.i("addScores", response);
-						if (response.equals("ok")) {
-
+						if (response.equals("1")) {
+							
 						} else {
+							
 						}
 					}
 				}, new ErrorListener() {

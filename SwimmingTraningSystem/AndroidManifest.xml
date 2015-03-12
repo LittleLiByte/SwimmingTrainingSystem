@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="10"
+        android:minSdkVersion="13"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -30,10 +30,12 @@
         </activity>
         <activity
             android:name="com.example.swimmingtraningsystem.activity.MainActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.example.swimmingtraningsystem.activity.LoginActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait" >
         </activity>
         <activity
@@ -54,13 +56,13 @@
         </activity>
         <activity
             android:name="com.example.swimmingtraningsystem.activity.TimerActivity"
-            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
             android:name="com.example.swimmingtraningsystem.activity.QueryScoreActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >
         </activity>
         <activity
             android:name="com.example.swimmingtraningsystem.activity.SettingActivity"

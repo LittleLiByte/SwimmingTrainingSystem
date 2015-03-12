@@ -27,7 +27,15 @@ public class SettingActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_setting);
-		app = (MyApplication) getApplication();
+		try {
+			app = (MyApplication) getApplication();
+			//这里是为了应对可能出现的application里面的全局变量被系统回收导致的错误
+			Long mUserId = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
+		} catch (Exception e) {
+			// TODO: handle exception
+			startActivity(new Intent(this, LoginActivity.class));
+		}
+		
 	}
 
 	public void createDialog() {

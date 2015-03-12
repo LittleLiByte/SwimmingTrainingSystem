@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -34,6 +35,7 @@ public class ModifyPassActivity extends Activity {
 	private EditText modify_comfirmpass;
 	private RequestQueue mQueue;
 	private Toast toast;
+	private Long userId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +43,17 @@ public class ModifyPassActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_modify);
+		try {
+			init();
+		} catch (Exception e) {
+			// TODO: handle exception
+			startActivity(new Intent(this, LoginActivity.class));
+		}
+	}
+
+	private void init() {
 		app = (MyApplication) getApplication();
+		userId = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		dbManager = DBManager.getInstance();
 		modify_oldpass = (EditText) findViewById(R.id.modify_oldpass);
 		modify_newpass = (EditText) findViewById(R.id.modify_newpass);
@@ -58,7 +70,7 @@ public class ModifyPassActivity extends Activity {
 		String oldPassword = modify_oldpass.getText().toString().trim();
 		String newPassword = modify_newpass.getText().toString().trim();
 		String comfPassword = modify_comfirmpass.getText().toString().trim();
-		long userId = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
+
 		String name = dbManager.getUser(userId).getUsername();
 		String userPass = dbManager.getUser(userId).getPassword();
 		if (TextUtils.isEmpty(oldPassword)) {
@@ -77,7 +89,8 @@ public class ModifyPassActivity extends Activity {
 			dbManager.modifyUserPassword(userId, comfPassword);
 			XUtils.showToast(this, toast, "修改密码成功！");
 			// 如果处在联网状态，则发送至服务器
-			boolean isConnect = (Boolean) app.getMap().get(Constants.IS_CONNECT_SERVICE);
+			boolean isConnect = (Boolean) app.getMap().get(
+					Constants.IS_CONNECT_SERVICE);
 			if (isConnect) {
 				// 发送至服务器
 				modifyRequest(oldPassword, newPassword, comfPassword);

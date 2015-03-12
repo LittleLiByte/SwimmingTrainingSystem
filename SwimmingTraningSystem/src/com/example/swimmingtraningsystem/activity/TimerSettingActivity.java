@@ -61,7 +61,12 @@ public class TimerSettingActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_clockset);
-		init();
+		try {
+			init();
+		} catch (Exception e) {
+			// TODO: handle exception
+			startActivity(new Intent(this, LoginActivity.class));
+		}
 
 	}
 

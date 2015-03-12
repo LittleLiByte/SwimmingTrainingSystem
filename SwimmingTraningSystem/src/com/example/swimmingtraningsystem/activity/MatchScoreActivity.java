@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.AbsListView;
@@ -61,12 +62,16 @@ public class MatchScoreActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_matchscore);
-		initView();
-
+		try {
+			init();
+		} catch (Exception e) {
+			// TODO: handle exception
+			startActivity(new Intent(this, LoginActivity.class));
+		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void initView() {
+	private void init() {
 		// TODO Auto-generated method stub
 		app = (MyApplication) getApplication();
 		Intent result = getIntent();
@@ -166,6 +171,7 @@ public class MatchScoreActivity extends Activity {
 	 * @param v
 	 */
 	public void matchBack(View v) {
+		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
 		finish();
 	}
 
@@ -248,4 +254,15 @@ public class MatchScoreActivity extends Activity {
 		mQueue.add(stringRequest);
 	}
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// TODO Auto-generated method stub
+		// 进入计时界面却不进行成绩匹配而直接返回,要将当前第几次计时置0
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
+			finish();
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
 }

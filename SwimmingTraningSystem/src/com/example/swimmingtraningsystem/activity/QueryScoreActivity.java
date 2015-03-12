@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -71,7 +72,12 @@ public class QueryScoreActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_score);
-		init();
+		try {
+			init();
+		} catch (Exception e) {
+			// TODO: handle exception
+			startActivity(new Intent(this, LoginActivity.class));
+		}
 	}
 
 	/**

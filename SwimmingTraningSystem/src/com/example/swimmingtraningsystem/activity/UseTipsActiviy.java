@@ -1,6 +1,7 @@
 package com.example.swimmingtraningsystem.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -33,8 +34,16 @@ public class UseTipsActiviy extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_tips);
-		expandableListView = (ExpandableListView) findViewById(R.id.tips_list);
+		try {
+			init();
+		} catch (Exception e) {
+			// TODO: handle exception
+			startActivity(new Intent(this, LoginActivity.class));
+		}
+	}
 
+	private void init() {
+		expandableListView = (ExpandableListView) findViewById(R.id.tips_list);
 		final ExpandableListAdapter adapter = new BaseExpandableListAdapter() {
 
 			// 自己定义一个获得文字信息的方法
@@ -125,7 +134,6 @@ public class UseTipsActiviy extends Activity {
 			}
 
 		};
-
 		expandableListView.setAdapter(adapter);
 	}
 }

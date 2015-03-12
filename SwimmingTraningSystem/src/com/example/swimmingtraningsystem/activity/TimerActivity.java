@@ -110,8 +110,13 @@ public class TimerActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_timer);
-		setupView();
-		setupData();
+		try {
+			setupView();
+			setupData();
+		} catch (Exception e) {
+			// TODO: handle exception
+			startActivity(new Intent(this, LoginActivity.class));
+		}
 	}
 
 	private void setupView() {

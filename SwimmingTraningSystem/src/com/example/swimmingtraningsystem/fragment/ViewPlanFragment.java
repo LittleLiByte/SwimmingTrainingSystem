@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -41,6 +42,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
+import com.example.swimmingtraningsystem.activity.LoginActivity;
 import com.example.swimmingtraningsystem.activity.MyApplication;
 import com.example.swimmingtraningsystem.db.DBManager;
 import com.example.swimmingtraningsystem.effect.Effectstype;
@@ -89,6 +91,15 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
+		try {
+			initFragment();
+		} catch (Exception e) {
+			startActivity(new Intent(getActivity(), LoginActivity.class));
+		}
+		
+	}
+
+	private void initFragment() {
 		activity = getActivity();
 		app = (MyApplication) activity.getApplication();
 		long userID = (Long) app.getMap().get(Constants.CURRENT_USER_ID);

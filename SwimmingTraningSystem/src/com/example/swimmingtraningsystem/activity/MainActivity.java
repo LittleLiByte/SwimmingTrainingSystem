@@ -49,18 +49,33 @@ public class MainActivity extends Activity {
 					R.anim.slide_bottom_out);
 		}
 	};
+	private MyApplication app;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_main);
+		try {
+			init();
+		} catch (Exception e) {
+			// TODO: handle exception
+			startActivity(new Intent(this, LoginActivity.class));
+		}
+
+	}
+
+	private void init() {
 		sexangleViewGroup = (SexangleViewGroup) findViewById(R.id.sexangleView);
 		initView();
-		MyApplication app = (MyApplication) getApplication();
+		app = (MyApplication) getApplication();
 		app.addActivity(this);
 	}
 
+	
+	/**
+	 * 初始化六边形实体
+	 */
 	private void initView() {
 		// TODO Auto-generated method stub
 		for (int i = 0; i < 5; i++) {
@@ -106,7 +121,7 @@ public class MainActivity extends Activity {
 				Toast.makeText(this, "在按一次退出", Toast.LENGTH_SHORT).show();
 				mExitTime = System.currentTimeMillis();
 			} else {
-				finish();
+				app.exit();
 			}
 
 			return true;
@@ -122,9 +137,8 @@ public class MainActivity extends Activity {
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		MyApplication app = (MyApplication) getApplication();
 		app.getMap().put(Constants.SWIM_TIME, 1);
-		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
+		app.getMap().put(Constants.CURRENT_SWIM_TIME, "");
 		app.getMap().put(Constants.ATHLETE_NUMBER, 0);
 		app.getMap().put(Constants.ATHLTE_ID_LIST, null);
 		app.getMap().put(Constants.PLAN_ID, 0);

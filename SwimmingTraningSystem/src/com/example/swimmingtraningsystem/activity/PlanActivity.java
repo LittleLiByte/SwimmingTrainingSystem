@@ -3,6 +3,7 @@ package com.example.swimmingtraningsystem.activity;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
@@ -63,8 +64,13 @@ public class PlanActivity extends FragmentActivity implements OnClickListener {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_plan);
-		initView();
-		initData();
+		try {
+			initView();
+			initData();
+		} catch (Exception e) {
+			// TODO: handle exception
+			startActivity(new Intent(this, LoginActivity.class));
+		}
 	}
 
 	private void initView() {

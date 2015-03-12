@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -35,6 +36,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
+import com.example.swimmingtraningsystem.activity.LoginActivity;
 import com.example.swimmingtraningsystem.activity.MyApplication;
 import com.example.swimmingtraningsystem.adapter.AddPlanListAdapter;
 import com.example.swimmingtraningsystem.adapter.ChoseAthleteAdapter;
@@ -88,12 +90,15 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
-		setupView();
-		initData();
-
+		try {
+			initView();
+			initData();
+		} catch (Exception e) {
+			startActivity(new Intent(getActivity(), LoginActivity.class));
+		}
 	}
 
-	private void setupView() {
+	private void initView() {
 		activity = getActivity();
 		app = (MyApplication) activity.getApplication();
 		dbManager = DBManager.getInstance();

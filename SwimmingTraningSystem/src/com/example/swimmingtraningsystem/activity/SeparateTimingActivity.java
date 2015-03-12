@@ -145,6 +145,15 @@ public class SeparateTimingActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_seperatetiming);
 
+		try {
+			init();
+		} catch (Exception e) {
+			// TODO: handle exception
+			startActivity(new Intent(this, LoginActivity.class));
+		}
+	}
+
+	private void init() {
 		app = (MyApplication) getApplication();
 		context = SeparateTimingActivity.this;
 		dbManager = DBManager.getInstance();
@@ -185,14 +194,12 @@ public class SeparateTimingActivity extends Activity {
 
 			}
 		});
-		init();
+		initSwimingPool();
 	}
 
-	private void init() {
+	private void initSwimingPool() {
 		// TODO Auto-generated method stub
-
 		poolway = (LinearLayout) findViewById(R.id.poolway);
-
 		// 计时成绩文本的大小属性,放置在布局中心
 		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);

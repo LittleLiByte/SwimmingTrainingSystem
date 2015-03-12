@@ -80,6 +80,7 @@ public class LoginActivity extends Activity {
 	 */
 	private void initData() {
 		app = (MyApplication) getApplication();
+		app.addActivity(this);
 		dbManager = DBManager.getInstance();
 		// 检查是否有保存的用户名和密码，如果有就回显
 		SharedPreferences sp = getSharedPreferences(Constants.LOGININFO,
@@ -232,7 +233,7 @@ public class LoginActivity extends Activity {
 						Intent i = new Intent(LoginActivity.this,
 								MainActivity.class);
 						startActivity(i);
-						finish();
+//						finish();
 					}
 				}, new ErrorListener() {
 
@@ -377,10 +378,10 @@ public class LoginActivity extends Activity {
 				LoginActivity.this.startActivity(intent);
 				overridePendingTransition(R.anim.push_right_in,
 						R.anim.push_left_out);
-				finish();
+//				 finish();
 			}
 		};
-		handler.postDelayed(updateThread, 1000);
+		handler.postDelayed(updateThread, 800);
 	}
 
 }

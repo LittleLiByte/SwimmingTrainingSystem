@@ -51,7 +51,6 @@ import com.example.swimmingtraningsystem.view.Switch;
  */
 public class AthleteActivity extends Activity {
 	private static final String UNKNOW_ERROR = "服务器错误";
-	private static final String SYNCHRONOUS_SUCCESS = "同步成功！";
 	private static final String ADD_ATHLETE_TITLE_STRING = "添加运动员";
 	private static final String NAME_CANNOT_BE_EMPTY_STRING = "运动员名字不能为空";
 	private static final String NAME_CANNOT_BE_REPEATE_STRING = "存在运动员名字重复，请更改";
@@ -233,11 +232,11 @@ public class AthleteActivity extends Activity {
 		a.setGender(gender);
 		a.setPhone(contact);
 		a.setExtras(others);
-		a.setUser(mUser);
 
 		if (isConnect) {
 			addAthleteequest(a);
 		} else {
+			a.setUser(mUser);
 			a.save();
 			XUtils.showToast(AthleteActivity.this, mToast,
 					Constants.ADD_SUCCESS_STRING);
@@ -254,7 +253,9 @@ public class AthleteActivity extends Activity {
 	 * @param obj
 	 */
 	public void addAthleteequest(final Athlete a) {
-		final String athleteJson = JsonTools.creatJsonString(a);
+		Map<String, Object> jsonMap = new HashMap<String, Object>();
+		jsonMap.put("athlete", a);
+		final String athleteJson = JsonTools.creatJsonString(jsonMap);
 		StringRequest request = new StringRequest(Method.POST, XUtils.HOSTURL
 				+ ADDATHLETE, new Listener<String>() {
 
@@ -270,6 +271,7 @@ public class AthleteActivity extends Activity {
 								Constants.ADD_SUCCESS_STRING);
 						int aid = (Integer) obj.get("aid");
 						a.setAid(aid);
+						a.setUser(mUser);
 						a.save();
 						mAthletes = mDbManager.getAthletes(mUserId);
 						mAthleteListAdapter.setDatas(mAthletes);
@@ -310,47 +312,44 @@ public class AthleteActivity extends Activity {
 	 * 获取服务器上的运动员信息
 	 */
 	private void getAthleteRequest() {
-		StringRequest getrequest = new StringRequest(Method.GET, XUtils.HOSTURL
-				+ GETATHLETES, new Listener<String>() {
+		StringRequest getrequest = new StringRequest(Method.POST,
+				XUtils.HOSTURL + GETATHLETES, new Listener<String>() {
 
-			@Override
-			public void onResponse(String response) {
-				// TODO Auto-generated method stub
-				loadingDialog.dismiss();
-				try {
-					JSONObject jsonObject = new JSONObject(response);
-					int resCode = (Integer) jsonObject.get("resCode");
-					if (resCode == 1) {
-						String jsonString = jsonObject.get("athlete")
-								.toString();
-						List<Athlete> athletes = JsonTools.getObjects(
-								jsonString, Athlete.class);
-						// 将从服务器获取的运动员信息保存到本地数据库
-						for (Athlete a : athletes) {
-							a.save();
+					@Override
+					public void onResponse(String response) {
+						// TODO Auto-generated method stub
+						loadingDialog.dismiss();
+						try {
+							JSONObject jsonObject = new JSONObject(response);
+							int resCode = (Integer) jsonObject.get("resCode");
+							if (resCode == 1) {
+								String jsonString = jsonObject.get(
+										"athleteList").toString();
+								List<Athlete> athletes = JsonTools.getObjects(
+										jsonString, Athlete.class);
+								// 将从服务器获取的运动员信息保存到本地数据库
+								for (Athlete a : athletes) {
+									a.save();
+								}
+							} else {
+								XUtils.showToast(AthleteActivity.this, mToast,
+										UNKNOW_ERROR);
+							}
+
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
-					} else if (resCode == 2) {
-						XUtils.showToast(AthleteActivity.this, mToast,
-								SYNCHRONOUS_SUCCESS);
-					} else {
-						XUtils.showToast(AthleteActivity.this, mToast,
-								UNKNOW_ERROR);
 					}
+				}, new ErrorListener() {
 
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}, new ErrorListener() {
-
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				// TODO Auto-generated method stub
-				loadingDialog.dismiss();
-				Log.e(Constants.TAG, error.getMessage());
-			}
-		});
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						// TODO Auto-generated method stub
+						loadingDialog.dismiss();
+						Log.e(Constants.TAG, error.getMessage());
+					}
+				});
 		getrequest.setRetryPolicy(new DefaultRetryPolicy(
 				Constants.SOCKET_TIMEOUT,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,

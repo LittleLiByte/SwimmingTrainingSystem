@@ -106,7 +106,7 @@ public class LoginActivity extends Activity {
 				Context.MODE_PRIVATE);
 		XUtils.HOSTURL = hostSp
 				.getString("hostInfo",
-						"http://192.168.1.230:8080/SWIMYES/httpPost.action?action_flag=");
+						"http://192.168.1.230:8080/SWIMYUE33/httpPost.action?action_flag=");
 	}
 
 	/**
@@ -200,7 +200,8 @@ public class LoginActivity extends Activity {
 								String userJson = obj.get("user").toString();
 								User user = JsonTools.getObject(userJson,
 										User.class);
-
+								int uid = (Integer) obj.get("uid");
+								user.setUid(uid);
 								if (dbManager.getUserByName(user.getUsername()) == null) {
 									// 如果数据库中不存在该用户，则直接将该用户保存至数据库
 									user.save();
@@ -230,10 +231,18 @@ public class LoginActivity extends Activity {
 						}
 
 						XUtils.showToast(LoginActivity.this, toast, "登陆成功");
-						Intent i = new Intent(LoginActivity.this,
-								MainActivity.class);
-						startActivity(i);
-//						finish();
+
+						Handler handler = new Handler();
+						Runnable updateThread = new Runnable() {
+							public void run() {
+								Intent intent = new Intent(LoginActivity.this,
+										MainActivity.class);
+								LoginActivity.this.startActivity(intent);
+								overridePendingTransition(R.anim.push_right_in,
+										R.anim.push_left_out);
+							}
+						};
+						handler.postDelayed(updateThread, 800);
 					}
 				}, new ErrorListener() {
 
@@ -315,7 +324,7 @@ public class LoginActivity extends Activity {
 				} else {
 
 					String hostUrl = "http://" + hostIp + ":" + hostPort
-							+ "/SWIMYES/httpPost.action?action_flag=";
+							+ "/SWIMYUE33/httpPost.action?action_flag=";
 					// 保存服务器ip和端口地址到sp
 					XUtils.HOSTURL = hostUrl;
 					XUtils.SaveLoginInfo(LoginActivity.this, hostUrl, hostIp,
@@ -378,7 +387,7 @@ public class LoginActivity extends Activity {
 				LoginActivity.this.startActivity(intent);
 				overridePendingTransition(R.anim.push_right_in,
 						R.anim.push_left_out);
-//				 finish();
+				// finish();
 			}
 		};
 		handler.postDelayed(updateThread, 800);

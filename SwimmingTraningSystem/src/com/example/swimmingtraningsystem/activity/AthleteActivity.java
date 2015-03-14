@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -100,6 +101,7 @@ public class AthleteActivity extends Activity {
 			init();
 		} catch (Exception e) {
 			// TODO: handle exception
+			e.printStackTrace();
 			startActivity(new Intent(this, LoginActivity.class));
 		}
 	}
@@ -146,67 +148,74 @@ public class AthleteActivity extends Activity {
 	 * @param v
 	 */
 	public void addAthlete(View v) {
-		final NiftyDialogBuilder addDialog = NiftyDialogBuilder
-				.getInstance(this);
-		Effectstype effect = Effectstype.RotateLeft;
-		Window window = addDialog.getWindow();
-		addDialog
-				.withTitle(ADD_ATHLETE_TITLE_STRING)
-				.withMessage(null)
-				.withIcon(getResources().getDrawable(R.drawable.ic_launcher))
-				.isCancelableOnTouchOutside(false)
-				.withDuration(700)
-				.withEffect(effect)
-				.withButton1Text(Constants.CANCLE_STRING)
-				.withButton2Text(Constants.OK_STRING)
-				.setButton1Click(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						addDialog.dismiss();
-					}
-				})
-				.setButton2Click(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-
-						String name = mAthleteName.getText().toString().trim();
-						String ageString = mAthleteAge.getText().toString()
-								.trim();
-						String phone = mAthleteContact.getText().toString()
-								.trim();
-						String other = mOthers.getText().toString().trim();
-
-						boolean isCheck = mGenderSwitch.isChecked();
-
-						System.out.println("isCheck--->" + isCheck);
-						String gender = "男";
-						if (!isCheck) {
-							gender = "女";
-						}
-						boolean isExit = mDbManager.isAthleteNameExsit(mUserId,
-								name);
-						if (TextUtils.isEmpty(name)) {
-							XUtils.showToast(AthleteActivity.this, mToast,
-									NAME_CANNOT_BE_EMPTY_STRING);
-						} else if (isExit) {
-							XUtils.showToast(AthleteActivity.this, mToast,
-									NAME_CANNOT_BE_REPEATE_STRING);
-						} else if (TextUtils.isEmpty(ageString)) {
-							XUtils.showToast(AthleteActivity.this, mToast,
-									AGE_CANNOT_BE_EMPTY_STRING);
-						} else {
-							int age = Integer.parseInt(ageString);
-							addAthlete(name, age, gender, phone, other);
+		if (XUtils.isFastDoubleClick()) {
+			final NiftyDialogBuilder addDialog = NiftyDialogBuilder
+					.getInstance(this);
+			Effectstype effect = Effectstype.RotateLeft;
+			Window window = addDialog.getWindow();
+			addDialog
+					.withTitle(ADD_ATHLETE_TITLE_STRING)
+					.withMessage(null)
+					.withIcon(
+							getResources().getDrawable(R.drawable.ic_launcher))
+					.isCancelableOnTouchOutside(false)
+					.withDuration(700)
+					.withEffect(effect)
+					.withButton1Text(Constants.CANCLE_STRING)
+					.withButton2Text(Constants.OK_STRING)
+					.setButton1Click(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
 							addDialog.dismiss();
 						}
-					}
-				}).setCustomView(R.layout.add_athlete_dialog, v.getContext())
-				.show();
-		mAthleteName = (EditText) window.findViewById(R.id.add_et_user);
-		mAthleteAge = (EditText) window.findViewById(R.id.add_et_age);
-		mAthleteContact = (EditText) window.findViewById(R.id.add_et_contact);
-		mOthers = (EditText) window.findViewById(R.id.add_et_extra);
-		mGenderSwitch = (Switch) window.findViewById(R.id.toggle_gender);
+					})
+					.setButton2Click(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+
+							String name = mAthleteName.getText().toString()
+									.trim();
+							String ageString = mAthleteAge.getText().toString()
+									.trim();
+							String phone = mAthleteContact.getText().toString()
+									.trim();
+							String other = mOthers.getText().toString().trim();
+
+							boolean isCheck = mGenderSwitch.isChecked();
+
+							System.out.println("isCheck--->" + isCheck);
+							String gender = "男";
+							if (!isCheck) {
+								gender = "女";
+							}
+							boolean isExit = mDbManager.isAthleteNameExsit(
+									mUserId, name);
+							if (TextUtils.isEmpty(name)) {
+								XUtils.showToast(AthleteActivity.this, mToast,
+										NAME_CANNOT_BE_EMPTY_STRING);
+							} else if (isExit) {
+								XUtils.showToast(AthleteActivity.this, mToast,
+										NAME_CANNOT_BE_REPEATE_STRING);
+							} else if (TextUtils.isEmpty(ageString)) {
+								XUtils.showToast(AthleteActivity.this, mToast,
+										AGE_CANNOT_BE_EMPTY_STRING);
+							} else {
+								int age = Integer.parseInt(ageString);
+								addAthlete(name, age, gender, phone, other);
+								addDialog.dismiss();
+							}
+						}
+					})
+					.setCustomView(R.layout.add_athlete_dialog, v.getContext())
+					.show();
+			mAthleteName = (EditText) window.findViewById(R.id.add_et_user);
+			mAthleteAge = (EditText) window.findViewById(R.id.add_et_age);
+			mAthleteContact = (EditText) window
+					.findViewById(R.id.add_et_contact);
+			mOthers = (EditText) window.findViewById(R.id.add_et_extra);
+			mGenderSwitch = (Switch) window.findViewById(R.id.toggle_gender);
+		}
+
 	}
 
 	/**
@@ -323,14 +332,32 @@ public class AthleteActivity extends Activity {
 							JSONObject jsonObject = new JSONObject(response);
 							int resCode = (Integer) jsonObject.get("resCode");
 							if (resCode == 1) {
-								String jsonString = jsonObject.get(
-										"athleteList").toString();
-								List<Athlete> athletes = JsonTools.getObjects(
-										jsonString, Athlete.class);
-								// 将从服务器获取的运动员信息保存到本地数据库
-								for (Athlete a : athletes) {
-									a.save();
+								// String jsonString = jsonObject.get(
+								// "athleteList").toString();
+								// List<Athlete> athletes =
+								// JsonTools.getObjects(
+								// jsonString, Athlete.class);
+								// // 将从服务器获取的运动员信息保存到本地数据库
+								// for (Athlete a : athletes) {
+								// a.save();}
+
+								JSONArray athlteArray = jsonObject
+										.getJSONArray("athleteList");
+								int athletesNumber = athlteArray.length();
+								for (int i = 0; i < athletesNumber; i++) {
+									Athlete athlete = new Athlete();
+									TempAthlete tempAthlete = (TempAthlete) athlteArray
+											.get(i);
+									athlete.setAid(tempAthlete.getAid());
+									athlete.setName(tempAthlete.getName());
+									athlete.setAge(tempAthlete.getAge());
+									athlete.setGender(tempAthlete.getGender());
+									athlete.setPhone(tempAthlete.getPhone());
+									athlete.setExtras(tempAthlete.getExtras());
+									athlete.setUser(mUser);
+									athlete.save();
 								}
+
 							} else {
 								XUtils.showToast(AthleteActivity.this, mToast,
 										UNKNOW_ERROR);
@@ -349,12 +376,114 @@ public class AthleteActivity extends Activity {
 						loadingDialog.dismiss();
 						Log.e(Constants.TAG, error.getMessage());
 					}
-				});
+				}) {
+
+			@Override
+			protected Map<String, String> getParams() throws AuthFailureError {
+				// 设置请求参数
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("uid", mUser.getUid() + "");
+				return map;
+			}
+		};
 		getrequest.setRetryPolicy(new DefaultRetryPolicy(
 				Constants.SOCKET_TIMEOUT,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(getrequest);
+	}
+
+	class TempAthlete {
+		/**
+		 * 运动员id
+		 */
+		private long id;
+
+		private int aid;
+		/**
+		 * 运动员名字
+		 */
+		private String name;
+		/**
+		 * 运动员年龄
+		 */
+		private int age;
+		/**
+		 * 运动员性别
+		 */
+		private String gender;
+		/**
+		 * 运动员电话
+		 */
+		private String phone;
+		/**
+		 * 运动员备注
+		 */
+		private String extras;
+
+		public long getId() {
+			return id;
+		}
+
+		public void setId(long id) {
+			this.id = id;
+		}
+
+		public int getAid() {
+			return aid;
+		}
+
+		public void setAid(int aid) {
+			this.aid = aid;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public int getAge() {
+			return age;
+		}
+
+		public void setAge(int age) {
+			this.age = age;
+		}
+
+		public String getGender() {
+			return gender;
+		}
+
+		public void setGender(String gender) {
+			this.gender = gender;
+		}
+
+		public String getPhone() {
+			return phone;
+		}
+
+		public void setPhone(String phone) {
+			this.phone = phone;
+		}
+
+		public String getExtras() {
+			return extras;
+		}
+
+		public void setExtras(String extras) {
+			this.extras = extras;
+		}
+
+		@Override
+		public String toString() {
+			return "TempAthlete [id=" + id + ", aid=" + aid + ", name=" + name
+					+ ", age=" + age + ", gender=" + gender + ", phone="
+					+ phone + ", extras=" + extras + "]";
+		}
+
 	}
 
 	/**

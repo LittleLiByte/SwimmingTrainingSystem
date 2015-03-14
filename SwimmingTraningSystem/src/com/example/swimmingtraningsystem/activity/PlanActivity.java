@@ -69,6 +69,7 @@ public class PlanActivity extends FragmentActivity implements OnClickListener {
 			initData();
 		} catch (Exception e) {
 			// TODO: handle exception
+			e.printStackTrace();
 			startActivity(new Intent(this, LoginActivity.class));
 		}
 	}

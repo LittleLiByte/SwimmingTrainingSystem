@@ -18,7 +18,7 @@ public class Athlete extends DataSupport {
 	 * 运动员id
 	 */
 	private long id;
-	
+
 	private int aid;
 	/**
 	 * 运动员名字
@@ -44,7 +44,6 @@ public class Athlete extends DataSupport {
 	 * 运动员所属的教练
 	 */
 	private User user;
-	private int uid;
 	private List<Plan> plans = new ArrayList<Plan>();
 	private List<Score> scores = new ArrayList<Score>();
 
@@ -102,14 +101,6 @@ public class Athlete extends DataSupport {
 
 	public void setExtras(String extras) {
 		this.extras = extras;
-	}
-
-	public int getUid() {
-		return uid;
-	}
-
-	public void setUid(int uid) {
-		this.uid = uid;
 	}
 
 	public User getUser() {

@@ -52,6 +52,7 @@ public class ShowScoreActivity extends Activity {
 			init();
 		} catch (Exception e) {
 			// TODO: handle exception
+			e.printStackTrace();
 			startActivity(new Intent(this, LoginActivity.class));
 		}
 	}

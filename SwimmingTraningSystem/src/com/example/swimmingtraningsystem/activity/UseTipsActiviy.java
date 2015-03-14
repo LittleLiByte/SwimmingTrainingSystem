@@ -25,7 +25,7 @@ import com.example.swimmingtraningsystem.util.Constants;
  * 
  */
 public class UseTipsActiviy extends Activity {
-
+	private MyApplication application;
 	private ExpandableListView expandableListView;
 
 	@Override
@@ -38,11 +38,16 @@ public class UseTipsActiviy extends Activity {
 			init();
 		} catch (Exception e) {
 			// TODO: handle exception
+			e.printStackTrace();
 			startActivity(new Intent(this, LoginActivity.class));
 		}
 	}
 
 	private void init() {
+		application=(MyApplication) getApplication();
+		@SuppressWarnings("unused")
+		long userID = (Long) application.getMap().get(Constants.CURRENT_USER_ID);
+		
 		expandableListView = (ExpandableListView) findViewById(R.id.tips_list);
 		final ExpandableListAdapter adapter = new BaseExpandableListAdapter() {
 

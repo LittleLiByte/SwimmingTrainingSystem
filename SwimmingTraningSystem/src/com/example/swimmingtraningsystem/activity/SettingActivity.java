@@ -33,6 +33,7 @@ public class SettingActivity extends Activity {
 			Long mUserId = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		} catch (Exception e) {
 			// TODO: handle exception
+			e.printStackTrace();
 			startActivity(new Intent(this, LoginActivity.class));
 		}
 		

@@ -94,6 +94,7 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 			initView();
 			initData();
 		} catch (Exception e) {
+			e.printStackTrace();
 			startActivity(new Intent(getActivity(), LoginActivity.class));
 		}
 	}

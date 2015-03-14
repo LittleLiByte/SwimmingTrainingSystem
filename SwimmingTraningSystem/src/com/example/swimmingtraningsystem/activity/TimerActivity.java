@@ -115,6 +115,7 @@ public class TimerActivity extends Activity {
 			setupData();
 		} catch (Exception e) {
 			// TODO: handle exception
+			e.printStackTrace();
 			startActivity(new Intent(this, LoginActivity.class));
 		}
 	}
@@ -122,6 +123,8 @@ public class TimerActivity extends Activity {
 	private void setupView() {
 		// TODO Auto-generated method stub
 		app = (MyApplication) getApplication();
+		//如果app中的全局变量被系统强制回收，通过以下改行代码会触发异常，直接将应用界面重启至登陆页面
+		long userID = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		time_title = (TextView) findViewById(R.id.time_title);
 		tvTime = (TextView) findViewById(R.id.duocitvTime);
 		tvTip = (TextView) findViewById(R.id.textwujici);
@@ -280,6 +283,7 @@ public class TimerActivity extends Activity {
 
 	/**
 	 * 生成固定格式的时间字符串
+	 * 
 	 * @return
 	 */
 	protected String getStrTime() {

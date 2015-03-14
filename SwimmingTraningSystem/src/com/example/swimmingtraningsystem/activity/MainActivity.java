@@ -60,6 +60,7 @@ public class MainActivity extends Activity {
 			init();
 		} catch (Exception e) {
 			// TODO: handle exception
+			e.printStackTrace();
 			startActivity(new Intent(this, LoginActivity.class));
 		}
 
@@ -70,9 +71,10 @@ public class MainActivity extends Activity {
 		initView();
 		app = (MyApplication) getApplication();
 		app.addActivity(this);
+		@SuppressWarnings("unused")
+		long userID = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 	}
 
-	
 	/**
 	 * 初始化六边形实体
 	 */

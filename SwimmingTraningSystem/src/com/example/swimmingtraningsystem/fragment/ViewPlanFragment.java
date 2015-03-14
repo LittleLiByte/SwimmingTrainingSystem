@@ -94,6 +94,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 		try {
 			initFragment();
 		} catch (Exception e) {
+			e.printStackTrace();
 			startActivity(new Intent(getActivity(), LoginActivity.class));
 		}
 		

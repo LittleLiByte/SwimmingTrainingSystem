@@ -9,16 +9,16 @@
 
     <list>
 
-        <mapping class="com.example.swimmingtraningsystem.model.User" >
+        <mapping class="com.scnu.swimmingtrainingsystem.model.User" >
         </mapping>
 
-        <mapping class="com.example.swimmingtraningsystem.model.Plan" >
+        <mapping class="com.scnu.swimmingtrainingsystem.model.Plan" >
         </mapping>
 
-        <mapping class="com.example.swimmingtraningsystem.model.Athlete" >
+        <mapping class="com.scnu.swimmingtrainingsystem.model.Athlete" >
         </mapping>
 
-        <mapping class="com.example.swimmingtraningsystem.model.Score" >
+        <mapping class="com.scnu.swimmingtrainingsystem.model.Score" >
         </mapping>
     </list>
 

@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/shuilifang1" >
 
-    <com.example.swimmingtraningsystem.view.MyTextView
+    <com.scnu.swimmingtrainingsystem.view.MyTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"

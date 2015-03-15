@@ -86,7 +86,7 @@
     </style>
 
     <style name="AppThemeLight" parent="@android:style/Theme.DeviceDefault.Light">
-        <item name="com.example.swimmingtraningsystem:switchStyle">@style/switch_light</item>
+        <item name="com.scnu.swimmingtrainingsystem:switchStyle">@style/switch_light</item>
     </style>
 
     <style name="switch_light">

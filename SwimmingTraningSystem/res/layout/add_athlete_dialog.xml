@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res/com.example.swimmingtraningsystem"
+    xmlns:app="http://schemas.android.com/apk/res/com.scnu.swimmingtrainingsystem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_dialog"
@@ -97,7 +97,7 @@
                 android:textColor="#FF6633"
                 android:textSize="18sp" />
 
-            <com.example.swimmingtraningsystem.view.Switch
+            <com.scnu.swimmingtrainingsystem.view.Switch
                 android:id="@+id/toggle_gender"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"

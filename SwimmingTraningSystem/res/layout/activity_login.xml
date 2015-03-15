@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/lightgray" >
 
-    <com.example.swimmingtraningsystem.view.EditTextWithDel
+    <com.scnu.swimmingtrainingsystem.view.EditTextWithDel
         android:id="@+id/tv_user"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,7 +16,7 @@
         android:singleLine="true"
         android:hint="请输入用户名" />
 
-    <com.example.swimmingtraningsystem.view.EditTextWithDel
+    <com.scnu.swimmingtrainingsystem.view.EditTextWithDel
         android:id="@+id/tv_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

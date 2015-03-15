@@ -45,13 +45,13 @@
             android:scrollbars="none" >
         </ListView>
 
-        <com.example.swimmingtraningsystem.view.DragListView
+        <com.scnu.swimmingtrainingsystem.view.DragListView
             android:id="@+id/matchName_list"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:scrollbars="none" >
-        </com.example.swimmingtraningsystem.view.DragListView>
+        </com.scnu.swimmingtrainingsystem.view.DragListView>
     </LinearLayout>
 
     <Button

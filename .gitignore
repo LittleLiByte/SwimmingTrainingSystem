@@ -7,3 +7,9 @@
 /SwimmingTraningSystem/bin/R.txt
 /SwimmingTraningSystem/bin/resources.ap_
 /SwimmingTraningSystem/gen
+/wheel/gen
+/wheel/bin/classes
+/wheel/bin/res
+/wheel/bin/AndroidManifest.xml
+/wheel/bin/R.txt
+/wheel/*.classpath

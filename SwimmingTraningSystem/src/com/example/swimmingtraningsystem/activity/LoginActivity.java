@@ -45,7 +45,14 @@ import com.example.swimmingtraningsystem.view.LoadingDialog;
  * 
  */
 public class LoginActivity extends Activity {
-
+	/**
+	 * 默认用户帐号
+	 */
+	private static final String DEFAULT_USERNAME = "defaultUser";
+	/**
+	 * 默认用户的密码
+	 */
+	private static final String DEFAULT_PASSWORD = "123456asdjkl";
 	private MyApplication app;
 	private DBManager dbManager;
 	private EditText etLogin;
@@ -56,14 +63,6 @@ public class LoginActivity extends Activity {
 	private RequestQueue mQueue;
 	private LoadingDialog loadingDialog;
 	private Effectstype effect;
-	/**
-	 * 默认用户帐号
-	 */
-	private static final String DEFAULT_USERNAME = "defaultUser";
-	/**
-	 * 默认用户的密码
-	 */
-	private static final String DEFAULT_PASSWORD = "123456asdjkl";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +106,7 @@ public class LoginActivity extends Activity {
 		XUtils.HOSTURL = hostSp
 				.getString("hostInfo",
 						"http://192.168.1.230:8080/SWIMYUE33/httpPost.action?action_flag=");
+		testRequest();
 	}
 
 	/**
@@ -183,7 +183,7 @@ public class LoginActivity extends Activity {
 	 */
 	public void loginRequest(final String s1, final String s2) {
 
-		StringRequest stringRequest = new StringRequest(Method.POST,
+		StringRequest loginRequest = new StringRequest(Method.POST,
 				XUtils.HOSTURL + "login", new Listener<String>() {
 
 					@Override
@@ -266,11 +266,11 @@ public class LoginActivity extends Activity {
 			}
 
 		};
-		stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+		loginRequest.setRetryPolicy(new DefaultRetryPolicy(
 				Constants.SOCKET_TIMEOUT,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-		mQueue.add(stringRequest);
+		mQueue.add(loginRequest);
 	}
 
 	/**
@@ -294,7 +294,7 @@ public class LoginActivity extends Activity {
 		effect = Effectstype.Slit;
 		settingDialog.withTitle("服务器IP与端口设置").withMessage(null)
 				.withIcon(getResources().getDrawable(R.drawable.ic_launcher))
-				.isCancelableOnTouchOutside(true).withDuration(700)
+				.isCancelableOnTouchOutside(true).withDuration(500)
 				.withEffect(effect).withButton1Text(Constants.CANCLE_STRING)
 				.withButton2Text("完成")
 				.setCustomView(R.layout.dialog_setting_host, context);
@@ -322,7 +322,6 @@ public class LoginActivity extends Activity {
 				if (TextUtils.isEmpty(hostIp) || TextUtils.isEmpty(hostPort)) {
 					XUtils.showToast(LoginActivity.this, toast, "ip与端口地址均不可为空！");
 				} else {
-
 					String hostUrl = "http://" + hostIp + ":" + hostPort
 							+ "/SWIMYUE33/httpPost.action?action_flag=";
 					// 保存服务器ip和端口地址到sp
@@ -347,24 +346,32 @@ public class LoginActivity extends Activity {
 		userDialog
 				.withTitle("无法连接服务器！")
 				.withMessage(
-						"如果要继续使用，未注册请选择系统默认帐号登录，已注册请用注册帐号登录\n"
+						"如果要继续使用，未注册请选择系统默认帐号登录,或者重新尝试登陆\n"
 								+ "注意：默认账号只能试用，数据无法上传至服务器！")
 				.withIcon(getResources().getDrawable(R.drawable.ic_launcher))
-				.isCancelableOnTouchOutside(false).withDuration(700)
+				.isCancelableOnTouchOutside(false).withDuration(500)
 				// def
 				.withEffect(effect).withButton1Text("默认帐号登录")
-				// def gone
-				.hideOneButton()
+				.withButton2Text("重新登陆")
 				// def gone
 				.setButton1Click(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						etLogin.setText("defaultUser");
-						etLogin.setEnabled(false);
 						etPassword.setText("123456asdjkl");
-						etPassword.setEnabled(false);
+						// 保存登录信息
+						XUtils.SaveLoginInfo(LoginActivity.this, "defaultUser",
+								"123456asdjkl");
 						userDialog.dismiss();
 						offlineLogin();
+					}
+				}).setButton2Click(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						app.getMap().put(Constants.IS_CONNECT_SERVICE, true);
+						userDialog.dismiss();
 					}
 				}).show();
 
@@ -387,10 +394,35 @@ public class LoginActivity extends Activity {
 				LoginActivity.this.startActivity(intent);
 				overridePendingTransition(R.anim.push_right_in,
 						R.anim.push_left_out);
-				// finish();
 			}
 		};
-		handler.postDelayed(updateThread, 800);
+		handler.postDelayed(updateThread, 500);
 	}
 
+	/**
+	 * 测试请求
+	 * 
+	 */
+	public void testRequest() {
+
+		StringRequest testRequest = new StringRequest(Method.POST,
+				XUtils.HOSTURL + "connectionTest", new Listener<String>() {
+
+					@Override
+					public void onResponse(String response) {
+					}
+				}, new ErrorListener() {
+
+					@Override
+					public void onErrorResponse(VolleyError error) {
+					}
+				}) {
+
+		};
+		testRequest.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+		mQueue.add(testRequest);
+	}
 }

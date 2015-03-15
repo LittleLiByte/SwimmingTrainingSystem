@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -187,7 +188,7 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 		});
 		selectDialog.withTitle("选择运动员").withMessage(null)
 				.withIcon(getResources().getDrawable(R.drawable.ic_launcher))
-				.isCancelableOnTouchOutside(true).withDuration(500)
+				.isCancelableOnTouchOutside(false).withDuration(500)
 				.withEffect(effect).withButton1Text("返回")
 				.withButton2Text(Constants.OK_STRING)
 				.setButton1Click(new View.OnClickListener() {
@@ -287,15 +288,17 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 
 					@Override
 					public void onResponse(String response) {
+						Log.i(Constants.TAG, "res>>>>>>>>>>" + response);
 						try {
 							JSONObject obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
 							if (resCode == 1) {
-								XUtils.showToast(activity, toast,
-										Constants.ADD_SUCCESS_STRING);
+
 								int planID = obj.getInt("plan_id");
 								newPlan.setPid(planID);
 								newPlan.save();
+								XUtils.showToast(activity, toast,
+										Constants.ADD_SUCCESS_STRING);
 								planAdapter = new AddPlanListAdapter(activity,
 										planList, map);
 								planlv.setAdapter(planAdapter);

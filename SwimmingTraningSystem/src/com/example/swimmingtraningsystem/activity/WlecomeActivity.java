@@ -18,7 +18,7 @@ import com.example.swimmingtraningsystem.R;
 public class WlecomeActivity extends Activity {
 	private AlphaAnimation start_anima;
 	private View view;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -31,7 +31,6 @@ public class WlecomeActivity extends Activity {
 
 	private void initData() {
 		// TODO Auto-generated method stub
-
 	}
 
 	private void initView() {

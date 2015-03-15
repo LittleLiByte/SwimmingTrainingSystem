@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/lightgray" >
 
-    <EditText
+    <com.example.swimmingtraningsystem.view.EditTextWithDel
         android:id="@+id/tv_user"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,9 +13,10 @@
         android:layout_marginTop="80dp"
         android:drawableLeft="@drawable/user"
         android:drawablePadding="20dp"
+        android:singleLine="true"
         android:hint="请输入用户名" />
 
-    <EditText
+    <com.example.swimmingtraningsystem.view.EditTextWithDel
         android:id="@+id/tv_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -26,6 +27,7 @@
         android:drawableLeft="@drawable/password"
         android:drawablePadding="20dp"
         android:hint="请输入密码"
+         android:singleLine="true"
         android:inputType="textPassword" />
 
     <Button

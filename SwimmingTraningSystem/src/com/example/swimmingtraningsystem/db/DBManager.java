@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.litepal.crud.DataSupport;
 
+import android.R.integer;
 import android.content.ContentValues;
 
 import com.example.swimmingtraningsystem.model.Athlete;
@@ -106,6 +107,28 @@ public class DBManager {
 		List<Athlete> athletes = DataSupport.where("user_id=?", id).find(
 				Athlete.class, true);
 		return athletes;
+	}
+
+	/**
+	 * 获取该用户的所查询计划的运动员
+	 * 
+	 * @param athIds
+	 * @param userId
+	 * @return
+	 */
+	public List<Athlete> getAthletesByAid(Integer[] athIds, Long userId) {
+		String thisUserId = String.valueOf(userId);
+		List<Athlete> athleteList=new ArrayList<Athlete>();
+		for (int aid : athIds) {
+			String id = String.valueOf(aid);
+			List<Athlete> athletes = DataSupport.where("user_id=? and aid=? ",
+					thisUserId, id).find(Athlete.class);
+			if (athletes.size()!=0) {
+				athleteList.add(athletes.get(0));
+			}
+		}
+		return athleteList;
+
 	}
 
 	/**
@@ -231,15 +254,6 @@ public class DBManager {
 		}
 	}
 
-	/**
-	 * 获取数据库中当前用户所新建的所有计划
-	 * 
-	 * @return 计划列表
-	 */
-	public List<Plan> getAllPlans() {
-		List<Plan> plans = DataSupport.findAll(Plan.class);
-		return plans;
-	}
 
 	/**
 	 * 查找table_plan中当前用户的所有计划

@@ -1,10 +1,13 @@
 package com.example.swimmingtraningsystem.fragment;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,11 +37,14 @@ import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Response;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
@@ -71,7 +77,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 	private ListView listView;
 	private ViewPlanAdapter adapter;
 	private RelativeLayout relative;
-	private List<Plan> plans;
+	private List<Plan> plans = new ArrayList<Plan>();
 	private List<Plan> selectid;
 	private Button calcle, delete;
 	private TextView tips;
@@ -81,6 +87,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 	private Boolean isConnect;
 	private Toast mToast;
 	private Long mUserId;
+	private User mUser;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -99,14 +106,16 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 			e.printStackTrace();
 			startActivity(new Intent(getActivity(), LoginActivity.class));
 		}
-		
+
 	}
 
 	private void initFragment() {
 		activity = getActivity();
 		app = (MyApplication) activity.getApplication();
-		mUserId= (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		dbManager = DBManager.getInstance();
+		mUserId = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
+		mUser = dbManager.getUser(mUserId);
+
 		listView = (ListView) activity.findViewById(R.id.view_plan_list);
 		relative = (RelativeLayout) activity.findViewById(R.id.relative);
 		calcle = (Button) activity.findViewById(R.id.view_cancle);
@@ -116,7 +125,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 		delete.setOnClickListener(this);
 		selectid = new ArrayList<Plan>();
 		plans = dbManager.getUserPlans(mUserId);
-		adapter = new ViewPlanAdapter(activity, tips);
+		adapter = new ViewPlanAdapter(activity, tips, plans);
 		listView.setAdapter(adapter);
 		mQueue = Volley.newRequestQueue(activity);
 		// 如果处在联网状态，则发送至服务器
@@ -125,10 +134,12 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 		SharedPreferences sp = activity.getSharedPreferences(
 				Constants.LOGININFO, Context.MODE_PRIVATE);
 		boolean isFirst = sp.getBoolean(Constants.FISRTOPENPLAN, true);
-		if (isFirst) {
-			XUtils.initAthletes(activity, false);
+		boolean isAthleteOpen = sp.getBoolean(Constants.FISRTOPENATHLETE, true);
+		if (isFirst && !isAthleteOpen) {
+			XUtils.initPlans(activity, false);
 		}
-		if (isConnect && isFirst) {
+		// 当服务器可以联通且第一次打开计划页面且运动员页面不是第一次打开，才从服务器获取计划数据
+		if (isConnect && isFirst && !isAthleteOpen) {
 			if (loadingDialog == null) {
 				loadingDialog = LoadingDialog.createDialog(activity);
 				loadingDialog.setMessage("正在同步...");
@@ -177,14 +188,18 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 	class ViewPlanAdapter extends BaseAdapter {
 		private Context context;
 		private LayoutInflater inflater = null;
-		public SparseIntArray visiblecheck;// 用来记录是否显示checkBox
-		public SparseBooleanArray ischeck;
+		private SparseIntArray visiblecheck;// 用来记录是否显示checkBox
+		private SparseBooleanArray ischeck;
 		private TextView tips;
+		private List<Plan> planList = new ArrayList<Plan>();
+
 		private List<String> athleteName = new ArrayList<String>();
 
-		public ViewPlanAdapter(Context context, TextView tips) {
+		public ViewPlanAdapter(Context context, TextView tips,
+				List<Plan> planList) {
 			this.context = context;
 			this.tips = tips;
+			this.planList = planList;
 			inflater = (LayoutInflater) context
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			visiblecheck = new SparseIntArray();
@@ -193,12 +208,12 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 
 		public int getCount() {
 			// TODO Auto-generated method stub
-			return plans.size();
+			return planList.size();
 		}
 
 		public Object getItem(int position) {
 			// TODO Auto-generated method stub
-			return plans.get(position);
+			return planList.get(position);
 		}
 
 		public long getItemId(int position) {
@@ -233,7 +248,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 				holder = (ViewPlanHolder) convertView.getTag();
 			}
 
-			holder.txt.setText(plans.get(position).getName());
+			holder.txt.setText(planList.get(position).getName());
 
 			holder.checkBox.setChecked(ischeck.get(position));
 			holder.checkBox.setVisibility(visiblecheck.get(position));
@@ -246,10 +261,10 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 					if (isMulChoice) {
 						if (planHolder.checkBox.isChecked()) {
 							planHolder.checkBox.setChecked(false);
-							selectid.remove(plans.get(position));
+							selectid.remove(planList.get(position));
 						} else {
 							planHolder.checkBox.setChecked(true);
-							selectid.add(plans.get(position));
+							selectid.add(planList.get(position));
 						}
 						tips.setText("共选择了" + selectid.size() + "项");
 
@@ -262,6 +277,11 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 			return convertView;
 		}
 
+		public void setDatas(List<Plan> pl) {
+			this.planList.clear();
+			this.planList.addAll(pl);
+		}
+
 		private void createDialog(int position) {
 			final NiftyDialogBuilder selectDialog = NiftyDialogBuilder
 					.getInstance(activity);
@@ -272,11 +292,11 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 					.findViewById(R.id.view_plan_pool_length);
 			TextView times = (TextView) window
 					.findViewById(R.id.view_plan_times);
-			length.setText(plans.get(position).getPool());
-			times.setText(plans.get(position).getTime() + "");
+			length.setText(planList.get(position).getPool());
+			times.setText(planList.get(position).getTime() + "");
 			ListView viewList = (ListView) window
 					.findViewById(R.id.planlist_view);
-			long plan_id = plans.get(position).getId();
+			long plan_id = planList.get(position).getId();
 			List<Athlete> athletes = dbManager.getAthInPlan(plan_id);
 			if (athleteName.size() != 0)
 				athleteName.clear();
@@ -305,7 +325,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 				isMulChoice = true;
 				selectid.clear();
 				relative.setVisibility(View.VISIBLE);
-				for (int i = 0; i < plans.size(); i++) {
+				for (int i = 0; i < planList.size(); i++) {
 					adapter.visiblecheck.put(i, CheckBox.VISIBLE);
 				}
 				adapter.notifyDataSetChanged();
@@ -317,6 +337,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 			private TextView txt;
 			private CheckBox checkBox;
 		}
+
 	}
 
 	public void getPlansRequest() {
@@ -326,23 +347,44 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 					@Override
 					public void onResponse(String response) {
 						// TODO Auto-generated method stub
-						Log.i("getPlans", response);
+						Log.i(Constants.TAG, "response>>>>>" + response);
 						loadingDialog.dismiss();
 						try {
 							JSONObject jsonObject = new JSONObject(response);
 							int resCode = (Integer) jsonObject.get("resCode");
 							if (resCode == 1) {
-								String jsonString = jsonObject.get("plan")
+								String jsonString = jsonObject.get("planList")
 										.toString();
-								List<Plan> plans = JsonTools.getObjects(
-										jsonString, Plan.class);
-								// 将从服务器获取的运动员信息保存到本地数据库
-								for (Plan plan : plans) {
-									plan.save();
+								JSONArray planArray = new JSONArray(jsonString);
+								int planSize = planArray.length();
+								for (int i = 0; i < planSize; i++) {
+									Plan newPlan = new Plan();
+									TempPlan tpPlan = JsonTools.getObject(
+											planArray.get(i).toString(),
+											TempPlan.class);
+									newPlan.setPid(tpPlan.getPid());
+									newPlan.setName(tpPlan.getName());
+									newPlan.setPool(tpPlan.getPool());
+									if (tpPlan.getTime() != null) {
+										newPlan.setTime(Integer.parseInt(tpPlan
+												.getTime()));
+									}
+									Integer[] athIDs = tpPlan.getAthleteID();
+
+									List<Athlete> athsList = dbManager
+											.getAthletesByAid(athIDs, mUserId);
+									newPlan.setAthlete(athsList);
+									newPlan.setUser(mUser);
+									newPlan.save();
 								}
-							} else if (resCode == 2) {
+								adapter.setDatas(dbManager
+										.getUserPlans(mUserId));
+								adapter.notifyDataSetChanged();
 								XUtils.showToast(activity, mToast,
 										SYNCHRONOUS_SUCCESS);
+
+							} else if (resCode == 2) {
+								XUtils.showToast(activity, mToast, "同步失败");
 							} else {
 								XUtils.showToast(activity, mToast, UNKNOW_ERROR);
 							}
@@ -361,6 +403,21 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 						Log.e("ViewPlan", error.getMessage());
 					}
 				}) {
+
+			@Override
+			protected Response<String> parseNetworkResponse(
+					NetworkResponse response) {
+				String str = null;
+				try {
+					str = new String(response.data, "utf-8");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return Response.success(str,
+						HttpHeaderParser.parseCacheHeaders(response));
+			}
+
 			@Override
 			protected Map<String, String> getParams() throws AuthFailureError {
 				// 设置请求参数
@@ -405,6 +462,20 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 				}) {
 
 			@Override
+			protected Response<String> parseNetworkResponse(
+					NetworkResponse response) {
+				String str = null;
+				try {
+					str = new String(response.data, "utf-8");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return Response.success(str,
+						HttpHeaderParser.parseCacheHeaders(response));
+			}
+
+			@Override
 			protected Map<String, String> getParams() throws AuthFailureError {
 				// 设置请求参数
 				Map<String, String> map = new HashMap<String, String>();
@@ -418,6 +489,67 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);
+	}
+
+	/**
+	 * 
+	 * @author LitleByte 方便Gson转换的临时类
+	 * 
+	 */
+	class TempPlan {
+		int pid;
+		String name;
+		String time;
+		String pool;
+		Integer[] athleteID;
+
+		public int getPid() {
+			return pid;
+		}
+
+		public void setPid(int pid) {
+			this.pid = pid;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getTime() {
+			return time;
+		}
+
+		public void setTime(String time) {
+			this.time = time;
+		}
+
+		public String getPool() {
+			return pool;
+		}
+
+		public void setPool(String pool) {
+			this.pool = pool;
+		}
+
+		public Integer[] getAthleteID() {
+			return athleteID;
+		}
+
+		public void setAthleteID(Integer[] athleteID) {
+			this.athleteID = athleteID;
+		}
+
+		@Override
+		public String toString() {
+			return "TempPlan [pid=" + pid + ", name=" + name + ", time=" + time
+					+ ", pool=" + pool + ", athleteID="
+					+ Arrays.toString(athleteID) + "]";
+		}
+
 	}
 
 }

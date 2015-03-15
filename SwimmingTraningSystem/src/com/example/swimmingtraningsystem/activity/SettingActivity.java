@@ -49,8 +49,6 @@ public class SettingActivity extends Activity {
 						Intent i = new Intent();
 						i.setClass(SettingActivity.this, LoginActivity.class);
 						startActivity(i);
-						finish();
-						app.exit();
 					}
 				});
 		build.setNegativeButton(Constants.CANCLE_STRING,

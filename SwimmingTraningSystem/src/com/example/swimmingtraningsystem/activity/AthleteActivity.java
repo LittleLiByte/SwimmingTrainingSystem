@@ -26,7 +26,6 @@ import android.widget.Toast;
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
-import com.android.volley.ParseError;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -134,16 +133,16 @@ public class AthleteActivity extends Activity {
 		if (isFirst) {
 			XUtils.initAthletes(this, false);
 		}
-//		 如果第一次打开应用并且可以连接服务器，就会尝试从服务器获取运动员信息
-		 if (isConnect && isFirst) {
-		if (loadingDialog == null) {
-			loadingDialog = LoadingDialog.createDialog(this);
-			loadingDialog.setMessage("正在同步...");
-			loadingDialog.setCanceledOnTouchOutside(false);
+		// 如果第一次打开应用并且可以连接服务器，就会尝试从服务器获取运动员信息
+		if (isConnect && isFirst) {
+			if (loadingDialog == null) {
+				loadingDialog = LoadingDialog.createDialog(this);
+				loadingDialog.setMessage("正在同步...");
+				loadingDialog.setCanceledOnTouchOutside(false);
+			}
+			loadingDialog.show();
+			getAthleteRequest();
 		}
-		loadingDialog.show();
-		getAthleteRequest();
-		 }
 
 	}
 
@@ -162,7 +161,7 @@ public class AthleteActivity extends Activity {
 				.withMessage(null)
 				.withIcon(getResources().getDrawable(R.drawable.ic_launcher))
 				.isCancelableOnTouchOutside(false)
-				.withDuration(700)
+				.withDuration(500)
 				.withEffect(effect)
 				.withButton1Text(Constants.CANCLE_STRING)
 				.withButton2Text(Constants.OK_STRING)
@@ -332,22 +331,14 @@ public class AthleteActivity extends Activity {
 							JSONObject jsonObject = new JSONObject(response);
 							int resCode = (Integer) jsonObject.get("resCode");
 							if (resCode == 1) {
-								// String jsonString = jsonObject.get(
-								// "athleteList").toString();
-								// List<Athlete> athletes =
-								// JsonTools.getObjects(
-								// jsonString, Athlete.class);
-								// // 将从服务器获取的运动员信息保存到本地数据库
-								// for (Athlete a : athletes) {
-								// a.save();}
 
-								JSONArray athlteArray = jsonObject
+								JSONArray athleteArray = jsonObject
 										.getJSONArray("athleteList");
-								int athletesNumber = athlteArray.length();
+								int athletesNumber = athleteArray.length();
 								for (int i = 0; i < athletesNumber; i++) {
 									Athlete athlete = new Athlete();
 									TempAthlete tempAthlete = JsonTools
-											.getObject(athlteArray.get(i)
+											.getObject(athleteArray.get(i)
 													.toString(),
 													TempAthlete.class);
 									athlete.setAid(tempAthlete.getAid());
@@ -362,7 +353,8 @@ public class AthleteActivity extends Activity {
 								mAthletes = mDbManager.getAthletes(mUserId);
 								mAthleteListAdapter.setDatas(mAthletes);
 								mAthleteListAdapter.notifyDataSetChanged();
-								XUtils.showToast(AthleteActivity.this, mToast, "同步成功！");
+								XUtils.showToast(AthleteActivity.this, mToast,
+										"同步成功！");
 							} else {
 								XUtils.showToast(AthleteActivity.this, mToast,
 										UNKNOW_ERROR);

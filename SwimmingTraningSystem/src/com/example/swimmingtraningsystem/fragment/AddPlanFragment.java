@@ -250,13 +250,15 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 				jsonMap.put("user", us.getUid());
 				jsonMap.put("athlete", idList);
 				jsonStr = JsonTools.creatJsonString(jsonMap);
-				addPlanRequest();
+				addPlanRequest(p);
 			} else {
 				// 否则将数据保存本地使用
 				p.save();
 				XUtils.showToast(activity, toast, "计划添加成功！");
+
+				activity.finish();
 			}
-			activity.finish();
+
 		}
 
 	}
@@ -279,7 +281,7 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 	/**
 	 * 将新增计划请求发送至服务器
 	 */
-	public void addPlanRequest() {
+	public void addPlanRequest(final Plan newPlan) {
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				XUtils.HOSTURL + "addPlan", new Listener<String>() {
 
@@ -291,10 +293,14 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 							if (resCode == 1) {
 								XUtils.showToast(activity, toast,
 										Constants.ADD_SUCCESS_STRING);
-								String userJson = obj.get("plan").toString();
-								Plan pl = JsonTools.getObject(userJson,
-										Plan.class);
-								pl.save();
+								int planID = obj.getInt("plan_id");
+								newPlan.setPid(planID);
+								newPlan.save();
+								planAdapter = new AddPlanListAdapter(activity,
+										planList, map);
+								planlv.setAdapter(planAdapter);
+
+								activity.finish();
 							}
 
 						} catch (JSONException e) {

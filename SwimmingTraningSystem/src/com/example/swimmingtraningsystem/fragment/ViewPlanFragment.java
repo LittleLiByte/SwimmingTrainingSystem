@@ -51,6 +51,7 @@ import com.example.swimmingtraningsystem.http.JsonTools;
 import com.example.swimmingtraningsystem.model.Athlete;
 import com.example.swimmingtraningsystem.model.Plan;
 import com.example.swimmingtraningsystem.model.Upid;
+import com.example.swimmingtraningsystem.model.User;
 import com.example.swimmingtraningsystem.util.Constants;
 import com.example.swimmingtraningsystem.util.XUtils;
 import com.example.swimmingtraningsystem.view.LoadingDialog;
@@ -79,6 +80,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 	private LoadingDialog loadingDialog;
 	private Boolean isConnect;
 	private Toast mToast;
+	private Long mUserId;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -103,7 +105,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 	private void initFragment() {
 		activity = getActivity();
 		app = (MyApplication) activity.getApplication();
-		long userID = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
+		mUserId= (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		dbManager = DBManager.getInstance();
 		listView = (ListView) activity.findViewById(R.id.view_plan_list);
 		relative = (RelativeLayout) activity.findViewById(R.id.relative);
@@ -113,7 +115,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 		calcle.setOnClickListener(this);
 		delete.setOnClickListener(this);
 		selectid = new ArrayList<Plan>();
-		plans = dbManager.getUserPlans(userID);
+		plans = dbManager.getUserPlans(mUserId);
 		adapter = new ViewPlanAdapter(activity, tips);
 		listView.setAdapter(adapter);
 		mQueue = Volley.newRequestQueue(activity);
@@ -333,7 +335,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 								String jsonString = jsonObject.get("plan")
 										.toString();
 								List<Plan> plans = JsonTools.getObjects(
-										jsonString, Athlete.class);
+										jsonString, Plan.class);
 								// 将从服务器获取的运动员信息保存到本地数据库
 								for (Plan plan : plans) {
 									plan.save();
@@ -359,15 +361,14 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 						Log.e("ViewPlan", error.getMessage());
 					}
 				}) {
-
-			// @Override
-			// protected Map<String, String> getParams() throws AuthFailureError
-			// {
-			// // 设置请求参数
-			// Map<String, String> map = new HashMap<String, String>();
-			// map.put("deletePlansJson", jsonString);
-			// return map;
-			// }
+			@Override
+			protected Map<String, String> getParams() throws AuthFailureError {
+				// 设置请求参数
+				Map<String, String> map = new HashMap<String, String>();
+				User mUser = dbManager.getUser(mUserId);
+				map.put("getPlanFirst", mUser.getUid() + "");
+				return map;
+			}
 
 		};
 		getAthRequest.setRetryPolicy(new DefaultRetryPolicy(

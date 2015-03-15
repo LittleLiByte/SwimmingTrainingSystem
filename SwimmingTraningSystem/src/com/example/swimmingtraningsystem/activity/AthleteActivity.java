@@ -1,5 +1,6 @@
 package com.example.swimmingtraningsystem.activity;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +25,15 @@ import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.swimmingtraningsystem.R;
@@ -129,16 +134,16 @@ public class AthleteActivity extends Activity {
 		if (isFirst) {
 			XUtils.initAthletes(this, false);
 		}
-		// 如果第一次打开应用并且可以连接服务器，就会尝试从服务器获取运动员信息
-		if (isConnect && isFirst) {
-			if (loadingDialog == null) {
-				loadingDialog = LoadingDialog.createDialog(this);
-				loadingDialog.setMessage("正在同步...");
-				loadingDialog.setCanceledOnTouchOutside(false);
-			}
-			loadingDialog.show();
-			getAthleteRequest();
+//		 如果第一次打开应用并且可以连接服务器，就会尝试从服务器获取运动员信息
+		 if (isConnect && isFirst) {
+		if (loadingDialog == null) {
+			loadingDialog = LoadingDialog.createDialog(this);
+			loadingDialog.setMessage("正在同步...");
+			loadingDialog.setCanceledOnTouchOutside(false);
 		}
+		loadingDialog.show();
+		getAthleteRequest();
+		 }
 
 	}
 
@@ -148,73 +153,67 @@ public class AthleteActivity extends Activity {
 	 * @param v
 	 */
 	public void addAthlete(View v) {
-		if (XUtils.isFastDoubleClick()) {
-			final NiftyDialogBuilder addDialog = NiftyDialogBuilder
-					.getInstance(this);
-			Effectstype effect = Effectstype.RotateLeft;
-			Window window = addDialog.getWindow();
-			addDialog
-					.withTitle(ADD_ATHLETE_TITLE_STRING)
-					.withMessage(null)
-					.withIcon(
-							getResources().getDrawable(R.drawable.ic_launcher))
-					.isCancelableOnTouchOutside(false)
-					.withDuration(700)
-					.withEffect(effect)
-					.withButton1Text(Constants.CANCLE_STRING)
-					.withButton2Text(Constants.OK_STRING)
-					.setButton1Click(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
+		final NiftyDialogBuilder addDialog = NiftyDialogBuilder
+				.getInstance(this);
+		Effectstype effect = Effectstype.RotateLeft;
+		Window window = addDialog.getWindow();
+		addDialog
+				.withTitle(ADD_ATHLETE_TITLE_STRING)
+				.withMessage(null)
+				.withIcon(getResources().getDrawable(R.drawable.ic_launcher))
+				.isCancelableOnTouchOutside(false)
+				.withDuration(700)
+				.withEffect(effect)
+				.withButton1Text(Constants.CANCLE_STRING)
+				.withButton2Text(Constants.OK_STRING)
+				.setButton1Click(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						addDialog.dismiss();
+					}
+				})
+				.setButton2Click(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+
+						String name = mAthleteName.getText().toString().trim();
+						String ageString = mAthleteAge.getText().toString()
+								.trim();
+						String phone = mAthleteContact.getText().toString()
+								.trim();
+						String other = mOthers.getText().toString().trim();
+
+						boolean isCheck = mGenderSwitch.isChecked();
+
+						System.out.println("isCheck--->" + isCheck);
+						String gender = "男";
+						if (!isCheck) {
+							gender = "女";
+						}
+						boolean isExit = mDbManager.isAthleteNameExsit(mUserId,
+								name);
+						if (TextUtils.isEmpty(name)) {
+							XUtils.showToast(AthleteActivity.this, mToast,
+									NAME_CANNOT_BE_EMPTY_STRING);
+						} else if (isExit) {
+							XUtils.showToast(AthleteActivity.this, mToast,
+									NAME_CANNOT_BE_REPEATE_STRING);
+						} else if (TextUtils.isEmpty(ageString)) {
+							XUtils.showToast(AthleteActivity.this, mToast,
+									AGE_CANNOT_BE_EMPTY_STRING);
+						} else {
+							int age = Integer.parseInt(ageString);
+							addAthlete(name, age, gender, phone, other);
 							addDialog.dismiss();
 						}
-					})
-					.setButton2Click(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-
-							String name = mAthleteName.getText().toString()
-									.trim();
-							String ageString = mAthleteAge.getText().toString()
-									.trim();
-							String phone = mAthleteContact.getText().toString()
-									.trim();
-							String other = mOthers.getText().toString().trim();
-
-							boolean isCheck = mGenderSwitch.isChecked();
-
-							System.out.println("isCheck--->" + isCheck);
-							String gender = "男";
-							if (!isCheck) {
-								gender = "女";
-							}
-							boolean isExit = mDbManager.isAthleteNameExsit(
-									mUserId, name);
-							if (TextUtils.isEmpty(name)) {
-								XUtils.showToast(AthleteActivity.this, mToast,
-										NAME_CANNOT_BE_EMPTY_STRING);
-							} else if (isExit) {
-								XUtils.showToast(AthleteActivity.this, mToast,
-										NAME_CANNOT_BE_REPEATE_STRING);
-							} else if (TextUtils.isEmpty(ageString)) {
-								XUtils.showToast(AthleteActivity.this, mToast,
-										AGE_CANNOT_BE_EMPTY_STRING);
-							} else {
-								int age = Integer.parseInt(ageString);
-								addAthlete(name, age, gender, phone, other);
-								addDialog.dismiss();
-							}
-						}
-					})
-					.setCustomView(R.layout.add_athlete_dialog, v.getContext())
-					.show();
-			mAthleteName = (EditText) window.findViewById(R.id.add_et_user);
-			mAthleteAge = (EditText) window.findViewById(R.id.add_et_age);
-			mAthleteContact = (EditText) window
-					.findViewById(R.id.add_et_contact);
-			mOthers = (EditText) window.findViewById(R.id.add_et_extra);
-			mGenderSwitch = (Switch) window.findViewById(R.id.toggle_gender);
-		}
+					}
+				}).setCustomView(R.layout.add_athlete_dialog, v.getContext())
+				.show();
+		mAthleteName = (EditText) window.findViewById(R.id.add_et_user);
+		mAthleteAge = (EditText) window.findViewById(R.id.add_et_age);
+		mAthleteContact = (EditText) window.findViewById(R.id.add_et_contact);
+		mOthers = (EditText) window.findViewById(R.id.add_et_extra);
+		mGenderSwitch = (Switch) window.findViewById(R.id.toggle_gender);
 
 	}
 
@@ -264,6 +263,7 @@ public class AthleteActivity extends Activity {
 	public void addAthleteequest(final Athlete a) {
 		Map<String, Object> jsonMap = new HashMap<String, Object>();
 		jsonMap.put("athlete", a);
+		jsonMap.put("uid", mUser.getUid());
 		final String athleteJson = JsonTools.creatJsonString(jsonMap);
 		StringRequest request = new StringRequest(Method.POST, XUtils.HOSTURL
 				+ ADDATHLETE, new Listener<String>() {
@@ -278,7 +278,7 @@ public class AthleteActivity extends Activity {
 					if (resCode == 1) {
 						XUtils.showToast(AthleteActivity.this, mToast,
 								Constants.ADD_SUCCESS_STRING);
-						int aid = (Integer) obj.get("aid");
+						int aid = (Integer) obj.get("athlete_id");
 						a.setAid(aid);
 						a.setUser(mUser);
 						a.save();
@@ -346,8 +346,10 @@ public class AthleteActivity extends Activity {
 								int athletesNumber = athlteArray.length();
 								for (int i = 0; i < athletesNumber; i++) {
 									Athlete athlete = new Athlete();
-									TempAthlete tempAthlete = (TempAthlete) athlteArray
-											.get(i);
+									TempAthlete tempAthlete = JsonTools
+											.getObject(athlteArray.get(i)
+													.toString(),
+													TempAthlete.class);
 									athlete.setAid(tempAthlete.getAid());
 									athlete.setName(tempAthlete.getName());
 									athlete.setAge(tempAthlete.getAge());
@@ -357,7 +359,10 @@ public class AthleteActivity extends Activity {
 									athlete.setUser(mUser);
 									athlete.save();
 								}
-
+								mAthletes = mDbManager.getAthletes(mUserId);
+								mAthleteListAdapter.setDatas(mAthletes);
+								mAthleteListAdapter.notifyDataSetChanged();
+								XUtils.showToast(AthleteActivity.this, mToast, "同步成功！");
 							} else {
 								XUtils.showToast(AthleteActivity.this, mToast,
 										UNKNOW_ERROR);
@@ -374,15 +379,29 @@ public class AthleteActivity extends Activity {
 					public void onErrorResponse(VolleyError error) {
 						// TODO Auto-generated method stub
 						loadingDialog.dismiss();
-						Log.e(Constants.TAG, error.getMessage());
+						// Log.e(Constants.TAG, error.getMessage());
 					}
 				}) {
+
+			@Override
+			protected Response<String> parseNetworkResponse(
+					NetworkResponse response) {
+				String str = null;
+				try {
+					str = new String(response.data, "utf-8");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return Response.success(str,
+						HttpHeaderParser.parseCacheHeaders(response));
+			}
 
 			@Override
 			protected Map<String, String> getParams() throws AuthFailureError {
 				// 设置请求参数
 				Map<String, String> map = new HashMap<String, String>();
-				map.put("uid", mUser.getUid() + "");
+				map.put("getAthleteFirst", mUser.getUid() + "");
 				return map;
 			}
 		};

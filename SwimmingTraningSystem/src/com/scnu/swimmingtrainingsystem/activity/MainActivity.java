@@ -140,7 +140,7 @@ public class MainActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onDestroy();
 		app.getMap().put(Constants.SWIM_TIME, 1);
-		app.getMap().put(Constants.CURRENT_SWIM_TIME, "");
+		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
 		app.getMap().put(Constants.ATHLETE_NUMBER, 0);
 		app.getMap().put(Constants.ATHLTE_ID_LIST, null);
 		app.getMap().put(Constants.PLAN_ID, 0);

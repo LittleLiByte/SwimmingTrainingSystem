@@ -39,6 +39,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.scnu.swimmingtrainingsystem.activity.LoginActivity;
 import com.scnu.swimmingtrainingsystem.activity.MyApplication;
+import com.scnu.swimmingtrainingsystem.activity.PlanActivity;
 import com.scnu.swimmingtrainingsystem.adapter.AddPlanListAdapter;
 import com.scnu.swimmingtrainingsystem.adapter.ChoseAthleteAdapter;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
@@ -51,6 +52,7 @@ import com.scnu.swimmingtrainingsystem.model.PlanHolder;
 import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.XUtils;
+import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 
 /**
  * 添加计划Fragment
@@ -80,6 +82,7 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 	private RequestQueue mQueue;
 	private String jsonStr = null;
 	private Toast toast;
+	private LoadingDialog loadingDialog;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -283,6 +286,13 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 	 * 将新增计划请求发送至服务器
 	 */
 	public void addPlanRequest(final Plan newPlan) {
+		if (loadingDialog == null) {
+			loadingDialog = LoadingDialog.createDialog(activity);
+			loadingDialog.setMessage("同步中...");
+			loadingDialog.setCanceledOnTouchOutside(false);
+		}
+		loadingDialog.show();
+		
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				XUtils.HOSTURL + "addPlan", new Listener<String>() {
 
@@ -297,13 +307,16 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 								int planID = obj.getInt("plan_id");
 								newPlan.setPid(planID);
 								newPlan.save();
+								loadingDialog.dismiss();
+								
 								XUtils.showToast(activity, toast,
 										Constants.ADD_SUCCESS_STRING);
 								planAdapter = new AddPlanListAdapter(activity,
 										planList, map);
 								planlv.setAdapter(planAdapter);
-
+								
 								activity.finish();
+								startActivity(new Intent(activity, PlanActivity.class));
 							}
 
 						} catch (JSONException e) {
@@ -316,6 +329,8 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 					@Override
 					public void onErrorResponse(VolleyError error) {
 						// TODO Auto-generated method stub
+						loadingDialog.dismiss();
+						XUtils.showToast(activity, toast, "连接错误");
 					}
 				}) {
 

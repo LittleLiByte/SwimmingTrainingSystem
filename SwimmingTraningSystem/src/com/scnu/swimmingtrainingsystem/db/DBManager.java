@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.litepal.crud.DataSupport;
 
+import android.R.integer;
 import android.content.ContentValues;
 
 import com.scnu.swimmingtrainingsystem.model.Athlete;
@@ -108,6 +109,13 @@ public class DBManager {
 		return athletes;
 	}
 
+	public Athlete getAthletesByAid(int aid) {
+		String athlete_id = String.valueOf(aid);
+		Athlete athlete = DataSupport.where("aid=?", athlete_id)
+				.find(Athlete.class).get(0);
+		return athlete;
+	}
+
 	/**
 	 * 获取该用户的所查询计划的运动员
 	 * 
@@ -117,12 +125,12 @@ public class DBManager {
 	 */
 	public List<Athlete> getAthletesByAid(Integer[] athIds, Long userId) {
 		String thisUserId = String.valueOf(userId);
-		List<Athlete> athleteList=new ArrayList<Athlete>();
+		List<Athlete> athleteList = new ArrayList<Athlete>();
 		for (int aid : athIds) {
 			String id = String.valueOf(aid);
 			List<Athlete> athletes = DataSupport.where("user_id=? and aid=? ",
 					thisUserId, id).find(Athlete.class);
-			if (athletes.size()!=0) {
+			if (athletes.size() != 0) {
 				athleteList.add(athletes.get(0));
 			}
 		}
@@ -252,7 +260,6 @@ public class DBManager {
 			DataSupport.delete(Plan.class, p.getId());
 		}
 	}
-
 
 	/**
 	 * 查找table_plan中当前用户的所有计划
@@ -398,6 +405,12 @@ public class DBManager {
 					.find(Score.class));
 		}
 		return s;
+	}
+
+	public Plan getPlanByPid(int pid) {
+		String planid = String.valueOf(pid);
+		Plan plan = DataSupport.where("pid=?", planid).find(Plan.class).get(0);
+		return plan;
 	}
 
 	/**

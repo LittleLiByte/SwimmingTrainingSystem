@@ -62,6 +62,16 @@ public class Constants {
 	 * 保存当前是否可以连接服务器的状态
 	 */
 	public static final String IS_CONNECT_SERVICE = "isConnect";
+	
+	/**
+	 * 上次登陆的user_id
+	 */
+	public static final String LAST_LOGIN_USER_ID="lastLoginUser";
+	
+	/**
+	 * 该用户是否是第一次登陆应用
+	 */
+	public static final String IS_THIS_USER_FIRST_LOGIN="isThisUserFirstLogin";
 
 	/**
 	 * Log信息所需tag--com.scnu.swimmingtrainingsystem

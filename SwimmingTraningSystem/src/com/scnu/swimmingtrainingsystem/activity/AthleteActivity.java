@@ -130,11 +130,13 @@ public class AthleteActivity extends Activity {
 		SharedPreferences sp = getSharedPreferences(Constants.LOGININFO,
 				Context.MODE_PRIVATE);
 		boolean isFirst = sp.getBoolean(Constants.FISRTOPENATHLETE, true);
-		if (isFirst) {
-			XUtils.initAthletes(this, false);
-		}
+		boolean userFirstLogin = sp.getBoolean(
+				Constants.IS_THIS_USER_FIRST_LOGIN, true);
+
 		// 如果第一次打开应用并且可以连接服务器，就会尝试从服务器获取运动员信息
-		if (isConnect && isFirst) {
+		if (isConnect && isFirst && userFirstLogin) {
+			XUtils.initAthletes(this, false);
+			XUtils.saveIsThisUserFirstLogin(this, false);
 			if (loadingDialog == null) {
 				loadingDialog = LoadingDialog.createDialog(this);
 				loadingDialog.setMessage("正在同步...");

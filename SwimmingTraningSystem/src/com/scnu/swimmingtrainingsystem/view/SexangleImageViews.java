@@ -31,8 +31,6 @@ public class SexangleImageViews extends ImageView {
 
 	private int mWidth;
 	private int mHeight;
-	private int centreX;
-	private int centreY;
 	private int mLenght;
 	private Paint paint;
 
@@ -107,8 +105,6 @@ public class SexangleImageViews extends ImageView {
 		mHeight = getHeight();
 
 		// ÖÐÐÄµã
-		centreX = mWidth / 2;
-		centreY = mHeight / 2;
 		mLenght = mWidth / 2;
 
 		double radian30 = 30 * Math.PI / 180;

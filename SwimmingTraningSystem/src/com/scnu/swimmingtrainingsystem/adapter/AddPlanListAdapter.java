@@ -22,6 +22,7 @@ import com.scnu.swimmingtrainingsystem.model.Athlete;
 public class AddPlanListAdapter extends BaseAdapter {
 	private Context context;
 	private List<Athlete> list;
+	@SuppressWarnings("unused")
 	private Map<Long, Boolean> map;
 
 	public AddPlanListAdapter(Context context, List<Athlete> list,

@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.scnu.swimmingtrainingsystem.R;
 import android.app.Activity;
 import android.content.Intent;
@@ -34,6 +37,7 @@ import com.scnu.swimmingtrainingsystem.http.JsonTools;
 import com.scnu.swimmingtrainingsystem.model.Athlete;
 import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.Score;
+import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.XUtils;
 import com.scnu.swimmingtrainingsystem.view.DragListView;
@@ -55,6 +59,8 @@ public class MatchScoreActivity extends Activity {
 	private long planID;
 	private Plan p;
 	private Toast toast;
+	private DBManager mDbManager;
+	private User mUser;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,14 +81,15 @@ public class MatchScoreActivity extends Activity {
 	private void init() {
 		// TODO Auto-generated method stub
 		app = (MyApplication) getApplication();
+		mDbManager = DBManager.getInstance();
+		Long userID = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
+		mUser = mDbManager.getUser(userID);
 		Intent result = getIntent();
 		scores = result.getStringArrayExtra("SCORES");
 		planID = (Long) app.getMap().get(Constants.PLAN_ID);
 		athID = (List<Long>) app.getMap().get(Constants.ATHLTE_ID_LIST);
-		dragDatas = (List<String>) app.getMap()
-				.get(Constants.DRAG_NAME_LIST);
-		int current = (Integer) app.getMap()
-				.get(Constants.CURRENT_SWIM_TIME);
+		dragDatas = (List<String>) app.getMap().get(Constants.DRAG_NAME_LIST);
+		int current = (Integer) app.getMap().get(Constants.CURRENT_SWIM_TIME);
 		athletes = DBManager.getInstance().getAthletes(athID);
 		mQueue = Volley.newRequestQueue(getApplicationContext());
 		listView = (ListView) findViewById(R.id.matchscore_list);
@@ -113,12 +120,14 @@ public class MatchScoreActivity extends Activity {
 	public void matchDone(View v) {
 		String date = (String) app.getMap().get(Constants.TEST_DATE);
 		List<Athlete> athletes = dragAdapter.getList();
-		int nowCurrent = (Integer) app.getMap().get(
-				Constants.CURRENT_SWIM_TIME);
+		int nowCurrent = (Integer) app.getMap()
+				.get(Constants.CURRENT_SWIM_TIME);
 		p = DBManager.getInstance().queryPlan(planID);
 		List<String> names = new ArrayList<String>();
 
 		List<Map<String, Object>> scoresJson = new ArrayList<Map<String, Object>>();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("uid", mUser.getUid());
 		for (int i = 0; i < scores.length; i++) {
 			Map<String, Object> scoreMap = new HashMap<String, Object>();
 			Athlete a = athletes.get(i);
@@ -130,21 +139,22 @@ public class MatchScoreActivity extends Activity {
 			s.setAthlete(a);
 			s.setP(p);
 			s.save();
+
 			scoreMap.put("score", scores[i]);
-			scoreMap.put("date", date);
+			scoreMap.put("up_time", date);
 			scoreMap.put("times", nowCurrent);
-			scoreMap.put("plan", p.getPid());
-			scoreMap.put("athlete", a.getAid());
+			scoreMap.put("plan_id", p.getPid());
+			scoreMap.put("athlete_id", a.getAid());
 			scoresJson.add(scoreMap);
 		}
-		XUtils.showToast(this, toast, "保存成功！");
+		map.put("scoreList", scoresJson);
 
 		// 如果处在联网状态，则发送至服务器
 		boolean isConnect = (Boolean) app.getMap().get(
 				Constants.IS_CONNECT_SERVICE);
 		if (isConnect) {
 			// 发送至服务器
-			createNewRequest(JsonTools.creatJsonString(scoresJson));
+			addScoreRequest(JsonTools.creatJsonString(map));
 		}
 
 		int swimTime = ((Integer) app.getMap().get(Constants.SWIM_TIME)) - 1;
@@ -157,7 +167,7 @@ public class MatchScoreActivity extends Activity {
 			Intent i = new Intent(this, ShowScoreActivity.class);
 			i.putExtra(Constants.TEST_DATE,
 					(String) app.getMap().get(Constants.TEST_DATE));
-			i.putExtra("Plan", p.getName() + "--" + p.getPool());
+			i.putExtra("Plan", "计划名：" + p.getName() + "   " + p.getPool() );
 			startActivity(i);
 			app.getMap().put(Constants.DRAG_NAME_LIST, null);
 			app.getMap().put(Constants.ATHLETE_NUMBER, 0);
@@ -217,7 +227,7 @@ public class MatchScoreActivity extends Activity {
 	 * @param jsonString
 	 *            本轮所有成绩的json字符串
 	 */
-	public void createNewRequest(final String jsonString) {
+	public void addScoreRequest(final String jsonString) {
 
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				XUtils.HOSTURL + "addScores", new Listener<String>() {
@@ -226,17 +236,30 @@ public class MatchScoreActivity extends Activity {
 					public void onResponse(String response) {
 						// TODO Auto-generated method stub
 						Log.i("addScores", response);
-						if (response.equals("ok")) {
-
-						} else {
+						JSONObject obj;
+						try {
+							obj = new JSONObject(response);
+							int resCode = (Integer) obj.get("resCode");
+							if (resCode == 1) {
+								XUtils.showToast(MatchScoreActivity.this,
+										toast, "保存成功！");
+							}else {
+								XUtils.showToast(MatchScoreActivity.this,
+										toast, "服务器错误！请重新计时！");
+							}
+							finish();
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
+
 					}
 				}, new ErrorListener() {
 
 					@Override
 					public void onErrorResponse(VolleyError error) {
 						// TODO Auto-generated method stub
-						Log.e("addScores", error.getMessage());
+						// Log.e("addScores", error.getMessage());
 					}
 				}) {
 

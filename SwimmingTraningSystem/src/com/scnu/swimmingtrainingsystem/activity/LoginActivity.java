@@ -6,6 +6,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.R.fraction;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -96,8 +97,8 @@ public class LoginActivity extends Activity {
 			defaulrUser.setUsername(DEFAULT_USERNAME);
 			defaulrUser.setPassword(DEFAULT_PASSWORD);
 			defaulrUser.save();
-			showSettingDialog(LoginActivity.this);
-			XUtils.SaveLoginInfo(LoginActivity.this, false);
+			showSettingDialog(this);
+			XUtils.SaveLoginInfo(this, false);
 		}
 
 		// 从SharedPreferences读取服务器地址信息
@@ -207,6 +208,8 @@ public class LoginActivity extends Activity {
 									user.save();
 									app.getMap().put(Constants.CURRENT_USER_ID,
 											user.getId());
+									//用户第一次登陆
+									XUtils.saveIsThisUserFirstLogin(LoginActivity.this, true);
 								} else {
 									// 如果该用户信息已存在本地数据库，则取出当前id作为全局变量
 									long currentId = dbManager.getUserByName(
@@ -231,7 +234,7 @@ public class LoginActivity extends Activity {
 						}
 
 						XUtils.showToast(LoginActivity.this, toast, "登陆成功");
-
+					
 						Handler handler = new Handler();
 						Runnable updateThread = new Runnable() {
 							public void run() {

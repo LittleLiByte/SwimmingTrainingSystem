@@ -1,6 +1,9 @@
 package com.scnu.swimmingtrainingsystem.util;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -61,6 +64,14 @@ public class XUtils {
 		editor.putString("hostInfo", host);
 		editor.putString("ip", ip);
 		editor.putString("port", port);
+		editor.commit();
+	}
+
+	public static void saveIsThisUserFirstLogin(Context context, boolean first) {
+		SharedPreferences sp = context.getSharedPreferences(
+				Constants.LOGININFO, context.MODE_PRIVATE);
+		Editor editor = sp.edit();
+		editor.putBoolean(Constants.IS_THIS_USER_FIRST_LOGIN, first);
 		editor.commit();
 	}
 
@@ -161,5 +172,16 @@ public class XUtils {
 		}
 		lastClickTime = time;
 		return false;
+	}
+
+	public static String getCurrentTime(String format) {
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
+		String currentTime = sdf.format(date);
+		return currentTime;
+	}
+
+	public static String getCurrentTime() {
+		return getCurrentTime("yyyy-MM-dd  HH:mm:ss");
 	}
 }

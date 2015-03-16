@@ -1,9 +1,16 @@
 package com.scnu.swimmingtrainingsystem.activity;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import com.scnu.swimmingtrainingsystem.R;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -18,23 +25,40 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request.Method;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.scnu.swimmingtrainingsystem.R;
+import com.scnu.swimmingtrainingsystem.adapter.QueryDatesAdapter;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
+import com.scnu.swimmingtrainingsystem.http.JsonTools;
 import com.scnu.swimmingtrainingsystem.model.Athlete;
 import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.Score;
 import com.scnu.swimmingtrainingsystem.model.Temp;
+import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.XUtils;
+import com.scnu.swimmingtrainingsystem.view.AutoListView;
+import com.scnu.swimmingtrainingsystem.view.AutoListView.OnLoadListener;
+import com.scnu.swimmingtrainingsystem.view.AutoListView.OnRefreshListener;
 import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 
 /**
@@ -43,8 +67,10 @@ import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
  * @author LittleByte
  * 
  */
-public class QueryScoreActivity extends Activity {
-
+public class QueryScoreActivity extends Activity implements OnRefreshListener,
+		OnLoadListener {
+	// Volley请求队列
+	private RequestQueue mQueue;
 	private LinearLayout totalDates, containLayout;
 	private ExpandableListView mExpandableListView;
 	private TextView details;
@@ -56,13 +82,16 @@ public class QueryScoreActivity extends Activity {
 	private List<Temp> sumList = new ArrayList<Temp>();
 	private LoadingDialog mLoadingDialog;
 	private List<String> dateList = new ArrayList<String>();
-	private DatesAdapter adapter;
-	private ListView dateListView;
-	private View headView;
+	private QueryDatesAdapter adapter;
+	private AutoListView dateListView;
 	private PopupWindow mPopWin;
 	private Toast mToast;
+	private User mUser;
+	private int currentPage = 1;
+	// 可查询的日期总数
+	private int totalRecords = 0;
+	private boolean isConnect;
 	private final static String NO_SUCH_RECORDS_STRING = "没有关于该查询条件的记录！";
-	private final static String PLEASE_SELECT_RIGHT_TIME_STRING = "请选择正确的查询时间！";
 	private final static String GENERATING_RESULT_STRING = "正在生成查询结果...";
 	private static final String NOT_CORRECT_STRING = "本次计时成绩不完整，无法正确展示！";
 
@@ -71,7 +100,7 @@ public class QueryScoreActivity extends Activity {
 		// TODO Auto-generated method stub
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_score);
+		setContentView(R.layout.activity_queryscore);
 		try {
 			init();
 		} catch (Exception e) {
@@ -87,14 +116,17 @@ public class QueryScoreActivity extends Activity {
 	private void init() {
 		MyApplication mApplication = (MyApplication) getApplication();
 		dbManager = DBManager.getInstance();
+		mQueue = Volley.newRequestQueue(this);
 		userid = (Long) mApplication.getMap().get(Constants.CURRENT_USER_ID);
+		mUser = dbManager.getUser(userid);
 		totalDates = (LinearLayout) findViewById(R.id.total_category);
 		containLayout = (LinearLayout) findViewById(R.id.ll_query_score);
 		details = (TextView) findViewById(R.id.show_details);
 		dateTextView = (TextView) findViewById(R.id.text_category);
 		mExpandableListView = (ExpandableListView) findViewById(R.id.query_score_list);
-
-		dateTextView.setOnClickListener(new OnClickListener() {
+		isConnect = (Boolean) mApplication.getMap().get(
+				Constants.IS_CONNECT_SERVICE);
+		totalDates.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -120,38 +152,231 @@ public class QueryScoreActivity extends Activity {
 	 * @param wrapContent
 	 * @param wrapContent2
 	 */
+	@SuppressWarnings("deprecation")
 	private void showPopupWindow(int wrapContent, int wrapContent2) {
 		// TODO Auto-generated method stub
 		LinearLayout layout = (LinearLayout) LayoutInflater.from(
 				QueryScoreActivity.this)
 				.inflate(R.layout.query_date_list, null);
-		dateListView = (ListView) layout.findViewById(R.id.date_list);
-		headView = View.inflate(this, R.layout.query_score_header, null);
-		dateListView.addHeaderView(headView);
-		adapter = new DatesAdapter(this, dateList);
+		dateListView = (AutoListView) layout.findViewById(R.id.date_list);
+		dateListView.setOnRefreshListener(this);
+		dateListView.setOnLoadListener(this);
+
+		adapter = new QueryDatesAdapter(this, dateList);
 		dateListView.setAdapter(adapter);
 		mPopWin = new PopupWindow(layout, totalDates.getWidth(),
-				containLayout.getHeight() / 3, true);
+				LinearLayout.LayoutParams.WRAP_CONTENT
+				/* containLayout.getHeight() / 3 */, true);
 		// 这句是为了防止弹出菜单获取焦点之后，点击activity的其他组件没有响应
 		mPopWin.setBackgroundDrawable(new BitmapDrawable());
 		mPopWin.showAsDropDown(totalDates, 0, 1);
 		mPopWin.update();
 		if (dateList.size() == 0) {
-			new QueryDatesTask().execute();
+			onRefresh();
 		} else {
-			dateListView.removeHeaderView(headView);
+			dateListView.onRefreshComplete();
+			dateListView.onLoadComplete();
+			dateListView.setResultSize(dateList.size());
 		}
-
 		dateListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// TODO Auto-generated method stub
-				dateTextView.setText(dateList.get(position));
+				details.setVisibility(View.GONE);
+				if (position <= dateList.size()) {
+					details.setVisibility(View.GONE);
+					dateTextView.setText(dateList.get(position - 1));
+					// 服务器联通则进行请求
+					if (isConnect) {
+						// dateList.get(position - 1)
+						getScoresRequest(dateList.get(position - 1));
+					} else {
+						// 本地查询（试用账号所使用的功能）
+						new QueryScoreTask().execute(dateList.get(position - 1));
+					}
+				}
 				mPopWin.dismiss();
 			}
 		});
+	}
+
+	protected void getScoresRequest(final String string) {
+		// TODO Auto-generated method stub
+
+		Map<String, Object> jsonMap = new HashMap<String, Object>();
+		jsonMap.put("up_time", string);
+		jsonMap.put("uid", mUser.getUid());
+		final String dateJson = JsonTools.creatJsonString(jsonMap);
+
+		StringRequest getScoreDateList = new StringRequest(Method.POST,
+				XUtils.HOSTURL + "getScores", new Listener<String>() {
+
+					@Override
+					public void onResponse(String response) {
+						System.out.println("response>>>>>>>>>>>>>>>>>"
+								+ response);
+						JSONObject obj;
+						try {
+							obj = new JSONObject(response);
+							int resCode = (Integer) obj.get("resCode");
+							if (resCode == 1) {
+								TempScore[] tempScores = JsonTools.getObject(
+										obj.get("dataList").toString(),
+										TempScore[].class);
+
+								int pid = tempScores[0].getPlan_id();
+								Plan planResult = dbManager.getPlanByPid(pid);
+
+								details.setVisibility(View.VISIBLE);
+								details.setText("计划名：" + planResult.getName()
+										+ "--" + planResult.getPool() + " "
+										+ planResult.getTime() + "趟");
+								for (TempScore tempScore : tempScores) {
+
+									int aid = tempScore.getAthlete_id();
+									Athlete ath = dbManager
+											.getAthletesByAid(aid);
+									Score newScore = new Score();
+									newScore.setP(planResult);
+									newScore.setDate(string);
+									newScore.setAthlete(ath);
+									newScore.setTimes(tempScore.getTimes());
+									newScore.setScore(tempScore.getScore());
+									newScore.save();
+								}
+								time = planResult.getTime();
+
+								List<List<Score>> listscores = new ArrayList<List<Score>>();
+								// 根据时间查询成绩
+								for (int t = 1; t <= time; t++) {
+									List<Score> sco = dbManager
+											.getScoreByDateAndTimes(string, t);
+									if (t == 1) {
+										List<Long> athIds = new ArrayList<Long>();
+										for (Score s : sco) {
+											athIds.add(s.getAthlete().getId());
+										}
+										sumList = dbManager
+												.getAthleteIdInScoreByDate(
+														string, athIds);
+									}
+									// 查询出来要确保该轮成绩是存在的
+									if (sco.size() != 0) {
+										listscores.add(sco);
+									}
+
+								}
+								NameScoreListAdapter scoreListAdapter = new NameScoreListAdapter(
+										QueryScoreActivity.this, listscores,
+										sumList, time + 1);
+								mExpandableListView
+										.setAdapter(scoreListAdapter);
+								// 默认展开
+								for (int i = 0; i <= time; i++) {
+									mExpandableListView.expandGroup(i);
+								}
+							} else {
+
+							}
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+					}
+				}, new ErrorListener() {
+
+					@Override
+					public void onErrorResponse(VolleyError error) {
+
+					}
+				}) {
+
+			@Override
+			protected Response<String> parseNetworkResponse(
+					NetworkResponse response) {
+				String str = null;
+				try {
+					str = new String(response.data, "utf-8");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return Response.success(str,
+						HttpHeaderParser.parseCacheHeaders(response));
+			}
+
+			@Override
+			protected Map<String, String> getParams() throws AuthFailureError {
+				// 设置请求参数
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("date", dateJson);
+				return map;
+			}
+		};
+		getScoreDateList.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+		mQueue.add(getScoreDateList);
+
+	}
+
+	class TempScore {
+		int athlete_id;
+		int plan_id;
+		int times;
+		String up_time;
+		String score;
+
+		public int getAthlete_id() {
+			return athlete_id;
+		}
+
+		public void setAthlete_id(int athlete_id) {
+			this.athlete_id = athlete_id;
+		}
+
+		public int getPlan_id() {
+			return plan_id;
+		}
+
+		public void setPlan_id(int plan_id) {
+			this.plan_id = plan_id;
+		}
+
+		public int getTimes() {
+			return times;
+		}
+
+		public void setTimes(int times) {
+			this.times = times;
+		}
+
+		public String getUp_time() {
+			return up_time;
+		}
+
+		public void setUp_time(String up_time) {
+			this.up_time = up_time;
+		}
+
+		public String getScore() {
+			return score;
+		}
+
+		public void setScore(String score) {
+			this.score = score;
+		}
+
+		@Override
+		public String toString() {
+			return "TempScore [athlete_id=" + athlete_id + ", plan_id="
+					+ plan_id + ", time=" + times + ", up_time=" + up_time
+					+ ", score=" + score + "]";
+		}
 	}
 
 	/**
@@ -162,22 +387,6 @@ public class QueryScoreActivity extends Activity {
 	public void back(View v) {
 		finish();
 		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);
-	}
-
-	/**
-	 * 响应查询事件
-	 * 
-	 * @param v
-	 */
-	public void queryScore(View v) {
-		details.setVisibility(View.GONE);
-		String condition = dateTextView.getText().toString().trim();
-		if (!condition.equals("请选择日期进行查询")) {
-			new QueryScoreTask().execute(condition);
-		} else {
-			XUtils.showToast(this, mToast, PLEASE_SELECT_RIGHT_TIME_STRING);
-		}
-
 	}
 
 	/**
@@ -238,14 +447,13 @@ public class QueryScoreActivity extends Activity {
 			super.onPostExecute(result);
 			// 成绩是否完整，中途退出计时会导致计时成绩不完整
 			boolean isComplete = true;
-			System.out.println("result.size()--->" + result.size());
 			if (result.size() != time) {
 				isComplete = false;
 			}
 			if (result != null && isComplete) {
 				details.setVisibility(View.VISIBLE);
-				details.setText(dateTextView.getText().toString() + "----"
-						+ plan.getPool() + " " + time + "趟");
+				details.setText("计划名：" + plan.getName() + "--" + plan.getPool()
+						+ " " + time + "趟");
 				NameScoreListAdapter scoreListAdapter = new NameScoreListAdapter(
 						QueryScoreActivity.this, result, sumList, time + 1);
 				mExpandableListView.setAdapter(scoreListAdapter);
@@ -399,6 +607,12 @@ public class QueryScoreActivity extends Activity {
 
 	}
 
+	/**
+	 * 获取本地的日期数据集的异步任务，离线状态使用
+	 * 
+	 * @author LiitleByte
+	 * 
+	 */
 	class QueryDatesTask extends AsyncTask<Void, Void, List<String>> {
 
 		@Override
@@ -418,57 +632,12 @@ public class QueryScoreActivity extends Activity {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			dateList = result;
-			dateListView.removeHeaderView(headView);
+			dateListView.onRefreshComplete();
+			dateListView.onLoadComplete();
+			dateListView.setResultSize(result.size());
 			adapter.setDatas(result);
 			adapter.notifyDataSetChanged();
 		}
-	}
-
-	class DatesAdapter extends BaseAdapter {
-		private Context mContext;
-		private List<String> list = new ArrayList<String>();
-
-		public DatesAdapter(Context mContext, List<String> list) {
-			this.mContext = mContext;
-			this.list = list;
-		}
-
-		@Override
-		public int getCount() {
-			// TODO Auto-generated method stub
-			return list.size();
-		}
-
-		@Override
-		public Object getItem(int position) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public long getItemId(int position) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			// TODO Auto-generated method stub
-			if (convertView == null) {
-				convertView = View.inflate(mContext,
-						android.R.layout.simple_list_item_1, null);
-			}
-			TextView tView = (TextView) convertView
-					.findViewById(android.R.id.text1);
-			tView.setText(list.get(position));
-			return convertView;
-		}
-
-		public void setDatas(List<String> list) {
-			this.list.clear();
-			this.list.addAll(list);
-		}
-
 	}
 
 	@Override
@@ -482,4 +651,120 @@ public class QueryScoreActivity extends Activity {
 		return false;
 	}
 
+	@Override
+	public void onLoad() {
+		// TODO Auto-generated method stub
+		if (isConnect) {
+			currentPage++;
+			System.out.println("currentPage>>>>>>>>" + currentPage);
+			getScoreDateListReqeust(currentPage);
+		}
+	}
+
+	@Override
+	public void onRefresh() {
+		// TODO Auto-generated method stub
+		// new QueryDatesTask().execute();
+		// 如果adapter中的数据为空才需要刷新，否则什么都不做
+		if (adapter.getList().size() == 0 || adapter.getList() == null) {
+			if (isConnect) {
+				// 如果与服务器联通
+				getScoreDateListReqeust(1);
+			} else {
+				// 当前为离线状态
+				new QueryDatesTask().execute();
+			}
+		} else {
+			dateListView.onRefreshComplete();
+		}
+	}
+
+	/**
+	 * 获取指定页数的日期数据集
+	 * 
+	 * @param curPage
+	 *            当前页
+	 */
+	protected void getScoreDateListReqeust(final int curPage) {
+		Map<String, Object> jsonMap = new HashMap<String, Object>();
+		jsonMap.put("curPage", curPage);
+		jsonMap.put("uid", mUser.getUid());
+		final String jsonString = JsonTools.creatJsonString(jsonMap);
+
+		StringRequest getScoreDateList = new StringRequest(Method.POST,
+				XUtils.HOSTURL + "getScoreDateList", new Listener<String>() {
+
+					@Override
+					public void onResponse(String response) {
+						JSONObject obj;
+						try {
+							obj = new JSONObject(response);
+							int resCode = (Integer) obj.get("resCode");
+							if (resCode == 1) {
+								totalRecords = obj.getInt("totalRecords");
+								System.out.println("totalRecords----"
+										+ totalRecords);
+								List<String> dateResult = new ArrayList<String>();
+								JSONArray dates = new JSONArray(obj.get(
+										"dataList").toString());
+								int length = dates.length();
+								for (int i = 0; i < length; i++) {
+									JSONObject jsonObject = new JSONObject(
+											dates.get(i).toString());
+									dateResult.add(jsonObject
+											.getString("up_time"));
+								}
+								if (curPage == 1) {
+									adapter.setDatas(dateResult);
+									dateListView.onRefreshComplete();
+								} else {
+									System.out.println("curPage<>><>><<><>"+curPage);
+									adapter.addDatas(dateResult);
+									dateListView.onRefreshComplete();
+								}
+								// dateListView.setResultSize(totalRecords);
+								adapter.notifyDataSetChanged();
+							}
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+					}
+				}, new ErrorListener() {
+
+					@Override
+					public void onErrorResponse(VolleyError error) {
+
+					}
+				}) {
+
+			@Override
+			protected Response<String> parseNetworkResponse(
+					NetworkResponse response) {
+				String str = null;
+				try {
+					str = new String(response.data, "utf-8");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return Response.success(str,
+						HttpHeaderParser.parseCacheHeaders(response));
+			}
+
+			@Override
+			protected Map<String, String> getParams() throws AuthFailureError {
+				// 设置请求参数
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("getScoreDate", jsonString);
+				return map;
+			}
+		};
+		getScoreDateList.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+		mQueue.add(getScoreDateList);
+	}
 }

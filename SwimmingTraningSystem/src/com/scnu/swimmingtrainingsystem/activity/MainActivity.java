@@ -33,10 +33,10 @@ public class MainActivity extends Activity {
 				i.setClass(MainActivity.this, AthleteActivity.class);
 				break;
 			case ID + 1:
-				i.setClass(MainActivity.this, PlanActivity.class);
+				i.setClass(MainActivity.this, TimerSettingActivity.class);
 				break;
 			case ID + 2:
-				i.setClass(MainActivity.this, TimerSettingActivity.class);
+				i.setClass(MainActivity.this, PlanActivity.class);
 				break;
 			case ID + 3:
 				i.setClass(MainActivity.this, QueryScoreActivity.class);
@@ -103,9 +103,9 @@ public class MainActivity extends Activity {
 		if (i == 0) {
 			return "运动员";
 		} else if (i == 1) {
-			return "计划";
-		} else if (i == 2) {
 			return "计时器";
+		} else if (i == 2) {
+			return "小功能";
 		} else if (i == 3) {
 			return "成绩查询";
 		} else if (i == 4) {

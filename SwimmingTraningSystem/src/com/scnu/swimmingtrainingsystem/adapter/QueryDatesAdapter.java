@@ -55,11 +55,6 @@ public class QueryDatesAdapter extends BaseAdapter {
 		this.list.addAll(list);
 	}
 
-	public void addDatas(List<String> datesList) {
-		// TODO Auto-generated method stub
-		this.list.addAll(list);
-	}
-
 	public List<String> getList() {
 		return this.list;
 	}

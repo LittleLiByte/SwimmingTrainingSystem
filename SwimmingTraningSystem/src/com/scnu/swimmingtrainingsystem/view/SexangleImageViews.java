@@ -80,13 +80,6 @@ public class SexangleImageViews extends ImageView {
 
 	}
 
-	/*
-	 * private int[] colors = { getResources().getColor(R.color.color_remind),
-	 * getResources().getColor(R.color.color_train),
-	 * getResources().getColor(R.color.color_setting),
-	 * getResources().getColor(R.color.color_sales) };
-	 */
-
 	private Bitmap[] bitmaps = {
 			BitmapFactory.decodeResource(getResources(), R.drawable.people1),
 			BitmapFactory.decodeResource(getResources(), R.drawable.plan),

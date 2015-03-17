@@ -10,7 +10,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -23,13 +22,19 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,12 +58,10 @@ import com.scnu.swimmingtrainingsystem.model.Athlete;
 import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.Score;
 import com.scnu.swimmingtrainingsystem.model.Temp;
+import com.scnu.swimmingtrainingsystem.model.TempScore;
 import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.XUtils;
-import com.scnu.swimmingtrainingsystem.view.AutoListView;
-import com.scnu.swimmingtrainingsystem.view.AutoListView.OnLoadListener;
-import com.scnu.swimmingtrainingsystem.view.AutoListView.OnRefreshListener;
 import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 
 /**
@@ -67,8 +70,7 @@ import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
  * @author LittleByte
  * 
  */
-public class QueryScoreActivity extends Activity implements OnRefreshListener,
-		OnLoadListener {
+public class QueryScoreActivity extends Activity implements OnScrollListener {
 	// Volley请求队列
 	private RequestQueue mQueue;
 	private LinearLayout totalDates, containLayout;
@@ -83,14 +85,21 @@ public class QueryScoreActivity extends Activity implements OnRefreshListener,
 	private LoadingDialog mLoadingDialog;
 	private List<String> dateList = new ArrayList<String>();
 	private QueryDatesAdapter adapter;
-	private AutoListView dateListView;
+	private ListView dateListView;
 	private PopupWindow mPopWin;
+	private ProgressBar progressBar;
+	private Button loadmoreButton;
+	private View moreView;
 	private Toast mToast;
 	private User mUser;
-	private int currentPage = 1;
-	// 可查询的日期总数
-	private int totalRecords = 0;
+	private int currentPage = 0;
 	private boolean isConnect;
+	// 设置最大的数据条数
+	private int maxDateNum = 0;
+	// 最后可见条目的索引
+	private int lastVisibleIndex;
+	// 当前窗口可见项总数
+	private int visibleItemCount = 5;
 	private final static String NO_SUCH_RECORDS_STRING = "没有关于该查询条件的记录！";
 	private final static String GENERATING_RESULT_STRING = "正在生成查询结果...";
 	private static final String NOT_CORRECT_STRING = "本次计时成绩不完整，无法正确展示！";
@@ -123,6 +132,7 @@ public class QueryScoreActivity extends Activity implements OnRefreshListener,
 		containLayout = (LinearLayout) findViewById(R.id.ll_query_score);
 		details = (TextView) findViewById(R.id.show_details);
 		dateTextView = (TextView) findViewById(R.id.text_category);
+
 		mExpandableListView = (ExpandableListView) findViewById(R.id.query_score_list);
 		isConnect = (Boolean) mApplication.getMap().get(
 				Constants.IS_CONNECT_SERVICE);
@@ -158,26 +168,36 @@ public class QueryScoreActivity extends Activity implements OnRefreshListener,
 		LinearLayout layout = (LinearLayout) LayoutInflater.from(
 				QueryScoreActivity.this)
 				.inflate(R.layout.query_date_list, null);
-		dateListView = (AutoListView) layout.findViewById(R.id.date_list);
-		dateListView.setOnRefreshListener(this);
-		dateListView.setOnLoadListener(this);
+		dateListView = (ListView) layout.findViewById(R.id.date_list);
 
+		// 实例化底部布局
+		moreView = getLayoutInflater().inflate(R.layout.listview_footer, null);
+		loadmoreButton = (Button) moreView.findViewById(R.id.more);
+		progressBar = (ProgressBar) moreView.findViewById(R.id.loading);
 		adapter = new QueryDatesAdapter(this, dateList);
+		// 加上底部View，注意要放在setAdapter方法前
+		dateListView.addFooterView(moreView);
 		dateListView.setAdapter(adapter);
+		dateListView.setOnScrollListener(this);
+
 		mPopWin = new PopupWindow(layout, totalDates.getWidth(),
-				LinearLayout.LayoutParams.WRAP_CONTENT
-				/* containLayout.getHeight() / 3 */, true);
+				containLayout.getHeight() / 3, true);
 		// 这句是为了防止弹出菜单获取焦点之后，点击activity的其他组件没有响应
 		mPopWin.setBackgroundDrawable(new BitmapDrawable());
 		mPopWin.showAsDropDown(totalDates, 0, 1);
 		mPopWin.update();
-		if (dateList.size() == 0) {
-			onRefresh();
-		} else {
-			dateListView.onRefreshComplete();
-			dateListView.onLoadComplete();
-			dateListView.setResultSize(dateList.size());
-		}
+		loadmoreButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				// 将进度条可见
+				progressBar.setVisibility(View.VISIBLE);
+				// 按钮不可见
+				loadmoreButton.setVisibility(View.GONE);
+				loadMoreData();
+			}
+		});
 		dateListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -187,14 +207,13 @@ public class QueryScoreActivity extends Activity implements OnRefreshListener,
 				details.setVisibility(View.GONE);
 				if (position <= dateList.size()) {
 					details.setVisibility(View.GONE);
-					dateTextView.setText(dateList.get(position - 1));
+					dateTextView.setText(dateList.get(position));
 					// 服务器联通则进行请求
 					if (isConnect) {
-						// dateList.get(position - 1)
-						getScoresRequest(dateList.get(position - 1));
+						getScoresRequest(dateList.get(position));
 					} else {
 						// 本地查询（试用账号所使用的功能）
-						new QueryScoreTask().execute(dateList.get(position - 1));
+						new QueryScoreTask().execute(dateList.get(position));
 					}
 				}
 				mPopWin.dismiss();
@@ -322,61 +341,6 @@ public class QueryScoreActivity extends Activity implements OnRefreshListener,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(getScoreDateList);
 
-	}
-
-	class TempScore {
-		int athlete_id;
-		int plan_id;
-		int times;
-		String up_time;
-		String score;
-
-		public int getAthlete_id() {
-			return athlete_id;
-		}
-
-		public void setAthlete_id(int athlete_id) {
-			this.athlete_id = athlete_id;
-		}
-
-		public int getPlan_id() {
-			return plan_id;
-		}
-
-		public void setPlan_id(int plan_id) {
-			this.plan_id = plan_id;
-		}
-
-		public int getTimes() {
-			return times;
-		}
-
-		public void setTimes(int times) {
-			this.times = times;
-		}
-
-		public String getUp_time() {
-			return up_time;
-		}
-
-		public void setUp_time(String up_time) {
-			this.up_time = up_time;
-		}
-
-		public String getScore() {
-			return score;
-		}
-
-		public void setScore(String score) {
-			this.score = score;
-		}
-
-		@Override
-		public String toString() {
-			return "TempScore [athlete_id=" + athlete_id + ", plan_id="
-					+ plan_id + ", time=" + times + ", up_time=" + up_time
-					+ ", score=" + score + "]";
-		}
 	}
 
 	/**
@@ -632,9 +596,7 @@ public class QueryScoreActivity extends Activity implements OnRefreshListener,
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			dateList = result;
-			dateListView.onRefreshComplete();
-			dateListView.onLoadComplete();
-			dateListView.setResultSize(result.size());
+			maxDateNum = adapter.getCount();
 			adapter.setDatas(result);
 			adapter.notifyDataSetChanged();
 		}
@@ -651,31 +613,15 @@ public class QueryScoreActivity extends Activity implements OnRefreshListener,
 		return false;
 	}
 
-	@Override
-	public void onLoad() {
+	public void loadMoreData() {
 		// TODO Auto-generated method stub
 		if (isConnect) {
+			// 如果与服务器联通
 			currentPage++;
-			System.out.println("currentPage>>>>>>>>" + currentPage);
 			getScoreDateListReqeust(currentPage);
-		}
-	}
-
-	@Override
-	public void onRefresh() {
-		// TODO Auto-generated method stub
-		// new QueryDatesTask().execute();
-		// 如果adapter中的数据为空才需要刷新，否则什么都不做
-		if (adapter.getList().size() == 0 || adapter.getList() == null) {
-			if (isConnect) {
-				// 如果与服务器联通
-				getScoreDateListReqeust(1);
-			} else {
-				// 当前为离线状态
-				new QueryDatesTask().execute();
-			}
 		} else {
-			dateListView.onRefreshComplete();
+			// 当前为离线状态
+			new QueryDatesTask().execute();
 		}
 	}
 
@@ -696,14 +642,14 @@ public class QueryScoreActivity extends Activity implements OnRefreshListener,
 
 					@Override
 					public void onResponse(String response) {
+						System.out.println("dateresponse>>>>" + response);
 						JSONObject obj;
 						try {
 							obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
 							if (resCode == 1) {
-								totalRecords = obj.getInt("totalRecords");
-								System.out.println("totalRecords----"
-										+ totalRecords);
+								maxDateNum = obj.getInt("totalRecords");
+
 								List<String> dateResult = new ArrayList<String>();
 								JSONArray dates = new JSONArray(obj.get(
 										"dataList").toString());
@@ -714,16 +660,21 @@ public class QueryScoreActivity extends Activity implements OnRefreshListener,
 									dateResult.add(jsonObject
 											.getString("up_time"));
 								}
-								if (curPage == 1) {
-									adapter.setDatas(dateResult);
-									dateListView.onRefreshComplete();
-								} else {
-									System.out.println("curPage<>><>><<><>"+curPage);
-									adapter.addDatas(dateResult);
-									dateListView.onRefreshComplete();
-								}
-								// dateListView.setResultSize(totalRecords);
-								adapter.notifyDataSetChanged();
+								dateList.addAll(dateResult);
+								System.out.println("dateList>>>" + dateList);
+								// 进度条不可见
+								progressBar.setVisibility(View.GONE);
+								// 按钮可见
+								loadmoreButton.setVisibility(View.VISIBLE);
+								dateListView.setAdapter(new QueryDatesAdapter(
+										QueryScoreActivity.this, dateList));
+							} else {
+								// 进度条不可见
+								progressBar.setVisibility(View.GONE);
+								// 按钮可见
+								loadmoreButton.setVisibility(View.GONE);
+								XUtils.showToast(QueryScoreActivity.this,
+										mToast, "数据已全部加载完成！");
 							}
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block
@@ -766,5 +717,23 @@ public class QueryScoreActivity extends Activity implements OnRefreshListener,
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(getScoreDateList);
+	}
+
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem,
+			int visibleItemCount, int totalItemCount) {
+		this.visibleItemCount = visibleItemCount;
+		lastVisibleIndex = firstVisibleItem + visibleItemCount - 1;
+	}
+
+	@Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+		int itemsLastIndex = adapter.getCount() - 1; // 数据集最后一项的索引
+		int lastIndex = itemsLastIndex + 1;
+		if (scrollState == OnScrollListener.SCROLL_STATE_IDLE
+				&& lastVisibleIndex == lastIndex) {
+			// 如果是自动加载,可以在这里放置异步加载数据的代码
+			// loadMoreData();
+		}
 	}
 }

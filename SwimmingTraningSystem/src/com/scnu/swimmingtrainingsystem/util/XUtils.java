@@ -184,4 +184,12 @@ public class XUtils {
 	public static String getCurrentTime() {
 		return getCurrentTime("yyyy-MM-dd  HH:mm:ss");
 	}
+	
+//	public static String toTimeString(String serviceTime) {
+//		Float.parseFloat(string)
+//		int totalTime=Integer.parseInt(serviceTime);
+//		totalTime/
+//		return null;
+//		
+//	}
 }

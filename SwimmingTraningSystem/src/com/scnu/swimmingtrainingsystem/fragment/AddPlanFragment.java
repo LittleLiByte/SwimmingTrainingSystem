@@ -39,9 +39,9 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.scnu.swimmingtrainingsystem.activity.LoginActivity;
 import com.scnu.swimmingtrainingsystem.activity.MyApplication;
-import com.scnu.swimmingtrainingsystem.activity.PlanActivity;
-import com.scnu.swimmingtrainingsystem.adapter.AddPlanListAdapter;
-import com.scnu.swimmingtrainingsystem.adapter.ChoseAthleteAdapter;
+import com.scnu.swimmingtrainingsystem.activity.OtherFunctionActivity;
+import com.scnu.swimmingtrainingsystem.adapter.ShowChosenAthleteAdapter;
+import com.scnu.swimmingtrainingsystem.adapter.ChooseAthleteAdapter;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
 import com.scnu.swimmingtrainingsystem.effect.Effectstype;
 import com.scnu.swimmingtrainingsystem.effect.NiftyDialogBuilder;
@@ -65,9 +65,9 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 	private Activity activity;
 	private ListView listView;
 	private List<Athlete> athletes;
-	private ChoseAthleteAdapter adapter;
+	private ChooseAthleteAdapter adapter;
 	private ListView planlv;
-	private AddPlanListAdapter planAdapter;
+	private ShowChosenAthleteAdapter showChosenAthleteAdapter;
 	private EditText planName;
 	private User us;
 	private DBManager dbManager;
@@ -163,7 +163,7 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 
 		Window window = selectDialog.getWindow();
 		listView = (ListView) window.findViewById(R.id.choose_list);
-		adapter = new ChoseAthleteAdapter(activity, athletes, map);
+		adapter = new ChooseAthleteAdapter(activity, athletes, map);
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -204,9 +204,9 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 					@Override
 					public void onClick(View v) {
 						// TODO Auto-generated method stub
-						planAdapter = new AddPlanListAdapter(activity,
+						showChosenAthleteAdapter = new ShowChosenAthleteAdapter(activity,
 								planList, map);
-						planlv.setAdapter(planAdapter);
+						planlv.setAdapter(showChosenAthleteAdapter);
 						selectDialog.dismiss();
 					}
 
@@ -226,17 +226,14 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 		if (TextUtils.isEmpty(pl_name)) {
 			XUtils.showToast(activity, toast, "计划名字不能为空！");
 			return;
-		} else if (dbManager.isNameExsit(us.getId(), pl_name)) {
-			XUtils.showToast(activity, toast, "计划名字已存在！");
-			return;
 		} else if (planList.size() == 0) {
 			XUtils.showToast(activity, toast, "该计划没有添加任何运动员！");
 			return;
 		} else {
 			Plan p = new Plan();
-			p.setName(pl_name);
+//			p.setName(pl_name);
 			p.setPool(poolScale);
-			p.setTime(distance);
+//			p.setTime(distance);
 			p.setUser(us);
 			p.setAthlete(planList);
 
@@ -311,12 +308,12 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 								
 								XUtils.showToast(activity, toast,
 										Constants.ADD_SUCCESS_STRING);
-								planAdapter = new AddPlanListAdapter(activity,
+								showChosenAthleteAdapter = new ShowChosenAthleteAdapter(activity,
 										planList, map);
-								planlv.setAdapter(planAdapter);
+								planlv.setAdapter(showChosenAthleteAdapter);
 								
 								activity.finish();
-								startActivity(new Intent(activity, PlanActivity.class));
+								startActivity(new Intent(activity, OtherFunctionActivity.class));
 							}
 
 						} catch (JSONException e) {

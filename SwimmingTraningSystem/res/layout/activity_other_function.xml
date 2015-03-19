@@ -17,7 +17,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="查看计划"
+            android:text="三次计频"
             android:textColor="@color/white"
             android:textSize="20sp" />
 
@@ -27,7 +27,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="添加计划"
+            android:text="冲刺计时"
             android:textColor="@color/white"
             android:textSize="20sp" />
     </LinearLayout>

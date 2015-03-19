@@ -11,7 +11,7 @@ public class Constants {
 	/**
 	 * 超时时间设置
 	 */
-	public static final int SOCKET_TIMEOUT = 1500;
+	public static final int SOCKET_TIMEOUT = 100;
 
 	/**
 	 * SharePreference所用的loginInfo的关键字
@@ -27,16 +27,6 @@ public class Constants {
 	 * 保存是第几次计时，提醒用户是第几次计时之中
 	 */
 	public static final String CURRENT_SWIM_TIME = "current";
-
-	/**
-	 * 保存所选计划中多有少个运动员，用于秒表的点击次数
-	 */
-	public static final String ATHLETE_NUMBER = "athleteCount";
-
-	/**
-	 * 保存所选计划中的运动院ID list
-	 */
-	public static final String ATHLTE_ID_LIST = "athIDList";
 
 	/**
 	 * 保存所选的计划ID

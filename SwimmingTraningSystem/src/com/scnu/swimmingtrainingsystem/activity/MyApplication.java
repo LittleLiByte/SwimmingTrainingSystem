@@ -28,10 +28,6 @@ public class MyApplication extends LitePalApplication {
 		mMap.put(Constants.SWIM_TIME, 1);
 		// 保存是第几次计时，提醒用户是第几次计时之中
 		mMap.put(Constants.CURRENT_SWIM_TIME, 0);
-		// 保存所选计划中多有少个运动员，用于秒表的点击次数
-		mMap.put(Constants.ATHLETE_NUMBER, 0);
-		// 保存所选计划中的运动院ID list
-		mMap.put(Constants.ATHLTE_ID_LIST, null);
 		// 保存所选的计划ID
 		mMap.put(Constants.PLAN_ID, 0);
 		// 保存开始计时的日期

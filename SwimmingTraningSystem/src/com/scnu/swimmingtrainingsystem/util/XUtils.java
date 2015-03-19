@@ -136,6 +136,41 @@ public class XUtils {
 				millisecond);
 	}
 
+	public static String getScoreSubtraction(String s1,String s2) {
+		int Subtraction=timeString2TimeInt(s1)-timeString2TimeInt(s2);
+		return timeInt2TimeString(Subtraction);
+		
+	}
+	
+	/**
+	 * 将时间字符串转化成毫秒数
+	 * @param timeString
+	 * @return
+	 */
+	public static int timeString2TimeInt(String timeString) {
+		int msc = Integer.parseInt(timeString.substring(6));
+		int sec = Integer.parseInt(timeString.substring(3, 5));
+		int min = Integer.parseInt(timeString.substring(0, 2));
+		int totalMsec=msc+sec*1000+min*60000;
+		return totalMsec;
+		
+	}
+	
+	public static String timeInt2TimeString(int totalMsec) {
+		// 秒数
+		long time_count_s = totalMsec / 1000;
+		// 小时数
+		long hour = time_count_s / 3600;
+		// 分
+		long min = time_count_s / 60 - hour * 60;
+		// 秒
+		long sec = time_count_s - hour * 3600 - min * 60;
+		// 毫秒
+		long msec = totalMsec % 1000;
+
+		return  String.format("%1$02d分%2$02d秒%3$03d", min, sec,
+				msec);
+	}
 	/**
 	 * 自定义显示Toast
 	 * 
@@ -173,23 +208,4 @@ public class XUtils {
 		lastClickTime = time;
 		return false;
 	}
-
-	public static String getCurrentTime(String format) {
-		Date date = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
-		String currentTime = sdf.format(date);
-		return currentTime;
-	}
-
-	public static String getCurrentTime() {
-		return getCurrentTime("yyyy-MM-dd  HH:mm:ss");
-	}
-	
-//	public static String toTimeString(String serviceTime) {
-//		Float.parseFloat(string)
-//		int totalTime=Integer.parseInt(serviceTime);
-//		totalTime/
-//		return null;
-//		
-//	}
 }

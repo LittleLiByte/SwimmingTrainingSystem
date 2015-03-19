@@ -21,12 +21,12 @@ import com.scnu.swimmingtrainingsystem.model.PlanHolder;
  * @author LittleByte
  * 
  */
-public class ChoseAthleteAdapter extends BaseAdapter {
+public class ChooseAthleteAdapter extends BaseAdapter {
 	private Context context;
 	private List<Athlete> list;
 	private Map<Long, Boolean> map;
 
-	public ChoseAthleteAdapter(Context context, List<Athlete> list,
+	public ChooseAthleteAdapter(Context context, List<Athlete> list,
 			HashMap<Long, Boolean> map) {
 		this.context = context;
 		this.list = list;

@@ -1,6 +1,8 @@
 package com.scnu.swimmingtrainingsystem.adapter;
 
-import com.scnu.swimmingtrainingsystem.R;
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.scnu.swimmingtrainingsystem.R;
 
 /**
  * 成绩列表匹配数据适配器
@@ -15,19 +18,22 @@ import android.widget.TextView;
  * @author LittleByte
  * 
  */
-public class MatchAdapter extends BaseAdapter {
+public class ScoreListAdapter extends BaseAdapter {
 	private Context context;
-	private String[] scores;
+	private List<String> scores = new ArrayList<String>();
 
-	public MatchAdapter(Context context, String[] scores) {
+	// private int size;
+
+	public ScoreListAdapter(Context context, List<String> scores) {
 		this.context = context;
 		this.scores = scores;
+		// this.size = size;
 	}
 
 	@Override
 	public int getCount() {
 		// TODO Auto-generated method stub
-		return scores.length;
+		return scores.size();
 	}
 
 	@Override
@@ -56,15 +62,19 @@ public class MatchAdapter extends BaseAdapter {
 		} else {
 			viewHolder = (ViewHolder) convertView.getTag();
 		}
-		viewHolder.tv1.setText((position + 1) + "");
-		viewHolder.tv2.setText(scores[position]);
+		viewHolder.tv1.setText("第" + (position + 1) + "名");
+		viewHolder.tv2.setText(scores.get(position));
 		return convertView;
+	}
+
+	public void remove(Object object) {
+		scores.remove(object);
+		notifyDataSetChanged();
 	}
 
 	final class ViewHolder {
 		private TextView tv1;
 		private TextView tv2;
-
 	}
 
 }

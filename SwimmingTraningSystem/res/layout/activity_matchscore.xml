@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingBottom="5dp" >
+    android:orientation="vertical" >
 
     <RelativeLayout
         android:id="@+id/athlete_headbar"
@@ -37,32 +36,54 @@
         android:layout_weight="1.0"
         android:orientation="horizontal" >
 
-        <ListView
+        <com.scnu.swimmingtrainingsystem.view.SlideCutListView
             android:id="@+id/matchscore_list"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="3"
+            android:cacheColorHint="#00000000"
+            android:divider="@drawable/base_list_divider_drawable"
+            android:listSelector="@android:color/transparent"
             android:scrollbars="none" >
-        </ListView>
+        </com.scnu.swimmingtrainingsystem.view.SlideCutListView>
 
         <com.scnu.swimmingtrainingsystem.view.DragListView
             android:id="@+id/matchName_list"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
+            android:cacheColorHint="#00000000"
+            android:divider="@drawable/base_list_divider_drawable"
+            android:listSelector="@android:color/transparent"
             android:scrollbars="none" >
         </com.scnu.swimmingtrainingsystem.view.DragListView>
     </LinearLayout>
 
-    <Button
-        android:id="@+id/match_done"
-        android:layout_marginTop="5dp"
+    <LinearLayout
+        android:id="@+id/ll_match_score"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:background="@drawable/startback"
-        android:onClick="matchDone"
-        android:text=" 保存  " />
+        android:layout_marginTop="5dp"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp" >
+
+        <Button
+            android:id="@+id/match_done"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1.0"
+            android:background="@drawable/startback"
+            android:onClick="matchDone"
+            android:text="保存并开始下一趟计时" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1.0"
+            android:background="@drawable/startback"
+            android:onClick="finishTiming"
+            android:text="结束并查看本轮计时" />
+    </LinearLayout>
 
 </LinearLayout>

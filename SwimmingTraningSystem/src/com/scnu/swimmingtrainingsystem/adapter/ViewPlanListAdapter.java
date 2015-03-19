@@ -84,7 +84,7 @@ public class ViewPlanListAdapter extends BaseAdapter {
 			viewHolder.btnDel.setVisibility(getIsvisibleMap().get(
 					lists.get(position).getId()));
 		}
-		viewHolder.tvTitle.setText(lists.get(position).getName());
+//		viewHolder.tvTitle.setText(lists.get(position).getName());
 
 		return convertView;
 	}

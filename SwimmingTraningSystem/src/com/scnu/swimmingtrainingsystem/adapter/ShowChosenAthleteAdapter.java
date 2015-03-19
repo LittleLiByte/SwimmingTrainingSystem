@@ -19,13 +19,13 @@ import com.scnu.swimmingtrainingsystem.model.Athlete;
  * @author LittleByte
  * 
  */
-public class AddPlanListAdapter extends BaseAdapter {
+public class ShowChosenAthleteAdapter extends BaseAdapter {
 	private Context context;
 	private List<Athlete> list;
 	@SuppressWarnings("unused")
 	private Map<Long, Boolean> map;
 
-	public AddPlanListAdapter(Context context, List<Athlete> list,
+	public ShowChosenAthleteAdapter(Context context, List<Athlete> list,
 			Map<Long, Boolean> map) {
 		this.context = context;
 		this.list = list;

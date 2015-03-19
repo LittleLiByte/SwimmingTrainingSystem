@@ -33,7 +33,7 @@ import com.scnu.swimmingtrainingsystem.fragment.ViewPlanFragment;
  * @author LittleByte
  * 
  */
-public class PlanActivity extends FragmentActivity implements OnClickListener {
+public class OtherFunctionActivity extends FragmentActivity implements OnClickListener {
 
 	private ViewPager viewpager;
 	private TextView viewPlan;
@@ -63,7 +63,7 @@ public class PlanActivity extends FragmentActivity implements OnClickListener {
 		// TODO Auto-generated method stub
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_plan);
+		setContentView(R.layout.activity_other_function);
 		try {
 			initView();
 			initData();

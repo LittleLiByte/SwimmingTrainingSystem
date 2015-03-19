@@ -1,6 +1,5 @@
 package com.scnu.swimmingtrainingsystem.view;
 
-import com.scnu.swimmingtrainingsystem.R;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.util.AttributeSet;
@@ -13,10 +12,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.scnu.swimmingtrainingsystem.adapter.DragListAdapter;
+import com.scnu.swimmingtrainingsystem.R;
+import com.scnu.swimmingtrainingsystem.adapter.NameListAdapter;
 
 /**
- * 可拖拽listview
+ * 可拖拽ListView
  * 
  * @author LittleByte
  * 
@@ -192,15 +192,15 @@ public class DragListView extends ListView {
 		// 超出边界处理
 		if (y < getChildAt(1).getTop()) {
 			// 超出上边界
-			dragPosition = 1;
+			dragPosition = 0;
 		} else if (y > getChildAt(getChildCount() - 1).getBottom()) {
 			// 超出下边界
 			dragPosition = getAdapter().getCount() - 1;
 		}
 
 		// 数据交换
-		if (dragPosition > 0 && dragPosition < getAdapter().getCount()) {
-			DragListAdapter adapter = (DragListAdapter) getAdapter();
+		if (dragPosition >= 0 && dragPosition < getAdapter().getCount()) {
+			NameListAdapter adapter = (NameListAdapter) getAdapter();
 			Object dragItem = adapter.getItem(dragSrcPosition);
 			adapter.remove(dragItem);
 			adapter.insert(dragItem, dragPosition);

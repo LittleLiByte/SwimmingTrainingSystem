@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,15 +16,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.scnu.swimmingtrainingsystem.R;
+import com.scnu.swimmingtrainingsystem.adapter.TimeLineListAdapter;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.XUtils;
 
@@ -37,70 +37,46 @@ import com.scnu.swimmingtrainingsystem.util.XUtils;
 public class TimerActivity extends Activity {
 
 	private MyApplication app;
-	private int count_max = 0;
-	/**
-	 * 点击表盘次数
-	 */
+	private int athleteNumber = 0;
+	// 点击表盘次数
 	private int clickCount = 0;
-	/**
-	 * 经过毫秒数
-	 */
+	// 经过毫秒数
 	private long mlCount = 0;
-	/**
-	 * 秒表显示时间
-	 */
+	// 秒表显示时间
 	private TextView tvTime;
-	/**
-	 * 成绩列表中提示
-	 */
+	// 成绩列表中提示
 	private TextView tvTip;
 	private TextView time_title;
-
-	private Button match;
-	/**
-	 * 成绩列表
-	 */
+	// 成绩列表
 	private ListView scoreList;
 
 	private int athletes = 1;
+
 	private ImageView min_progress, min_progress_hand, second_progress_hand,
 			second_progress, hour_progress_hand, hour_progress;
-
-	/**
-	 * 分针、秒针、时针动画
-	 */
+	// 分针、秒针、时针动画
 	private Animation rotateAnimation, secondrotateAnimation,
 			hourrotateAnimation;
-
-	/**
-	 * 转动角度
-	 */
+	// 转动角度
 	float predegree = 0;
 	float secondpredegree = 0;
 	float hourpredegree = 0;
 	private Toast toast;
 	private Handler handler;
 	private Message msg;
-	/**
-	 * 是否可以重置
-	 */
+	// 是否可以重置
 	boolean okclear = false;
-	/**
-	 * 表盘
-	 */
+	// 表盘
 	private RelativeLayout clockView;
-
-	/**
-	 * 毫秒计数定时器
-	 */
+	// 毫秒计数定时器
 	private Timer timer;
-	/**
-	 * 毫秒计数定时任务
-	 */
+	// 毫秒计数定时任务
 	private TimerTask task = null;
 
-	private String[] time;
-
+	// 保存成绩的list
+	private ArrayList<String> time = new ArrayList<String>();
+	// 保存两次成绩差的list
+	private ArrayList<String> timesub = new ArrayList<String>();
 	private String strTime_count = "";
 	private long time_cur;
 	private long time_beg;
@@ -123,7 +99,8 @@ public class TimerActivity extends Activity {
 	private void setupView() {
 		// TODO Auto-generated method stub
 		app = (MyApplication) getApplication();
-		//如果app中的全局变量被系统强制回收，通过以下改行代码会触发异常，直接将应用界面重启至登陆页面
+		// 如果app中的全局变量被系统强制回收，通过以下改行代码会触发异常，直接将应用界面重启至登陆页面
+		@SuppressWarnings("unused")
 		long userID = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		time_title = (TextView) findViewById(R.id.time_title);
 		tvTime = (TextView) findViewById(R.id.duocitvTime);
@@ -139,22 +116,20 @@ public class TimerActivity extends Activity {
 		hour_progress_hand = (ImageView) this
 				.findViewById(R.id.duocihour_progress_hand);
 		hour_progress = (ImageView) this.findViewById(R.id.duocihour_progress);
-		match = (Button) findViewById(R.id.match_people);
 		clockView = (RelativeLayout) findViewById(R.id.clcokview);
 
 		int swimTime = ((Integer) app.getMap().get(Constants.CURRENT_SWIM_TIME)) + 1;
 		time_title.setText("第" + swimTime + "次计时");
 		app.getMap().put(Constants.CURRENT_SWIM_TIME, swimTime);
+		athleteNumber = getIntent().getIntExtra("ATHLETE_NUMBER", 0);
 
-		count_max = (Integer) app.getMap().get(Constants.ATHLETE_NUMBER);
-
-		time = new String[count_max];
 		clockView.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
+				// 计时器是否在运行
 				clickCount++;
-				if (athletes <= count_max) {
+				if (athletes <= athleteNumber * 2) {
 					// 开始计时
 					if (clickCount == 1) {
 						okclear = false;
@@ -178,22 +153,25 @@ public class TimerActivity extends Activity {
 					} else {
 						tvTip.setVisibility(View.GONE);
 						setlistview();
-						if (athletes == (count_max + 1)) {
-							timerStop();
-							match.setVisibility(View.VISIBLE);
+						if (athletes == (athleteNumber + 1)) {
 							XUtils.showToast(TimerActivity.this, toast,
 									"成绩全部记录完成！");
 						}
 					}
+				} else {
+					timerStop();
+					XUtils.showToast(TimerActivity.this, toast,
+							"请不要保存太多不必要的成绩！");
 				}
 			}
 		});
+
 	}
 
+	@SuppressLint("HandlerLeak")
 	private void setupData() {
-
-		tvTime.setText("00分00秒000");
 		scoreList.setAdapter(null);
+		tvTime.setText("00分00秒000");
 		handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
@@ -221,29 +199,42 @@ public class TimerActivity extends Activity {
 	}
 
 	/**
-	 * 生存listview
+	 * 生成listview
 	 */
 	private void setlistview() {
 		// TODO Auto-generated method stub
 		okclear = true;
 		// 如果超过60分钟
 		if ((int) (mlCount) / 60000 >= 60) {
-			time[athletes - 1] = "超出计时范围！";
+			time.add(athletes - 1, "超出计时范围！");
 		} else {
-			time[athletes - 1] = tvTime.getText().toString();
+			time.add(athletes - 1, tvTime.getText().toString());
+			if (athletes > 1) {
+				// 两个成绩之差
+				String substracion = XUtils.getScoreSubtraction(
+						time.get(athletes - 1), time.get(athletes - 2));
+				timesub.add(substracion);
+			}
+
 		}
-		ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
-		for (int i = 0; i < athletes; i++) {
-			HashMap<String, Object> map = new HashMap<String, Object>();
-			map.put("jishicishu", String.valueOf(1 + i));
-			map.put("jicitime", time[i]);
+		ArrayList<HashMap<String, String>> listItem = new ArrayList<HashMap<String, String>>();
+		for (int i = 1; i <= athletes; i++) {
+			HashMap<String, String> map = new HashMap<String, String>();
+			map.put("athlete_score", time.get(i - 1));
+			if (i == 1) {
+				// 第一名
+				map.put("score_between", "");
+				map.put("athlete_ranking", "第1名");
+			} else {
+				map.put("score_between", timesub.get(i - 2));
+				map.put("athlete_ranking", "第" + i + "名");
+			}
 			listItem.add(map);
 		}
-		SimpleAdapter listItemAdapter = new SimpleAdapter(this, listItem,
-				R.layout.list_item, new String[] { "jishicishu", "jicitime" },
-				new int[] { R.id.jishicishu, R.id.jicitime });
+		TimeLineListAdapter listItemAdapter = new TimeLineListAdapter(this,
+				listItem);
 		scoreList.setAdapter(listItemAdapter);
-		scoreList.setSelection(athletes);
+		scoreList.setSelection(athletes - 1);
 		athletes++;
 
 	}
@@ -311,20 +302,22 @@ public class TimerActivity extends Activity {
 		if (okclear) {
 			okclear = false;
 			clickCount = 0;
-			timerStop();
+			time.clear();
+			timesub.clear();
 			predegree = 0;
 			secondpredegree = 0;
 			hourpredegree = 0;
 			mlCount = 0;
 			tvTip.setVisibility(View.VISIBLE);
 			athletes = 1;
+			timerStop();
 			setupData();
 			setAnimation();
 		}
 	}
 
 	/**
-	 * 计时完毕，停止动画，显示结果
+	 * 暂停计时器
 	 */
 	public void timerStop() {
 		if (null != task && null != timer) {
@@ -343,16 +336,21 @@ public class TimerActivity extends Activity {
 	 * @param v
 	 */
 	public void matchAthlete(View v) {
-		Intent intent = new Intent(this, MatchScoreActivity.class);
-		intent.putExtra("SCORES", time);
-		startActivity(intent);
-		finish();
+		if (scoreList.getAdapter() != null
+				&& scoreList.getAdapter().getCount() != 0) {
+			Intent intent = new Intent(this, MatchScoreActivity.class);
+			intent.putStringArrayListExtra("SCORES", time);
+			startActivity(intent);
+			finish();
+		} else {
+			XUtils.showToast(this, toast, "请开始计时并记录至少一次成绩！");
+		}
 	}
 
 	@Override
-	protected void onDestroy() {
+	protected void onStop() {
 		// TODO Auto-generated method stub
-		super.onDestroy();
+		super.onStop();
 		timerStop();
 		clockView.clearAnimation();
 	}

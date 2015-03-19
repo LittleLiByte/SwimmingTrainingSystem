@@ -2,14 +2,13 @@ package com.scnu.swimmingtrainingsystem.adapter;
 
 import java.util.List;
 
-import com.scnu.swimmingtrainingsystem.R;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.scnu.swimmingtrainingsystem.model.Athlete;
+import com.scnu.swimmingtrainingsystem.R;
 
 /**
  * 运动员名字拖拽列表数据适配器
@@ -17,12 +16,12 @@ import com.scnu.swimmingtrainingsystem.model.Athlete;
  * @author LittleByte
  * 
  */
-public class DragListAdapter extends BaseAdapter {
+public class NameListAdapter extends BaseAdapter {
 
 	private Context context;
-	private List<Athlete> lists;
+	private List<String> lists;
 
-	public DragListAdapter(Context context, List<Athlete> lists) {
+	public NameListAdapter(Context context, List<String> lists) {
 		this.context = context;
 		this.lists = lists;
 	}
@@ -45,7 +44,7 @@ public class DragListAdapter extends BaseAdapter {
 		return 0;
 	}
 
-	public List<Athlete> getList() {
+	public List<String> getList() {
 		return lists;
 	}
 
@@ -54,25 +53,26 @@ public class DragListAdapter extends BaseAdapter {
 	}
 
 	public void insert(Object dragItem, int position) {
-		lists.add(position, (Athlete) dragItem);
+		lists.add(position, (String) dragItem);
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		// TODO Auto-generated method stub
 		ViewHolder holder = null;
 
 		if (convertView == null) {
 			holder = new ViewHolder();
-			convertView = View.inflate(context, R.layout.drag_list_item, null);
+			convertView = View.inflate(context, R.layout.drag_list_item,
+					null);
 			holder.athName = (TextView) convertView
 					.findViewById(R.id.drag_list_item_text);
+
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-
-		holder.athName.setText(lists.get(position).getName());
+		holder.athName.setText(lists.get(position));
 		return convertView;
 	}
 

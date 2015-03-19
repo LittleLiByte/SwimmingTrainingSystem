@@ -8,7 +8,6 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.scnu.swimmingtrainingsystem.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,34 +29,33 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.scnu.swimmingtrainingsystem.adapter.DragListAdapter;
-import com.scnu.swimmingtrainingsystem.adapter.MatchAdapter;
+import com.scnu.swimmingtrainingsystem.R;
+import com.scnu.swimmingtrainingsystem.adapter.NameListAdapter;
+import com.scnu.swimmingtrainingsystem.adapter.ScoreListAdapter;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
 import com.scnu.swimmingtrainingsystem.http.JsonTools;
 import com.scnu.swimmingtrainingsystem.model.Athlete;
-import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.Score;
 import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.XUtils;
 import com.scnu.swimmingtrainingsystem.view.DragListView;
+import com.scnu.swimmingtrainingsystem.view.SlideCutListView;
+import com.scnu.swimmingtrainingsystem.view.SlideCutListView.RemoveDirection;
+import com.scnu.swimmingtrainingsystem.view.SlideCutListView.RemoveListener;
 
-public class MatchScoreActivity extends Activity {
+public class MatchScoreActivity extends Activity implements RemoveListener{
 
 	private MyApplication app;
-	private ListView listView;
-	private DragListView dragListView;
-	private MatchAdapter adapter;
-	private String[] scores;
-
-	private DragListAdapter dragAdapter;
+	private SlideCutListView scoreListView;
+	private DragListView nameListView;
+	private ScoreListAdapter adapter;
+	private ArrayList<String> scores = new ArrayList<String>();
+	private NameListAdapter dragAdapter;
 	private RequestQueue mQueue;
 	private List<ListView> viewList;
-	private List<Long> athID;
-	private List<Athlete> athletes;
 	private List<String> dragDatas;
-	private long planID;
-	private Plan p;
+
 	private Toast toast;
 	private DBManager mDbManager;
 	private User mUser;
@@ -82,34 +80,32 @@ public class MatchScoreActivity extends Activity {
 		// TODO Auto-generated method stub
 		app = (MyApplication) getApplication();
 		mDbManager = DBManager.getInstance();
+		mQueue = Volley.newRequestQueue(getApplicationContext());
 		Long userID = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		mUser = mDbManager.getUser(userID);
 		Intent result = getIntent();
-		scores = result.getStringArrayExtra("SCORES");
-		planID = (Long) app.getMap().get(Constants.PLAN_ID);
-		athID = (List<Long>) app.getMap().get(Constants.ATHLTE_ID_LIST);
+		scores = result.getStringArrayListExtra("SCORES");
+		scoreListView = (SlideCutListView) findViewById(R.id.matchscore_list);
+		nameListView = (DragListView) findViewById(R.id.matchName_list);
 		dragDatas = (List<String>) app.getMap().get(Constants.DRAG_NAME_LIST);
 		int current = (Integer) app.getMap().get(Constants.CURRENT_SWIM_TIME);
-		athletes = DBManager.getInstance().getAthletes(athID);
-		mQueue = Volley.newRequestQueue(getApplicationContext());
-		listView = (ListView) findViewById(R.id.matchscore_list);
-		dragListView = (DragListView) findViewById(R.id.matchName_list);
+
 		viewList = new ArrayList<ListView>();
-		viewList.add(listView);
-		viewList.add(dragListView);
+		viewList.add(scoreListView);
+		viewList.add(nameListView);
 		MyScrollListener mListener = new MyScrollListener();
-		listView.setOnScrollListener(mListener);
-		dragListView.setOnScrollListener(mListener);
-		adapter = new MatchAdapter(this, scores);
+		scoreListView.setOnScrollListener(mListener);
+		nameListView.setOnScrollListener(mListener);
+		scoreListView.setRemoveListener(this);
+		adapter = new ScoreListAdapter(this, scores);
 
 		if (current == 1) {
-			dragAdapter = new DragListAdapter(this, athletes);
+			dragAdapter = new NameListAdapter(this, dragDatas);
 		} else {
-			dragAdapter = new DragListAdapter(this, DBManager.getInstance()
-					.getAthleteByNames(dragDatas));
+			dragAdapter = new NameListAdapter(this, dragDatas);
 		}
-		listView.setAdapter(adapter);
-		dragListView.setAdapter(dragAdapter);
+		scoreListView.setAdapter(adapter);
+		nameListView.setAdapter(dragAdapter);
 	}
 
 	/**
@@ -119,31 +115,32 @@ public class MatchScoreActivity extends Activity {
 	 */
 	public void matchDone(View v) {
 		String date = (String) app.getMap().get(Constants.TEST_DATE);
-		List<Athlete> athletes = dragAdapter.getList();
+		List<Athlete> athletes = mDbManager.getAthleteByNames(dragAdapter
+				.getList());
 		int nowCurrent = (Integer) app.getMap()
 				.get(Constants.CURRENT_SWIM_TIME);
-		p = DBManager.getInstance().queryPlan(planID);
+		// p = DBManager.getInstance().queryPlan(planID);
 		List<String> names = new ArrayList<String>();
 
 		List<Map<String, Object>> scoresJson = new ArrayList<Map<String, Object>>();
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("uid", mUser.getUid());
-		for (int i = 0; i < scores.length; i++) {
+		for (int i = 0; i < scores.size(); i++) {
 			Map<String, Object> scoreMap = new HashMap<String, Object>();
 			Athlete a = athletes.get(i);
 			names.add(a.getName());
 			Score s = new Score();
 			s.setDate(date);
 			s.setTimes(nowCurrent);
-			s.setScore(scores[i]);
+			s.setScore(scores.get(i));
 			s.setAthlete(a);
-			s.setP(p);
+			// s.setP(p);
 			s.save();
 
-			scoreMap.put("score", scores[i]);
+			scoreMap.put("score", scores.get(i));
 			scoreMap.put("up_time", date);
 			scoreMap.put("times", nowCurrent);
-			scoreMap.put("plan_id", p.getPid());
+			// scoreMap.put("plan_id", p.getPid());
 			scoreMap.put("athlete_id", a.getAid());
 			scoresJson.add(scoreMap);
 		}
@@ -163,16 +160,20 @@ public class MatchScoreActivity extends Activity {
 			app.getMap().put(Constants.DRAG_NAME_LIST, names);
 			Intent i = new Intent(this, TimerActivity.class);
 			startActivity(i);
-		} else {
-			Intent i = new Intent(this, ShowScoreActivity.class);
-			i.putExtra(Constants.TEST_DATE,
-					(String) app.getMap().get(Constants.TEST_DATE));
-			i.putExtra("Plan", "计划名：" + p.getName() + "   " + p.getPool() );
-			startActivity(i);
-			app.getMap().put(Constants.DRAG_NAME_LIST, null);
-			app.getMap().put(Constants.ATHLETE_NUMBER, 0);
-			app.getMap().put(Constants.TEST_DATE, "");
 		}
+
+	}
+
+	/**
+	 * 結束本轮计时并显示总的计时情况
+	 * 
+	 * @param v
+	 */
+	public void finishTiming(View v) {
+		app.getMap().put(Constants.DRAG_NAME_LIST, null);
+		app.getMap().put(Constants.TEST_DATE, "");
+		Intent i = new Intent(this, ShowScoreActivity.class);
+		startActivity(i);
 		finish();
 	}
 
@@ -243,7 +244,7 @@ public class MatchScoreActivity extends Activity {
 							if (resCode == 1) {
 								XUtils.showToast(MatchScoreActivity.this,
 										toast, "保存成功！");
-							}else {
+							} else {
 								XUtils.showToast(MatchScoreActivity.this,
 										toast, "服务器错误！请重新计时！");
 							}
@@ -289,4 +290,18 @@ public class MatchScoreActivity extends Activity {
 		}
 		return super.onKeyDown(keyCode, event);
 	}
+
+	@Override
+	public void removeItem(RemoveDirection direction, int position) {
+		// TODO Auto-generated method stub
+		// 至少要保留一个成绩，否则本次计时无意义
+		if (adapter.getCount() > 1) {
+			scores.remove(position);
+			adapter.notifyDataSetChanged();
+		} else {
+			XUtils.showToast(this, toast, "至少要保留一个成绩");
+		}
+
+	}
+
 }

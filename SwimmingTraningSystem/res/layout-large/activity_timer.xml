@@ -152,7 +152,7 @@
     <RelativeLayout
         android:id="@+id/listjishi"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="220dp"
         android:layout_above="@+id/rl_buttom"
         android:layout_below="@id/clcokview"
         android:layout_marginTop="20dp"
@@ -179,25 +179,39 @@
         </ListView>
     </RelativeLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/rl_buttom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/v5_bottom_bar_bg_light" >
+        android:background="@drawable/v5_bottom_bar_bg_light"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp" >
+
+        <!--
+             <Button
+            android:id="@+id/time_out"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:background="@drawable/startback"
+            android:onClick="timeOut"
+            android:text="暂停"
+            android:textSize="20sp" />
+        -->
 
         <Button
             android:id="@+id/match_people"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_marginLeft="18dp"
-            android:layout_marginRight="18dp"
-            android:textSize="20sp"
+            android:layout_margin="15dp"
+            android:layout_weight="1.0"
             android:background="@drawable/startback"
             android:onClick="matchAthlete"
             android:text="运动员成绩匹配"
-            android:visibility="gone" />
-    </RelativeLayout>
+            android:textSize="20sp" />
+    </LinearLayout>
 
 </RelativeLayout>

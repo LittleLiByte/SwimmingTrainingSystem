@@ -249,9 +249,9 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 								Plan planResult = dbManager.getPlanByPid(pid);
 
 								details.setVisibility(View.VISIBLE);
-								details.setText("计划名：" + planResult.getName()
-										+ "--" + planResult.getPool() + " "
-										+ planResult.getTime() + "趟");
+//								details.setText("计划名：" + planResult.getName()
+//										+ "--" + planResult.getPool() + " "
+//										+ planResult.getTime() + "趟");
 								for (TempScore tempScore : tempScores) {
 
 									int aid = tempScore.getAthlete_id();
@@ -265,7 +265,7 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 									newScore.setScore(tempScore.getScore());
 									newScore.save();
 								}
-								time = planResult.getTime();
+//								time = planResult.getTime();
 
 								List<List<Score>> listscores = new ArrayList<List<Score>>();
 								// 根据时间查询成绩
@@ -380,7 +380,7 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 			plan = dbManager.getPlanInScoreByDate(params[0]);
 			// 输入的条件查询确保能查询出对应的成绩
 			if (plan != null) {
-				time = plan.getTime();
+//				time = plan.getTime();
 				List<List<Score>> listss = new ArrayList<List<Score>>();
 				// 根据时间查询成绩
 				for (int t = 1; t <= time; t++) {
@@ -416,8 +416,8 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 			}
 			if (result != null && isComplete) {
 				details.setVisibility(View.VISIBLE);
-				details.setText("计划名：" + plan.getName() + "--" + plan.getPool()
-						+ " " + time + "趟");
+//				details.setText("计划名：" + plan.getName() + "--" + plan.getPool()
+//						+ " " + time + "趟");
 				NameScoreListAdapter scoreListAdapter = new NameScoreListAdapter(
 						QueryScoreActivity.this, result, sumList, time + 1);
 				mExpandableListView.setAdapter(scoreListAdapter);

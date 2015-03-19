@@ -294,25 +294,6 @@ public class DBManager {
 		return plan;
 	}
 
-	/**
-	 * 判断指定用户的计划表中是否存在与给定名字相同的计划表
-	 * 
-	 * @param id
-	 * @param name
-	 * @return
-	 */
-	public boolean isNameExsit(long id, String name) {
-		boolean isExsit = false;
-		for (Plan p : getUserPlans(id)) {
-			if (name.equals(p.getName())) {
-				isExsit = true;
-				break;
-			}
-		}
-		return isExsit;
-
-	}
-
 	public List<Upid> getdeletePlanId(List<Plan> plans) {
 		List<Upid> upids = new ArrayList<Upid>();
 		for (Plan p : plans) {

@@ -82,8 +82,8 @@ public class SexangleImageViews extends ImageView {
 
 	private Bitmap[] bitmaps = {
 			BitmapFactory.decodeResource(getResources(), R.drawable.people1),
-			BitmapFactory.decodeResource(getResources(), R.drawable.plan),
 			BitmapFactory.decodeResource(getResources(), R.drawable.clock1),
+			BitmapFactory.decodeResource(getResources(), R.drawable.plan),
 			BitmapFactory.decodeResource(getResources(), R.drawable.result1),
 			BitmapFactory.decodeResource(getResources(), R.drawable.setting),
 

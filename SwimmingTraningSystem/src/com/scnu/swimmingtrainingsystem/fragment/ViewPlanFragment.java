@@ -11,7 +11,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.scnu.swimmingtrainingsystem.R;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -26,8 +25,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -48,11 +45,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.scnu.swimmingtrainingsystem.R;
 import com.scnu.swimmingtrainingsystem.activity.LoginActivity;
 import com.scnu.swimmingtrainingsystem.activity.MyApplication;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
-import com.scnu.swimmingtrainingsystem.effect.Effectstype;
-import com.scnu.swimmingtrainingsystem.effect.NiftyDialogBuilder;
 import com.scnu.swimmingtrainingsystem.http.JsonTools;
 import com.scnu.swimmingtrainingsystem.model.Athlete;
 import com.scnu.swimmingtrainingsystem.model.Plan;
@@ -192,7 +188,6 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 		private SparseBooleanArray ischeck;
 		private TextView tips;
 		private List<Plan> planList = new ArrayList<Plan>();
-
 		private List<String> athleteName = new ArrayList<String>();
 
 		public ViewPlanAdapter(Context context, TextView tips,
@@ -248,7 +243,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 				holder = (ViewPlanHolder) convertView.getTag();
 			}
 
-			holder.txt.setText(planList.get(position).getName());
+//			holder.txt.setText(planList.get(position).getName());
 
 			holder.checkBox.setChecked(ischeck.get(position));
 			holder.checkBox.setVisibility(visiblecheck.get(position));
@@ -282,7 +277,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 			this.planList.addAll(pl);
 		}
 
-		private void createDialog(int position) {
+		private void createDialog(int position) {/*
 			final NiftyDialogBuilder selectDialog = NiftyDialogBuilder
 					.getInstance(activity);
 			Effectstype effect = Effectstype.Fall;
@@ -315,7 +310,7 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 					.isCancelableOnTouchOutside(true).withDuration(500)
 					.withEffect(effect).hideFoot().show();
 
-		}
+		*/}
 
 		class Onlongclick implements OnLongClickListener {
 
@@ -363,12 +358,12 @@ public class ViewPlanFragment extends Fragment implements OnClickListener {
 											planArray.get(i).toString(),
 											TempPlan.class);
 									newPlan.setPid(tpPlan.getPid());
-									newPlan.setName(tpPlan.getName());
+//									newPlan.setName(tpPlan.getName());
 									newPlan.setPool(tpPlan.getPool());
-									if (tpPlan.getTime() != null) {
-										newPlan.setTime(Integer.parseInt(tpPlan
-												.getTime()));
-									}
+//									if (tpPlan.getTime() != null) {
+//										newPlan.setTime(Integer.parseInt(tpPlan
+//												.getTime()));
+//									}
 									Integer[] athIDs = tpPlan.getAthleteID();
 
 									List<Athlete> athsList = dbManager

@@ -28,6 +28,11 @@ public class Score extends DataSupport {
 	private String date;
 
 	/**
+	 * 创建本次成绩时运动员游泳的距离
+	 */
+	private int distance;
+
+	/**
 	 * 本次成绩所属的运动员
 	 */
 	private Athlete athlete;
@@ -68,6 +73,14 @@ public class Score extends DataSupport {
 		this.date = date;
 	}
 
+	public int getDistance() {
+		return distance;
+	}
+
+	public void setDistance(int distance) {
+		this.distance = distance;
+	}
+
 	public Athlete getAthlete() {
 		return athlete;
 	}
@@ -87,8 +100,8 @@ public class Score extends DataSupport {
 	@Override
 	public String toString() {
 		return "Score [id=" + id + ", times=" + times + ", score=" + score
-				+ ", date=" + date + ", athlete=" + athlete.getAid() + ", p="
-				+ p.getPid() + "]";
+				+ ", date=" + date + ", distance=" + distance + ", athlete="
+				+ athlete + ", p=" + p + "]";
 	}
 
 }

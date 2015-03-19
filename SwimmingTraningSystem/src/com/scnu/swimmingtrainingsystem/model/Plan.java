@@ -16,18 +16,19 @@ public class Plan extends DataSupport {
 	private long id;
 	private int pid;
 	/**
-	 * 计划名字
-	 */
-	private String name;
-	/**
 	 * 泳池大小
 	 */
 	private String pool;
+	
 	/**
-	 * 游泳的趟数
+	 * 该计划预计游泳进行的总距离
 	 */
-	private int time;
-
+	private int distance;
+	
+	/**
+	 * 该计划的备注，方便查阅并区分成绩
+	 */
+	private String extra;
 	
 	/**
 	 * 创建计划的用户
@@ -60,14 +61,6 @@ public class Plan extends DataSupport {
 		this.pid = pid;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public String getPool() {
 		return pool;
 	}
@@ -76,20 +69,20 @@ public class Plan extends DataSupport {
 		this.pool = pool;
 	}
 
-	public int getTime() {
-		return time;
+	public int getDistance() {
+		return distance;
 	}
 
-	public void setTime(int time) {
-		this.time = time;
+	public void setDistance(int distance) {
+		this.distance = distance;
 	}
 
-	public List<Athlete> getAthlete() {
-		return athlete;
+	public String getExtra() {
+		return extra;
 	}
 
-	public void setAthlete(List<Athlete> athlete) {
-		this.athlete = athlete;
+	public void setExtra(String extra) {
+		this.extra = extra;
 	}
 
 	public User getUser() {
@@ -98,6 +91,14 @@ public class Plan extends DataSupport {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public List<Athlete> getAthlete() {
+		return athlete;
+	}
+
+	public void setAthlete(List<Athlete> athlete) {
+		this.athlete = athlete;
 	}
 
 	public List<Score> getScores() {
@@ -110,9 +111,8 @@ public class Plan extends DataSupport {
 
 	@Override
 	public String toString() {
-		return "Plan [id=" + id + ", pid=" + pid + ", name=" + name + ", pool="
-				+ pool + ", time=" + time + ", user=" + user + ", athlete="
-				+ athlete + ", scores=" + scores + "]";
+		return "Plan [id=" + id + ", pid=" + pid + ", pool=" + pool
+				+ ", distance=" + distance + ", extra=" + extra + ", user="
+				+ user + ", athlete=" + athlete + ", scores=" + scores + "]";
 	}
-
 }

@@ -67,7 +67,7 @@ public class ChosePlanAdapter extends BaseAdapter {
 			holder = (PlanHolder) convertView.getTag();
 		}
 
-		holder.tv.setText(list.get(position).getName());
+//		holder.tv.setText(list.get(position).getName());
 
 		// 根据Map来设置checkbox的选中状况
 		holder.cb.setChecked(this.map.get(position));

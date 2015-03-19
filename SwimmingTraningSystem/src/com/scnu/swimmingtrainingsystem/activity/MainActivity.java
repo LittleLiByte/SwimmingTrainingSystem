@@ -36,7 +36,7 @@ public class MainActivity extends Activity {
 				i.setClass(MainActivity.this, TimerSettingActivity.class);
 				break;
 			case ID + 2:
-				i.setClass(MainActivity.this, PlanActivity.class);
+				i.setClass(MainActivity.this, OtherFunctionActivity.class);
 				break;
 			case ID + 3:
 				i.setClass(MainActivity.this, QueryScoreActivity.class);
@@ -141,8 +141,6 @@ public class MainActivity extends Activity {
 		super.onDestroy();
 		app.getMap().put(Constants.SWIM_TIME, 1);
 		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
-		app.getMap().put(Constants.ATHLETE_NUMBER, 0);
-		app.getMap().put(Constants.ATHLTE_ID_LIST, null);
 		app.getMap().put(Constants.PLAN_ID, 0);
 		app.getMap().put(Constants.TEST_DATE, "");
 		app.getMap().put(Constants.DRAG_NAME_LIST, null);

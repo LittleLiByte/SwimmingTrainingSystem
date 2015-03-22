@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:text="选择训练计划"
+            android:text="计时准备"
             android:textColor="#fff"
             android:textSize="20sp" />
 
@@ -30,6 +30,15 @@
             android:background="@color/transparent"
             android:onClick="clcokset_back"
             android:src="@drawable/btn_back" />
+
+        <ImageButton
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/title_btn_right"
+            android:onClick="showConfigCommand"
+            android:src="@drawable/title_btn_function" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -53,7 +62,7 @@
                 android:baselineAligned="false"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="10dp" >
+               >
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -83,12 +92,22 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal" >
 
-                    <EditText
-                        android:id="@+id/choose_plan_times"
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
-                        android:hint="游泳总距离"
+                        android:text="总距离"
+                        android:textColor="@color/aliceblue"
+                        android:textSize="13sp" />
+
+                    <EditText
+                        android:id="@+id/tv_distance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:hint="0"
+                        android:ems="5"
+                        android:inputType="number"
                         android:singleLine="true"
                         android:textColor="@color/dark_orange"
                         android:textSize="15sp" />
@@ -96,7 +115,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
+                        android:layout_marginLeft="5dp"
                         android:text="米"
                         android:textColor="@color/aliceblue"
                         android:textSize="15sp" />

@@ -24,8 +24,6 @@ public class MyApplication extends LitePalApplication {
 
 		mMap = new HashMap<String, Object>();
 
-		// 保存游泳趟数，控制跳转
-		mMap.put(Constants.SWIM_TIME, 1);
 		// 保存是第几次计时，提醒用户是第几次计时之中
 		mMap.put(Constants.CURRENT_SWIM_TIME, 0);
 		// 保存所选的计划ID

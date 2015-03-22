@@ -44,8 +44,8 @@
         </activity>
         <activity
             android:name="com.scnu.swimmingtrainingsystem.activity.TimerSettingActivity"
-            android:screenOrientation="portrait" 
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" >
         </activity>
         <activity
             android:name="com.scnu.swimmingtrainingsystem.activity.OtherFunctionActivity"
@@ -72,7 +72,8 @@
         </activity>
         <activity
             android:name="com.scnu.swimmingtrainingsystem.activity.MatchScoreActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" >
         </activity>
         <activity
             android:name="com.scnu.swimmingtrainingsystem.activity.ShowScoreActivity"

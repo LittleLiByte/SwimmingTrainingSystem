@@ -1,9 +1,7 @@
 package com.scnu.swimmingtrainingsystem.adapter;
 
 import java.util.List;
-import java.util.Map;
 
-import com.scnu.swimmingtrainingsystem.R;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,25 +9,21 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.scnu.swimmingtrainingsystem.model.Athlete;
+import com.scnu.swimmingtrainingsystem.R;
 
 /**
- * 添加计划数据适配器
+ * 被选中的运动员数据适配器
  * 
  * @author LittleByte
  * 
  */
 public class ShowChosenAthleteAdapter extends BaseAdapter {
 	private Context context;
-	private List<Athlete> list;
-	@SuppressWarnings("unused")
-	private Map<Long, Boolean> map;
+	private List<String> list;
 
-	public ShowChosenAthleteAdapter(Context context, List<Athlete> list,
-			Map<Long, Boolean> map) {
+	public ShowChosenAthleteAdapter(Context context, List<String> list) {
 		this.context = context;
 		this.list = list;
-		this.map = map;
 
 	}
 
@@ -57,14 +51,14 @@ public class ShowChosenAthleteAdapter extends BaseAdapter {
 		if (view == null) {
 			viewHolder = new ViewHolder();
 			view = LayoutInflater.from(context).inflate(
-					R.layout.add_plan_list_item, null);
-			viewHolder.tvTitle = (TextView) view.findViewById(R.id.plan_tv);
+					R.layout.chosen_athlete_list_item, null);
+			viewHolder.tvTitle = (TextView) view
+					.findViewById(R.id.tv_chosen_ath_name);
 			view.setTag(viewHolder);
 		} else {
 			viewHolder = (ViewHolder) view.getTag();
 		}
-
-		viewHolder.tvTitle.setText(this.list.get(position).getName());
+		viewHolder.tvTitle.setText(this.list.get(position));
 		return view;
 	}
 

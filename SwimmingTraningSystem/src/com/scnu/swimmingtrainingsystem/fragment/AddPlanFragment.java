@@ -163,7 +163,7 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 
 		Window window = selectDialog.getWindow();
 		listView = (ListView) window.findViewById(R.id.choose_list);
-		adapter = new ChooseAthleteAdapter(activity, athletes, map);
+//		adapter = new ChooseAthleteAdapter(activity, athletes, map);
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -175,10 +175,10 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 				holder.cb.toggle();
 
 				if (holder.cb.isChecked()) {
-					if (!planList
-							.contains(adapter.getChooseAthlete().get(arg2)))
-						// 如果checkbox已选并且planList中无该项
-						planList.add(adapter.getChooseAthlete().get(arg2));
+//					if (!planList
+//							.contains(adapter.getChooseAthlete().get(arg2)))
+//						// 如果checkbox已选并且planList中无该项
+//						planList.add(adapter.getChooseAthlete().get(arg2));
 				} else {
 					// 如果checkbox不选择并且planList中有该项
 					if (planList.contains(adapter.getChooseAthlete().get(arg2)))
@@ -204,8 +204,8 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 					@Override
 					public void onClick(View v) {
 						// TODO Auto-generated method stub
-						showChosenAthleteAdapter = new ShowChosenAthleteAdapter(activity,
-								planList, map);
+//						showChosenAthleteAdapter = new ShowChosenAthleteAdapter(activity,
+//								planList, map);
 						planlv.setAdapter(showChosenAthleteAdapter);
 						selectDialog.dismiss();
 					}
@@ -308,8 +308,8 @@ public class AddPlanFragment extends Fragment implements OnClickListener {
 								
 								XUtils.showToast(activity, toast,
 										Constants.ADD_SUCCESS_STRING);
-								showChosenAthleteAdapter = new ShowChosenAthleteAdapter(activity,
-										planList, map);
+//								showChosenAthleteAdapter = new ShowChosenAthleteAdapter(activity,
+//										planList, map);
 								planlv.setAdapter(showChosenAthleteAdapter);
 								
 								activity.finish();

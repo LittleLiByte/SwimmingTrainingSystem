@@ -2,6 +2,7 @@ package com.scnu.swimmingtrainingsystem.activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -47,6 +49,7 @@ public class TimerActivity extends Activity {
 	// 成绩列表中提示
 	private TextView tvTip;
 	private TextView time_title;
+	private Button resetButton;
 	// 成绩列表
 	private ListView scoreList;
 
@@ -105,6 +108,7 @@ public class TimerActivity extends Activity {
 		time_title = (TextView) findViewById(R.id.time_title);
 		tvTime = (TextView) findViewById(R.id.duocitvTime);
 		tvTip = (TextView) findViewById(R.id.textwujici);
+		resetButton = (Button) findViewById(R.id.resetbutton);
 		scoreList = (ListView) findViewById(R.id.duocijishilist);
 		min_progress = (ImageView) this.findViewById(R.id.duocimin_progress);
 		min_progress_hand = (ImageView) this
@@ -121,7 +125,8 @@ public class TimerActivity extends Activity {
 		int swimTime = ((Integer) app.getMap().get(Constants.CURRENT_SWIM_TIME)) + 1;
 		time_title.setText("第" + swimTime + "次计时");
 		app.getMap().put(Constants.CURRENT_SWIM_TIME, swimTime);
-		athleteNumber = getIntent().getIntExtra("ATHLETE_NUMBER", 0);
+		athleteNumber = ((List<String>) app.getMap().get(
+				Constants.DRAG_NAME_LIST)).size();
 
 		clockView.setOnClickListener(new OnClickListener() {
 
@@ -351,8 +356,7 @@ public class TimerActivity extends Activity {
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
-		timerStop();
-		clockView.clearAnimation();
+		reset(resetButton);
 	}
 
 	@Override

@@ -17,4 +17,27 @@
         android:textColor="@color/white"
         android:textSize="18sp" />
 
+    <EditText
+        android:id="@+id/et_each_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/tv_1"
+        android:ems="5"
+        android:gravity="center"
+        android:hint="0"
+        android:inputType="number"
+        android:textColor="@color/white" >
+    </EditText>
+
+    <TextView
+        android:id="@+id/tv_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:text="米处记录"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+
 </RelativeLayout>

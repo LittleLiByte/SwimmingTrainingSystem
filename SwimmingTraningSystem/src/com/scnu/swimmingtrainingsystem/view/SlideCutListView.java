@@ -287,4 +287,10 @@ public class SlideCutListView extends ListView {
 		public void removeItem(RemoveDirection direction, int position);
 	}
 
+	public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		int expandSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2,
+				MeasureSpec.AT_MOST);
+		super.onMeasure(widthMeasureSpec, expandSpec);
+
+	}
 }

@@ -3,7 +3,8 @@ package com.scnu.swimmingtrainingsystem.activity;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.scnu.swimmingtrainingsystem.R;
+import org.litepal.crud.DataSupport;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -13,11 +14,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.TextView;
 
+import com.scnu.swimmingtrainingsystem.R;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
+import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.Score;
 import com.scnu.swimmingtrainingsystem.model.Temp;
 import com.scnu.swimmingtrainingsystem.util.Constants;
@@ -33,11 +36,11 @@ public class ShowScoreActivity extends Activity {
 	private MyApplication mApplication;
 	private DBManager mDbManager;
 	private ExpandableListView mExpandableListView;
-	private List<Temp> mScoreSum = new ArrayList<Temp>();
-	private List<List<Score>> list = new ArrayList<List<Score>>();
+	// private List<Temp> mScoreSum = new ArrayList<Temp>();
+	// private List<List<Score>> list = new ArrayList<List<Score>>();
 	private TextView mPlanName;
 	private LoadingDialog mLoadingDialog;
-	private ScoreListAdapter adapter;
+	private ShowScoreListAdapter adapter;
 	private String date;
 	private Integer times;
 	private static final String GENERATING_THE_SCORES = "正在生成本次计时结果...";
@@ -65,25 +68,31 @@ public class ShowScoreActivity extends Activity {
 		mDbManager = DBManager.getInstance();
 		mExpandableListView = (ExpandableListView) findViewById(R.id.show_list);
 		mPlanName = (TextView) findViewById(R.id.show_the_plan);
+
 		times = (Integer) mApplication.getMap()
 				.get(Constants.CURRENT_SWIM_TIME) + 1;
-		date = getIntent().getStringExtra(Constants.TEST_DATE);
-		String planString = getIntent().getStringExtra("Plan");
-		mPlanName.setText(planString);
+		date = (String) mApplication.getMap().get(Constants.TEST_DATE);
+		Long planid = (Long) mApplication.getMap().get(Constants.PLAN_ID);
+		Plan plan = DataSupport.find(Plan.class, planid);
+		mPlanName.setText(plan.getPool() + " 总距离：" + plan.getDistance() + " 共"
+				+ (times - 1) + "趟");
 
-		adapter = new ScoreListAdapter(this, list, mScoreSum, 0);
-		mExpandableListView.setAdapter(adapter);
-		// 启动查询异步任务
-		new QueryScoreTask().execute(date);
-		// 屏蔽收缩
-		mExpandableListView.setOnGroupClickListener(new OnGroupClickListener() {
+		boolean isComplete = getIntent().getBooleanExtra("isComplete", true);
+		if (times == 2 && isComplete) {
+			TempScoreList tempScoreList = generateScoreList(date);
+			ShowScoreListAdapter adapter = new ShowScoreListAdapter(this,
+					tempScoreList.getScoresList(), tempScoreList.getTemps(), 2);
+			mExpandableListView.setAdapter(adapter);
+		} else if (times == 2 && !isComplete) {
 
-			@Override
-			public boolean onGroupClick(ExpandableListView parent, View v,
-					int groupPosition, long id) {
-				return true;
-			}
-		});
+		} else {
+			// 启动查询异步任务
+			new QueryScoreTask().execute(date);
+		}
+		// 默认展开
+		for (int i = 0; i < times; i++) {
+			mExpandableListView.expandGroup(i);
+		}
 	}
 
 	public void showBack(View v) {
@@ -96,7 +105,7 @@ public class ShowScoreActivity extends Activity {
 	 * @author LittleByte
 	 * 
 	 */
-	class QueryScoreTask extends AsyncTask<String, Void, TempScore> {
+	class QueryScoreTask extends AsyncTask<String, Void, TempScoreList> {
 
 		@Override
 		protected void onPreExecute() {
@@ -112,30 +121,13 @@ public class ShowScoreActivity extends Activity {
 		}
 
 		@Override
-		protected TempScore doInBackground(String... params) {
+		protected TempScoreList doInBackground(String... params) {
 			// TODO Auto-generated method stub
-			TempScore tempScore = new TempScore();
-			List<Score> athScores = mDbManager
-					.getAthleteNumberInScoreByDate(params[0]);
-			List<Long> athIds = new ArrayList<Long>();
-			for (Score s : athScores) {
-				athIds.add(s.getAthlete().getId());
-			}
-			List<Temp> totalScores = mDbManager.getAthleteIdInScoreByDate(date,
-					athIds);
-			List<List<Score>> lists = new ArrayList<List<Score>>();
-			for (int i = 1; i < times; i++) {
-				List<Score> ls = mDbManager.getScoreByDateAndTimes(date, i);
-				lists.add(ls);
-			}
-			tempScore.setScoresList(lists);
-			tempScore.setTemps(totalScores);
-			tempScore.setSwimTime(times);
-			return tempScore;
+			return generateScoreList(params);
 		}
 
 		@Override
-		protected void onPostExecute(TempScore result) {
+		protected void onPostExecute(TempScoreList result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			adapter.setDatas(result.getScoresList(), result.getTemps(),
@@ -150,7 +142,28 @@ public class ShowScoreActivity extends Activity {
 		}
 	}
 
-	class TempScore {
+	private TempScoreList generateScoreList(String... params) {
+		TempScoreList tempScore = new TempScoreList();
+		List<Score> athScores = mDbManager
+				.getAthleteNumberInScoreByDate(params[0]);
+		List<Long> athIds = new ArrayList<Long>();
+		for (Score s : athScores) {
+			athIds.add(s.getAthlete().getId());
+		}
+		List<Temp> totalScores = mDbManager.getAthleteIdInScoreByDate(date,
+				athIds);
+		List<List<Score>> lists = new ArrayList<List<Score>>();
+		for (int i = 1; i < times; i++) {
+			List<Score> ls = mDbManager.getScoreByDateAndTimes(date, i);
+			lists.add(ls);
+		}
+		tempScore.setScoresList(lists);
+		tempScore.setTemps(totalScores);
+		tempScore.setSwimTime(times);
+		return tempScore;
+	}
+
+	class TempScoreList {
 		private List<List<Score>> scoresList = new ArrayList<List<Score>>();
 		List<Temp> temps = new ArrayList<Temp>();
 		private int swimTime;
@@ -181,13 +194,13 @@ public class ShowScoreActivity extends Activity {
 
 	}
 
-	class ScoreListAdapter extends BaseExpandableListAdapter {
+	class ShowScoreListAdapter extends BaseExpandableListAdapter {
 		private Context mContext;
 		private List<List<Score>> mLists = new ArrayList<List<Score>>();
 		private List<Temp> mTemps = new ArrayList<Temp>();
 		private int mSwimTime = 0;
 
-		public ScoreListAdapter(Context mContext, List<List<Score>> mLists,
+		public ShowScoreListAdapter(Context mContext, List<List<Score>> mLists,
 				List<Temp> mTemps, int mSwimTime) {
 			this.mContext = mContext;
 			this.mLists = mLists;
@@ -267,10 +280,17 @@ public class ShowScoreActivity extends Activity {
 			convertView = View.inflate(mContext,
 					R.layout.show_score_list_item_head, null);
 			TextView tv1 = (TextView) convertView.findViewById(R.id.show_times);
+			EditText eachDistanceEditText = (EditText) convertView
+					.findViewById(R.id.et_each_distance);
+			TextView tipView = (TextView) convertView.findViewById(R.id.tv_1);
 			if (groupPosition < getGroupCount() - 1) {
 				tv1.setText("第" + (groupPosition + 1) + "趟");
+				eachDistanceEditText.setText(mLists.get(0).get(0).getDistance()
+						+ "");
 			} else {
 				tv1.setText("成绩总计");
+				tipView.setVisibility(View.GONE);
+				eachDistanceEditText.setVisibility(View.GONE);
 			}
 			return convertView;
 		}
@@ -289,12 +309,15 @@ public class ShowScoreActivity extends Activity {
 
 	}
 
+	public void saveScores(View v) {
+
+	}
+
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
 		mApplication.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
-		mApplication.getMap().put(Constants.SWIM_TIME, 0);
 		mApplication.getMap().put(Constants.PLAN_ID, 0);
 	}
 

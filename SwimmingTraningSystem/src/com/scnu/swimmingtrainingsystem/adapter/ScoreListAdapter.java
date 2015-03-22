@@ -22,12 +22,10 @@ public class ScoreListAdapter extends BaseAdapter {
 	private Context context;
 	private List<String> scores = new ArrayList<String>();
 
-	// private int size;
 
 	public ScoreListAdapter(Context context, List<String> scores) {
 		this.context = context;
 		this.scores = scores;
-		// this.size = size;
 	}
 
 	@Override

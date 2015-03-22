@@ -8,15 +8,22 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -27,7 +34,9 @@ import com.scnu.swimmingtrainingsystem.db.DBManager;
 import com.scnu.swimmingtrainingsystem.effect.Effectstype;
 import com.scnu.swimmingtrainingsystem.effect.NiftyDialogBuilder;
 import com.scnu.swimmingtrainingsystem.model.Athlete;
+import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.PlanHolder;
+import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.XUtils;
 
@@ -42,9 +51,11 @@ public class TimerSettingActivity extends Activity {
 
 	private MyApplication app;
 	private DBManager dbManager;
-
+	private RelativeLayout headLayout;
+	private EditText distanceEditText;
+	private EditText remarksEditText;
 	/**
-	 * 展示全部运动员的listview
+	 * 展示全部运动员的ListView
 	 */
 	private ListView athleteListView;
 	/**
@@ -52,11 +63,12 @@ public class TimerSettingActivity extends Activity {
 	 */
 	private ChooseAthleteAdapter allAthleteAdapter;
 	/**
-	 * 数据中全部运动员
+	 * 全部运动员
 	 */
 	private List<Athlete> athletes;
+	private List<String> athleteNames = new ArrayList<String>();
 	/**
-	 * 显示在activity上的被选中要计时的运动员listview
+	 * 显示在activity上的被选中要计时的运动员ListView
 	 */
 	private ListView chosenListView;
 	/**
@@ -67,11 +79,12 @@ public class TimerSettingActivity extends Activity {
 	/**
 	 * 已选中的运动员
 	 */
-	private List<Athlete> chosenAthletes = new ArrayList<Athlete>();
+	private List<String> chosenAthletes = new ArrayList<String>();
 	private Spinner poolSpinner;
 
 	private Toast toast;
-	private HashMap<Long, Boolean> map = new HashMap<Long, Boolean>();
+	private HashMap<Integer, Boolean> map = new HashMap<Integer, Boolean>();
+	private Long userid;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +93,8 @@ public class TimerSettingActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_clockset);
 		try {
-			init();
+			initView();
+			initData();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -89,45 +103,60 @@ public class TimerSettingActivity extends Activity {
 
 	}
 
-	private void init() {
+	private void initView() {
 		// TODO Auto-generated method stub
 		app = (MyApplication) getApplication();
 		dbManager = DBManager.getInstance();
+		headLayout = (RelativeLayout) findViewById(R.id.clockset_headbar);
 		chosenListView = (ListView) findViewById(R.id.list_choosed);
-		long userid = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
+		poolSpinner = (Spinner) findViewById(R.id.pool_length);
+		distanceEditText = (EditText) findViewById(R.id.tv_distance);
+		remarksEditText = (EditText) findViewById(R.id.et_remarks);
+	}
+
+	private void initData() {
+
+		SharedPreferences sp = getSharedPreferences(Constants.LOGININFO,
+				Context.MODE_PRIVATE);
+		int selectedPositoin = sp.getInt(Constants.SELECTED_POOL, 1);
+		String swimDistance = sp.getString(Constants.SWIM_DISTANCE, "");
+
+		userid = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		athletes = dbManager.getAthletes(userid);
+		for (Athlete ath : athletes) {
+			athleteNames.add(ath.getName());
+		}
+
 		// 初始化map数据，即将全部运动员设为不选中状态
 		for (int i = 0; i < athletes.size(); i++) {
-			map.put(athletes.get(i).getId(), false);
+			map.put(i, false);
 		}
+		distanceEditText.setText(swimDistance);
 		List<String> poolLength = new ArrayList<String>();
 		poolLength.add("25米池");
 		poolLength.add("50米池");
-		poolSpinner = (Spinner) findViewById(R.id.pool_length);
 		ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(this,
 				android.R.layout.simple_spinner_item, poolLength);
 		adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		poolSpinner.setAdapter(adapter1);
-		poolSpinner.setSelection(1);
+		poolSpinner.setSelection(selectedPositoin);
 		showChosenAthleteAdapter = new ShowChosenAthleteAdapter(
-				TimerSettingActivity.this, chosenAthletes, map);
+				TimerSettingActivity.this, chosenAthletes);
 	}
 
 	/**
-	 * 选择计划
+	 * 选择运动员
 	 * 
 	 * @param v
 	 */
 	public void chooseAthlete(View v) {
-
 		final NiftyDialogBuilder selectDialog = NiftyDialogBuilder
 				.getInstance(this);
 		Effectstype effect = Effectstype.Fall;
 		selectDialog.setCustomView(R.layout.dialog_choose_athlete, this);
-
 		Window window = selectDialog.getWindow();
 		athleteListView = (ListView) window.findViewById(R.id.choose_list);
-		allAthleteAdapter = new ChooseAthleteAdapter(this, athletes, map);
+		allAthleteAdapter = new ChooseAthleteAdapter(this, athleteNames, map);
 		athleteListView.setAdapter(allAthleteAdapter);
 		athleteListView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -137,7 +166,6 @@ public class TimerSettingActivity extends Activity {
 				PlanHolder holder = (PlanHolder) arg1.getTag();
 				// 改变CheckBox的状态
 				holder.cb.toggle();
-
 				if (holder.cb.isChecked()) {
 					if (!chosenAthletes.contains(allAthleteAdapter
 							.getChooseAthlete().get(arg2)))
@@ -152,7 +180,7 @@ public class TimerSettingActivity extends Activity {
 								.getChooseAthlete().get(arg2));
 				}
 				// 将CheckBox的选中状况记录下来
-				map.put(athletes.get(arg2).getId(), holder.cb.isChecked());
+				map.put(arg2, holder.cb.isChecked());
 			}
 		});
 		selectDialog.withTitle("选择运动员").withMessage(null)
@@ -171,7 +199,7 @@ public class TimerSettingActivity extends Activity {
 					public void onClick(View v) {
 						// TODO Auto-generated method stub
 						showChosenAthleteAdapter = new ShowChosenAthleteAdapter(
-								TimerSettingActivity.this, chosenAthletes, map);
+								TimerSettingActivity.this, chosenAthletes);
 						chosenListView.setAdapter(showChosenAthleteAdapter);
 						selectDialog.dismiss();
 					}
@@ -187,21 +215,32 @@ public class TimerSettingActivity extends Activity {
 	 * @param v
 	 */
 	public void startTiming(View v) {
-		if (showChosenAthleteAdapter.getCount() != 0) {
+
+		if (chosenAthletes.size() != 0) {
+			// 保存上一次的配置
+			XUtils.saveSelectedPool(this, poolSpinner.getSelectedItemPosition());
+			XUtils.saveDistance(this, distanceEditText.getText().toString());
+
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String date = sdf.format(new Date());
 			// 保存计时日期
 			app.getMap().put(Constants.TEST_DATE, date);
-			
+
 			List<String> athleteNames = new ArrayList<String>();
-			for (Athlete ath : chosenAthletes) {
+			List<Athlete> chosenPersons = dbManager
+					.getAthleteByNames(chosenAthletes);
+			for (Athlete ath : chosenPersons) {
 				athleteNames.add(ath.getName());
 			}
-			//报存显示在成绩运动员匹配页面的运动员名字
+			// 报存显示在成绩运动员匹配页面的运动员名字
 			app.getMap().put(Constants.DRAG_NAME_LIST, athleteNames);
-			
+
+			String poolString = (String) poolSpinner.getSelectedItem();
+			String distance = distanceEditText.getText().toString().trim();
+			String extra = remarksEditText.getText().toString();
+			// 将配置保存到数据库计划表中
+			savePlan(poolString, distance, extra, chosenPersons);
 			Intent i = new Intent(this, TimerActivity.class);
-			i.putExtra("ATHLETE_NUMBER", chosenAthletes.size());
 			startActivity(i);
 			finish();
 		} else {
@@ -210,9 +249,37 @@ public class TimerSettingActivity extends Activity {
 
 	}
 
+	private void savePlan(String pool, String distance, String extra,
+			List<Athlete> athlete) {
+		// TODO Auto-generated method stub
+		User user = dbManager.getUser(userid);
+		Plan plan = new Plan();
+		plan.setPool(pool);
+		plan.setDistance(distance);
+		plan.setExtra(extra);
+		plan.setUser(user);
+		plan.setAthlete(athlete);
+		plan.save();
+		app.getMap().put(Constants.PLAN_ID, plan.getId());
+	}
+
 	public void clcokset_back(View v) {
 		finish();
 		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);
+	}
+
+	@SuppressWarnings("deprecation")
+	public void showConfigCommand(View v) {
+		View view = LayoutInflater.from(this).inflate(
+				R.layout.popupwindow_config_listview, null);
+		PopupWindow mPopWin = new PopupWindow(view,
+				RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT, true);
+		// 这句是为了防止弹出菜单获取焦点之后，点击activity的其他组件没有响应
+		mPopWin.setBackgroundDrawable(new BitmapDrawable());
+		mPopWin.showAsDropDown(headLayout,
+				headLayout.getRight() - mPopWin.getWidth(), 1);
+		mPopWin.update();
 	}
 
 	@Override

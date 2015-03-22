@@ -19,17 +19,17 @@ public class Plan extends DataSupport {
 	 * 泳池大小
 	 */
 	private String pool;
-	
+
 	/**
 	 * 该计划预计游泳进行的总距离
 	 */
-	private int distance;
-	
+	private String distance;
+
 	/**
 	 * 该计划的备注，方便查阅并区分成绩
 	 */
 	private String extra;
-	
+
 	/**
 	 * 创建计划的用户
 	 */
@@ -69,11 +69,11 @@ public class Plan extends DataSupport {
 		this.pool = pool;
 	}
 
-	public int getDistance() {
+	public String getDistance() {
 		return distance;
 	}
 
-	public void setDistance(int distance) {
+	public void setDistance(String distance) {
 		this.distance = distance;
 	}
 

@@ -1,10 +1,8 @@
 package com.scnu.swimmingtrainingsystem.util;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
+import android.R.integer;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -76,6 +74,55 @@ public class XUtils {
 	}
 
 	/**
+	 * 记录选择的泳池大小
+	 * 
+	 * @param context
+	 * @param position
+	 */
+	public static void saveSelectedPool(Context context, int position) {
+		SharedPreferences sp = context.getSharedPreferences(
+				Constants.LOGININFO, context.MODE_PRIVATE);
+		Editor editor = sp.edit();
+		editor.putInt(Constants.SELECTED_POOL, position);
+		editor.commit();
+	}
+
+	/**
+	 * 记录预计的游泳总距离
+	 * 
+	 * @param context
+	 * @param distance
+	 */
+	public static void saveDistance(Context context, String distance) {
+		SharedPreferences sp = context.getSharedPreferences(
+				Constants.LOGININFO, context.MODE_PRIVATE);
+		Editor editor = sp.edit();
+		editor.putString(Constants.SWIM_DISTANCE, distance);
+		editor.commit();
+	}
+
+	/**
+	 * 保存当前成绩状态，留到统计时进行调整
+	 * 
+	 * @param context
+	 * @param i
+	 *            第几趟
+	 * @param crrentDistance
+	 * @param scoreString
+	 * @param athleteString
+	 */
+	public static void saveCurrentScoreAndAthlete(Context context, int i,
+			int crrentDistance, String scoreString, String athleteString) {
+		SharedPreferences sp = context.getSharedPreferences(
+				Constants.LOGININFO, context.MODE_PRIVATE);
+		Editor editor = sp.edit();
+		editor.putInt(Constants.CURRENT_DISTANCE + i, crrentDistance);
+		editor.putString(Constants.SCORESJSON + i, scoreString);
+		editor.putString(Constants.ATHLETEJSON + i, athleteString);
+		editor.commit();
+	}
+
+	/**
 	 * 记录是否第一次打开应用的运动员Activity
 	 * 
 	 * @param context
@@ -136,14 +183,15 @@ public class XUtils {
 				millisecond);
 	}
 
-	public static String getScoreSubtraction(String s1,String s2) {
-		int Subtraction=timeString2TimeInt(s1)-timeString2TimeInt(s2);
+	public static String getScoreSubtraction(String s1, String s2) {
+		int Subtraction = timeString2TimeInt(s1) - timeString2TimeInt(s2);
 		return timeInt2TimeString(Subtraction);
-		
+
 	}
-	
+
 	/**
 	 * 将时间字符串转化成毫秒数
+	 * 
 	 * @param timeString
 	 * @return
 	 */
@@ -151,11 +199,11 @@ public class XUtils {
 		int msc = Integer.parseInt(timeString.substring(6));
 		int sec = Integer.parseInt(timeString.substring(3, 5));
 		int min = Integer.parseInt(timeString.substring(0, 2));
-		int totalMsec=msc+sec*1000+min*60000;
+		int totalMsec = msc + sec * 1000 + min * 60000;
 		return totalMsec;
-		
+
 	}
-	
+
 	public static String timeInt2TimeString(int totalMsec) {
 		// 秒数
 		long time_count_s = totalMsec / 1000;
@@ -168,9 +216,9 @@ public class XUtils {
 		// 毫秒
 		long msec = totalMsec % 1000;
 
-		return  String.format("%1$02d分%2$02d秒%3$03d", min, sec,
-				msec);
+		return String.format("%1$02d分%2$02d秒%3$03d", min, sec, msec);
 	}
+
 	/**
 	 * 自定义显示Toast
 	 * 

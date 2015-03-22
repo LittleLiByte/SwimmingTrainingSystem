@@ -39,8 +39,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
             android:background="@drawable/add"
-            android:onClick="addAthlete"
-            android:padding="20dp" />
+            android:onClick="addAthlete" />
     </RelativeLayout>
 
     <LinearLayout
@@ -56,7 +55,7 @@
             android:layout_width="100dp"
             android:layout_height="30dp"
             android:background="@drawable/bg_ll_title"
-            android:text=" 运动员ID"
+            android:text="运动员ID"
             android:textColor="#A8A8A8"
             android:textSize="20sp" />
 
@@ -65,7 +64,8 @@
             android:layout_width="100dp"
             android:layout_height="30dp"
             android:background="@drawable/bg_ll_title"
-            android:text="    姓名"
+            android:gravity="center"
+            android:text="姓名"
             android:textColor="#A8A8A8"
             android:textSize="20sp" />
 
@@ -74,7 +74,8 @@
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:background="@drawable/bg_ll_title"
-            android:text="       操作"
+            android:gravity="center"
+            android:text="操作"
             android:textColor="#A8A8A8"
             android:textSize="20sp" />
     </LinearLayout>

@@ -30,9 +30,11 @@
             android:id="@+id/tb_AthName"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:gravity="center"
             android:paddingBottom="4dp"
             android:paddingTop="4dp"
+            android:singleLine="true"
             android:text="姓名"
             android:textColor="#77000000"
             android:textSize="20sp" />

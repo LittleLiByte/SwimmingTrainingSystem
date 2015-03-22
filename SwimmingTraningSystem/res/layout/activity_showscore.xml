@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -15,12 +15,12 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:text="成绩展示"
+            android:text="成绩统计"
             android:textColor="#fff"
             android:textSize="20sp" />
 
         <ImageButton
-            android:id="@+id/show_back"
+            android:id="@+id/ImageButton01"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -28,103 +28,19 @@
             android:background="@color/transparent"
             android:onClick="showBack"
             android:src="@drawable/btn_back" />
-
-        <RelativeLayout
-            android:id="@+id/RelativeLayout01"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:background="#3D8BFF" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:text="成绩展示"
-                android:textColor="#fff"
-                android:textSize="20sp" />
-
-            <ImageButton
-                android:id="@+id/ImageButton01"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:background="@color/transparent"
-                android:onClick="showBack"
-                android:src="@drawable/btn_back" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/RelativeLayout02"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:background="#3D8BFF" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:text="成绩展示"
-                android:textColor="#fff"
-                android:textSize="20sp" />
-
-            <ImageButton
-                android:id="@+id/ImageButton02"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:background="@color/transparent"
-                android:onClick="showBack"
-                android:src="@drawable/btn_back" />
-
-            <RelativeLayout
-                android:id="@+id/RelativeLayout03"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:background="#3D8BFF" >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:text="成绩展示"
-                    android:textColor="#fff"
-                    android:textSize="20sp" />
-
-                <ImageButton
-                    android:id="@+id/ImageButton03"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:background="@color/transparent"
-                    android:onClick="showBack"
-                    android:src="@drawable/btn_back" />
-            </RelativeLayout>
-        </RelativeLayout>
-
     </RelativeLayout>
 
     <TextView
         android:id="@+id/show_the_plan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/show_headbar"
         android:background="@color/aliceblue"
         android:gravity="center"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
-        android:text="计划1"
         android:singleLine="true"
+        android:text="计划1"
         android:textColor="@color/white"
         android:textSize="18sp" />
 
@@ -132,7 +48,21 @@
         android:id="@+id/show_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/bt_show_save"
+        android:layout_below="@id/show_the_plan"
         android:groupIndicator="@null" >
     </ExpandableListView>
 
-</LinearLayout>
+    <Button
+        android:id="@+id/bt_show_save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:background="@drawable/startback"
+        android:text="调整完成，上传成绩"
+        android:textSize="16sp"
+        android:onClick="saveScores" />
+
+</RelativeLayout>

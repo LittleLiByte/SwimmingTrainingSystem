@@ -1,6 +1,5 @@
 package com.scnu.swimmingtrainingsystem.util;
 
-
 /**
  * 保存系统所需常量类
  * 
@@ -17,11 +16,6 @@ public class Constants {
 	 * SharePreference所用的loginInfo的关键字
 	 */
 	public static final String LOGININFO = "loginInfo";
-
-	/**
-	 * 游泳趟数，用于控制跳转
-	 */
-	public static final String SWIM_TIME = "swimTime";
 
 	/**
 	 * 保存是第几次计时，提醒用户是第几次计时之中
@@ -52,16 +46,16 @@ public class Constants {
 	 * 保存当前是否可以连接服务器的状态
 	 */
 	public static final String IS_CONNECT_SERVICE = "isConnect";
-	
+
 	/**
 	 * 上次登陆的user_id
 	 */
-	public static final String LAST_LOGIN_USER_ID="lastLoginUser";
-	
+	public static final String LAST_LOGIN_USER_ID = "lastLoginUser";
+
 	/**
 	 * 该用户是否是第一次登陆应用
 	 */
-	public static final String IS_THIS_USER_FIRST_LOGIN="isThisUserFirstLogin";
+	public static final String IS_THIS_USER_FIRST_LOGIN = "isThisUserFirstLogin";
 
 	/**
 	 * Log信息所需tag--com.scnu.swimmingtrainingsystem
@@ -83,12 +77,21 @@ public class Constants {
 	 */
 	public static final String ADD_SUCCESS_STRING = "添加成功";
 
-	public final static String countries[] = new String[] { "第1道", "第2道",
-			"第3道", "第4道", "第5道", "第6道", "第7道", "第8道", };
+	public static final String SELECTED_POOL = "selectedPool";
+
+	public static final String SWIM_DISTANCE = "swimDistance";
 
 	public static final String FISRTOPENATHLETE = "fisrtOpenAthlete";
 
 	public static final String FISRTOPENPLAN = "fisrtOpenPlan";
+
+	public static final String FISRTSTARTTIMING = "fisrtStartTiming";
+
+	public static final String CURRENT_DISTANCE = "currentDistance";
+
+	public static final String SCORESJSON = "scoresJson";
+
+	public static final String ATHLETEJSON = "athleteJson";
 	/**
 	 * 使用说明标题
 	 */

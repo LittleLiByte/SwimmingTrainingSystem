@@ -139,7 +139,6 @@ public class MainActivity extends Activity {
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		app.getMap().put(Constants.SWIM_TIME, 1);
 		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
 		app.getMap().put(Constants.PLAN_ID, 0);
 		app.getMap().put(Constants.TEST_DATE, "");

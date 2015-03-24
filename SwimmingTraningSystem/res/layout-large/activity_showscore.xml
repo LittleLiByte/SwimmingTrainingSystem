@@ -53,15 +53,4 @@
         android:groupIndicator="@null" >
     </ExpandableListView>
 
-    <Button
-        android:id="@+id/bt_show_save"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="25dp"
-        android:layout_marginRight="25dp"
-        android:background="@drawable/startback"
-        android:text="调整完成，上传成绩"
-        android:textSize="25sp" />
-
 </RelativeLayout>

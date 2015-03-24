@@ -64,7 +64,7 @@ import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
  * @author LittleByte
  * 
  */
-public class ViewPlanFragment extends Fragment implements OnClickListener {
+public class CountDashFragment extends Fragment implements OnClickListener {
 	private static final String UNKNOW_ERROR = "服务器错误";
 	private static final String SYNCHRONOUS_SUCCESS = "同步成功！";
 	private MyApplication app;

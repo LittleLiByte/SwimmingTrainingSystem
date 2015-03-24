@@ -145,7 +145,6 @@ public class AthleteActivity extends Activity {
 			loadingDialog.show();
 			getAthleteRequest();
 		}
-
 	}
 
 	/**

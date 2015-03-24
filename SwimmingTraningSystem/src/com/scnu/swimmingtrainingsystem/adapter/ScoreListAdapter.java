@@ -22,7 +22,6 @@ public class ScoreListAdapter extends BaseAdapter {
 	private Context context;
 	private List<String> scores = new ArrayList<String>();
 
-
 	public ScoreListAdapter(Context context, List<String> scores) {
 		this.context = context;
 		this.scores = scores;
@@ -75,4 +74,7 @@ public class ScoreListAdapter extends BaseAdapter {
 		private TextView tv2;
 	}
 
+	public List<String> getList() {
+		return this.scores;
+	}
 }

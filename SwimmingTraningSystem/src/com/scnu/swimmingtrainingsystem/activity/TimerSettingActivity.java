@@ -121,6 +121,7 @@ public class TimerSettingActivity extends Activity {
 		int selectedPositoin = sp.getInt(Constants.SELECTED_POOL, 1);
 		String swimDistance = sp.getString(Constants.SWIM_DISTANCE, "");
 
+		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
 		userid = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		athletes = dbManager.getAthletes(userid);
 		for (Athlete ath : athletes) {

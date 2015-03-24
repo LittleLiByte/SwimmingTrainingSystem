@@ -39,8 +39,6 @@
                 android:maxLength="20"
                 android:paddingLeft="5dp"
                 android:singleLine="true" >
-
-                <requestFocus />
             </EditText>
         </LinearLayout>
 
@@ -103,8 +101,9 @@
                 android:layout_height="30dp"
                 android:layout_gravity="center"
                 android:layout_marginLeft="10dp"
-                app:textLeft="@string/off"
-                app:textRight="@string/on" />
+                app:isChecked="true"
+                app:textLeft="@string/on"
+                app:textRight="@string/off" />
         </LinearLayout>
 
         <LinearLayout

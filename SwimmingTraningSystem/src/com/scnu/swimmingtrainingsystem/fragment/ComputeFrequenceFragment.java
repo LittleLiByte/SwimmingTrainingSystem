@@ -60,7 +60,7 @@ import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
  * @author LittleByte
  * 
  */
-public class AddPlanFragment extends Fragment implements OnClickListener {
+public class ComputeFrequenceFragment extends Fragment implements OnClickListener {
 	private MyApplication app;
 	private Activity activity;
 	private ListView listView;

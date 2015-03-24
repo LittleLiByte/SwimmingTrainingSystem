@@ -77,7 +77,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="00分00秒000"
+            android:text="0:00'00''00"
             android:textSize="24sp"
             android:textStyle="bold" />
 

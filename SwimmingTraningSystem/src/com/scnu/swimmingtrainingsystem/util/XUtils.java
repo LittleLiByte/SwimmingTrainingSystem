@@ -1,6 +1,7 @@
 package com.scnu.swimmingtrainingsystem.util;
 
 import java.util.List;
+import java.util.Locale;
 
 import android.R.integer;
 import android.content.Context;
@@ -157,30 +158,31 @@ public class XUtils {
 	 * @return
 	 */
 	public static String scoreSum(List<String> list) {
+		int hour = 0;
 		int minute = 0;
 		int second = 0;
 		int millisecond = 0;
 		for (String s : list) {
-			int msc = Integer.parseInt(s.substring(6));
+			int msc = Integer.parseInt(s.substring(9)) * 10;
 			millisecond += msc;
 
-			int sec = Integer.parseInt(s.substring(3, 5));
+			int sec = Integer.parseInt(s.substring(5, 7));
 			second += sec;
 
-			int min = Integer.parseInt(s.substring(0, 2));
+			int min = Integer.parseInt(s.substring(2, 4));
 			minute += min;
-		}
 
+			int h = Integer.parseInt(s.substring(0, 1));
+			hour += h;
+		}
 		second += millisecond / 1000;
-		millisecond = millisecond % 1000;
+		millisecond = millisecond % 1000/10;
 		minute += second / 60;
 		second = second % 60;
-		if (minute > 59) {
-			return "数据统计超出计算范围！！！";
-		}
-
-		return String.format("%1$02d分%2$02d秒%3$03d", minute, second,
-				millisecond);
+		hour += minute / 60;
+		minute = minute % 60;
+		return String.format("%1$01d:%2$02d'%3$02d''%4$02d", hour, minute,
+				second, millisecond);
 	}
 
 	public static String getScoreSubtraction(String s1, String s2) {
@@ -196,10 +198,11 @@ public class XUtils {
 	 * @return
 	 */
 	public static int timeString2TimeInt(String timeString) {
-		int msc = Integer.parseInt(timeString.substring(6));
-		int sec = Integer.parseInt(timeString.substring(3, 5));
-		int min = Integer.parseInt(timeString.substring(0, 2));
-		int totalMsec = msc + sec * 1000 + min * 60000;
+		int msc = Integer.parseInt(timeString.substring(9)) * 10;
+		int sec = Integer.parseInt(timeString.substring(5, 7));
+		int min = Integer.parseInt(timeString.substring(2, 4));
+		int hour = Integer.parseInt(timeString.substring(0, 1));
+		int totalMsec = msc + sec * 1000 + min * 60000 + hour * 3600000;
 		return totalMsec;
 
 	}
@@ -214,9 +217,11 @@ public class XUtils {
 		// 秒
 		long sec = time_count_s - hour * 3600 - min * 60;
 		// 毫秒
-		long msec = totalMsec % 1000;
+		long msec = totalMsec % 1000 / 10;
 
-		return String.format("%1$02d分%2$02d秒%3$03d", min, sec, msec);
+		return String.format("%1$01d:%2$02d'%3$02d''%4$02d",
+				hour, min, sec, msec);
+		// %1$01d:%2$02d'%3$ 03d''%4$ 03d
 	}
 
 	/**

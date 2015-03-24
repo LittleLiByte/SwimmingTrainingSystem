@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.litepal.crud.DataSupport;
 
-import android.R.integer;
 import android.content.ContentValues;
 
 import com.scnu.swimmingtrainingsystem.model.Athlete;
@@ -304,7 +303,6 @@ public class DBManager {
 			upids.add(upid);
 		}
 		return upids;
-
 	}
 
 	/**
@@ -355,6 +353,23 @@ public class DBManager {
 	public List<Score> getScoreByDate(String date) {
 		List<Score> list = DataSupport.where("date=?", date).find(Score.class);
 		return list;
+	}
+
+	/**
+	 * 通过日期在成绩表中查找对应的运动员ID，并返回Aid
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public List<Integer> getAthlteAidInScoreByDate(String date) {
+		List<Integer> aidList = new ArrayList<Integer>();
+		List<Score> scList = DataSupport.where("date=?", date).find(
+				Score.class, true);
+		int n = scList.size();
+		for (int i = 0; i < n; i++) {
+			aidList.add(scList.get(i).getAthlete().getAid());
+		}
+		return aidList;
 	}
 
 	/**
@@ -436,16 +451,19 @@ public class DBManager {
 	}
 
 	/**
-	 * 查找特定日期中一轮测试有多少运动员
+	 * 查找特定日期中一轮测试的运动员id,可以用来计算总成绩
 	 * 
 	 * @param date
 	 * @return
 	 */
-	public List<Score> getAthleteNumberInScoreByDate(String date) {
-
+	public List<Long> getAthleteNumberInScoreByDate(String date) {
+		List<Long> athIds = new ArrayList<Long>();
 		List<Score> list = DataSupport.select("athlete_id")
 				.where("date=? and times=?", date, "1").find(Score.class, true);
-		return list;
+		for (Score s : list) {
+			athIds.add(s.getAthlete().getId());
+		}
+		return athIds;
 	}
 
 	/**

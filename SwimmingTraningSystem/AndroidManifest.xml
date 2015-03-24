@@ -87,6 +87,10 @@
             android:name="com.scnu.swimmingtrainingsystem.activity.UseTipsActiviy"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.EachTimeScoreActivity"
+            android:screenOrientation="portrait" >
+        </activity>
     </application>
 
 </manifest>

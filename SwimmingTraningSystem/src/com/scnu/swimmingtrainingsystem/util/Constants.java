@@ -51,6 +51,8 @@ public class Constants {
 	 * 上次登陆的user_id
 	 */
 	public static final String LAST_LOGIN_USER_ID = "lastLoginUser";
+	
+	public static  final String COMPLETE_NUMBER="completeNumber";
 
 	/**
 	 * 该用户是否是第一次登陆应用
@@ -116,4 +118,9 @@ public class Constants {
 					+ "最后按下保存按钮即可保存本次计时。同样，计时完成后会显示每次的成绩和综合成绩。" },
 			{ "成绩查询时可以按照进行训练测试日期进行查询" } };
 
+	public static final String CURRENT_DISTANCE_IS_NULL="current_distance_is_null";
+	
+	public static final String NUMBER_NOT_EQUAL="number_not_equal";
+	
+	public static final String CORRECT="correct";
 }

@@ -1,7 +1,7 @@
 package com.scnu.swimmingtrainingsystem.model;
 
 /**
- * 这是存储运动员多趟成绩的临时对象
+ * 这是存储运动员成绩总和的临时对象
  * 
  * @author LittleByte
  * 

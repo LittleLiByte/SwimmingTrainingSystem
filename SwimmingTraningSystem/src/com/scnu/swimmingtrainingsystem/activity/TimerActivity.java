@@ -176,7 +176,7 @@ public class TimerActivity extends Activity {
 	@SuppressLint("HandlerLeak")
 	private void setupData() {
 		scoreList.setAdapter(null);
-		tvTime.setText("00∑÷00√Î000");
+		tvTime.setText("0:00'00''00");
 		handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
@@ -292,10 +292,11 @@ public class TimerActivity extends Activity {
 		// √Î
 		long sec = time_count_s - hour * 3600 - min * 60;
 		// ∫¡√Î
-		long msec = mlCount % 1000;
+		long msec = mlCount % 1000/10;
 
-		return strTime_count = String.format("%1$02d∑÷%2$02d√Î%3$03d", min, sec,
-				msec);
+		return strTime_count = String.format("%1$01d:%2$02d'%3$02d''%4$02d",
+				hour, min, sec, msec);
+		// %1$01d:%2$02d'%3$ 03d''%4$ 03d
 	}
 
 	/**

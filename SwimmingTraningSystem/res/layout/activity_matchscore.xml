@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:dslv="http://schemas.android.com/apk/res/com.scnu.swimmingtrainingsystem"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -60,7 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1.0"
-        layout="@layout/match_2_list_" />
+        layout="@layout/match_2_list" />
 
     <LinearLayout
         android:id="@+id/ll_match_score"
@@ -86,7 +85,7 @@
             android:layout_weight="1.0"
             android:background="@drawable/startback"
             android:onClick="finishTiming"
-            android:text="结束并查看本轮计时" />
+            android:text="结束本轮计时并进入调整页面" />
     </LinearLayout>
 
 </LinearLayout>

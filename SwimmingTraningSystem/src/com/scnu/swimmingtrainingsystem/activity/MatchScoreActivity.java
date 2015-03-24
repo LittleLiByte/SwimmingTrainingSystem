@@ -1,12 +1,8 @@
 package com.scnu.swimmingtrainingsystem.activity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
 import android.app.Activity;
@@ -16,7 +12,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -27,15 +22,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request.Method;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.mobeta.android.dslv.DragSortListView;
 import com.scnu.swimmingtrainingsystem.R;
 import com.scnu.swimmingtrainingsystem.adapter.ScoreListAdapter;
@@ -46,19 +32,15 @@ import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.Score;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.XUtils;
-import com.scnu.swimmingtrainingsystem.view.SlideCutListView;
-import com.scnu.swimmingtrainingsystem.view.SlideCutListView.RemoveDirection;
-import com.scnu.swimmingtrainingsystem.view.SlideCutListView.RemoveListener;
 
-public class MatchScoreActivity extends Activity implements RemoveListener {
+public class MatchScoreActivity extends Activity {
 
 	private MyApplication app;
-	private SlideCutListView scoreListView;
+	private DragSortListView scoreListView;
 	private DragSortListView nameListView;
 	private ScoreListAdapter adapter;
 	private ArrayList<String> scores = new ArrayList<String>();
 	private ArrayAdapter<String> dragAdapter;
-	private RequestQueue mQueue;
 	private List<ListView> viewList;
 	private List<String> dragDatas;
 	private AutoCompleteTextView acTextView;
@@ -88,10 +70,18 @@ public class MatchScoreActivity extends Activity implements RemoveListener {
 		public float getSpeed(float w, long t) {
 			if (w > 0.8f) {
 				// Traverse all views in a millisecond
-				return ((float) adapter.getCount()) / 0.001f;
+				return ((float) dragAdapter.getCount()) / 0.001f;
 			} else {
 				return 10.0f * w;
 			}
+		}
+	};
+
+	private DragSortListView.RemoveListener onRemove2 = new DragSortListView.RemoveListener() {
+		@Override
+		public void remove(int which) {
+			scores.remove(which);
+			adapter.notifyDataSetChanged();
 		}
 	};
 
@@ -115,17 +105,14 @@ public class MatchScoreActivity extends Activity implements RemoveListener {
 		// TODO Auto-generated method stub
 		app = (MyApplication) getApplication();
 		mDbManager = DBManager.getInstance();
-		mQueue = Volley.newRequestQueue(getApplicationContext());
-		@SuppressWarnings("unused")
-		Long userID = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		Intent result = getIntent();
 		scores = result.getStringArrayListExtra("SCORES");
-		scoreListView = (SlideCutListView) findViewById(R.id.matchscore_list);
+		scoreListView = (DragSortListView) findViewById(R.id.matchscore_list);
 		nameListView = (DragSortListView) findViewById(R.id.matchName_list);
 		nameListView.setDropListener(onDrop);
 		nameListView.setRemoveListener(onRemove);
 		nameListView.setDragScrollProfile(ssProfile);
-
+		scoreListView.setRemoveListener(onRemove2);
 		// 设置数据源
 		String[] autoStrings = new String[] { "25", "55", "75", "100", "125",
 				"150", "175", "200", "225", "250", "275", "300" };
@@ -144,7 +131,6 @@ public class MatchScoreActivity extends Activity implements RemoveListener {
 		MyScrollListener mListener = new MyScrollListener();
 		scoreListView.setOnScrollListener(mListener);
 		nameListView.setOnScrollListener(mListener);
-		scoreListView.setRemoveListener(this);
 		adapter = new ScoreListAdapter(this, scores);
 
 		dragAdapter = new ArrayAdapter<String>(this, R.layout.drag_list_item,
@@ -168,8 +154,6 @@ public class MatchScoreActivity extends Activity implements RemoveListener {
 					.trim());
 		}
 		// 暂时保存到SharePreferences
-		System.out.println("scores--->" + scores.toString());
-		System.out.println("dragDatas--->" + dragDatas.toString());
 		String scoresString = JsonTools.creatJsonString(scores);
 		String athleteJson = JsonTools.creatJsonString(dragDatas);
 		createDialog(this, nowCurrent, crrentDistance, scoresString,
@@ -197,7 +181,6 @@ public class MatchScoreActivity extends Activity implements RemoveListener {
 			s.setDistance(distance);
 			s.setP(p);
 			s.save();
-
 		}
 	}
 
@@ -207,7 +190,7 @@ public class MatchScoreActivity extends Activity implements RemoveListener {
 	 * @param v
 	 */
 	public void finishTiming(View v) {
-		Intent i = new Intent(this, ShowScoreActivity.class);
+		Intent i = null;
 		String date = (String) app.getMap().get(Constants.TEST_DATE);
 		String actv = acTextView.getText().toString().trim();
 		int crrentDistance = 0;
@@ -221,18 +204,25 @@ public class MatchScoreActivity extends Activity implements RemoveListener {
 		int scoresNumber = adapter.getCount();
 		int athleteNumber = dragAdapter.getCount();
 
-		if (nowCurrent == 1 && scoresNumber == athleteNumber) {
-			// 如果这是第一趟并且成绩数目与运动员数目相等，则直接保存到数据库
-			matchSuccess(date, nowCurrent, crrentDistance);
-		} else if (nowCurrent == 1 && scoresNumber != athleteNumber) {
+		if (nowCurrent == 1) {
+			if (crrentDistance == 0 && TextUtils.isEmpty(actv)) {
+				XUtils.showToast(this, toast, "请填写记录当前成绩的距离！");
+				return;
+			} else if (scoresNumber != athleteNumber) {
+				XUtils.showToast(this, toast, "成绩数目与运动员数目不相等！");
+				return;
+			} else {
+				i = new Intent(this, ShowScoreActivity.class);
+				// 如果这是第一趟并且成绩数目与运动员数目相等，则直接保存到数据库
+				matchSuccess(date, nowCurrent, crrentDistance);
+			}
+		} else {
+			i = new Intent(this, EachTimeScoreActivity.class);
 			// 如果这是第一趟并且成绩数目与运动员数目不相等,则先保存到sp中，统计再做调整
 			String scoresString = JsonTools.creatJsonString(scores);
 			String athleteJson = JsonTools.creatJsonString(dragDatas);
-			XUtils.saveCurrentScoreAndAthlete(this, 1, crrentDistance,
+			XUtils.saveCurrentScoreAndAthlete(this, nowCurrent, crrentDistance,
 					scoresString, athleteJson);
-			i.putExtra("isComplete", false);
-		} else {
-
 		}
 		startActivity(i);
 		finish();
@@ -261,8 +251,8 @@ public class MatchScoreActivity extends Activity implements RemoveListener {
 			final int crrentDistance, final String scoreString,
 			final String athleteString) {
 		AlertDialog.Builder build = new AlertDialog.Builder(this);
-		build.setTitle("成绩数目与运动员数目不同!").setMessage(
-				"是否开始下一趟计时？ \n选择【否】则返回调整成绩或者运动员数目\n选择【是】则直接开始下一趟计时，统计页面再做调整");
+		build.setTitle("系统提示").setMessage(
+				"是否开始下一趟计时？ \n选择【否】则返回调整成绩或者运动员数目,或者结束本轮计时\n选择【是】则直接开始下一趟计时");
 		build.setNegativeButton("否", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -273,6 +263,7 @@ public class MatchScoreActivity extends Activity implements RemoveListener {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
+				//暂时保存到SharePreferences
 				XUtils.saveCurrentScoreAndAthlete(context, i, crrentDistance,
 						scoreString, athleteString);
 				Intent intent = new Intent(MatchScoreActivity.this,
@@ -318,63 +309,6 @@ public class MatchScoreActivity extends Activity implements RemoveListener {
 		}
 	}
 
-	/**
-	 * 创建保存本轮计时成绩的请求
-	 * 
-	 * @param jsonString
-	 *            本轮所有成绩的json字符串
-	 */
-	public void addScoreRequest(final String jsonString) {
-
-		StringRequest stringRequest = new StringRequest(Method.POST,
-				XUtils.HOSTURL + "addScores", new Listener<String>() {
-
-					@Override
-					public void onResponse(String response) {
-						// TODO Auto-generated method stub
-						Log.i("addScores", response);
-						JSONObject obj;
-						try {
-							obj = new JSONObject(response);
-							int resCode = (Integer) obj.get("resCode");
-							if (resCode == 1) {
-								XUtils.showToast(MatchScoreActivity.this,
-										toast, "保存成功！");
-							} else {
-								XUtils.showToast(MatchScoreActivity.this,
-										toast, "服务器错误！请重新计时！");
-							}
-							finish();
-						} catch (JSONException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-
-					}
-				}, new ErrorListener() {
-
-					@Override
-					public void onErrorResponse(VolleyError error) {
-						// TODO Auto-generated method stub
-						// Log.e("addScores", error.getMessage());
-					}
-				}) {
-
-			@Override
-			protected Map<String, String> getParams() throws AuthFailureError {
-				// 设置请求参数
-				Map<String, String> map = new HashMap<String, String>();
-				map.put("scoresJson", jsonString);
-				return map;
-			}
-		};
-		stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-				Constants.SOCKET_TIMEOUT,
-				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-		mQueue.add(stringRequest);
-	}
-
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
@@ -385,19 +319,6 @@ public class MatchScoreActivity extends Activity implements RemoveListener {
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
-	}
-
-	@Override
-	public void removeItem(RemoveDirection direction, int position) {
-		// TODO Auto-generated method stub
-		// 至少要保留一个成绩，否则本次计时无意义
-		if (adapter.getCount() > 1) {
-			scores.remove(position);
-			adapter.notifyDataSetChanged();
-		} else {
-			XUtils.showToast(this, toast, "至少要保留一个成绩");
-		}
-
 	}
 
 }

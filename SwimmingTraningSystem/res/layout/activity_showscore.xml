@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -15,12 +15,12 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:text="成绩统计"
+            android:text="成绩展示"
             android:textColor="#fff"
             android:textSize="20sp" />
 
         <ImageButton
-            android:id="@+id/ImageButton01"
+            android:id="@+id/show_back"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -34,7 +34,6 @@
         android:id="@+id/show_the_plan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/show_headbar"
         android:background="@color/aliceblue"
         android:gravity="center"
         android:paddingBottom="5dp"
@@ -48,21 +47,7 @@
         android:id="@+id/show_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bt_show_save"
-        android:layout_below="@id/show_the_plan"
         android:groupIndicator="@null" >
     </ExpandableListView>
 
-    <Button
-        android:id="@+id/bt_show_save"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:background="@drawable/startback"
-        android:text="调整完成，上传成绩"
-        android:textSize="16sp"
-        android:onClick="saveScores" />
-
-</RelativeLayout>
+</LinearLayout>

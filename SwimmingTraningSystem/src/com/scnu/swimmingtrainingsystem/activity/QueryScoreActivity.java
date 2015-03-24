@@ -469,12 +469,12 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 				childHolder = new ChildHolder();
 				convertView = View.inflate(mContext,
 						R.layout.show_score_list_item_sub, null);
-				childHolder.rank = (TextView) convertView
-						.findViewById(R.id.show_rank);
-				childHolder.score = (TextView) convertView
-						.findViewById(R.id.show_score);
-				childHolder.name = (TextView) convertView
-						.findViewById(R.id.show_name);
+//				childHolder.rank = (TextView) convertView
+//						.findViewById(R.id.show_rank);
+//				childHolder.score = (TextView) convertView
+//						.findViewById(R.id.show_score);
+//				childHolder.name = (TextView) convertView
+//						.findViewById(R.id.show_name);
 				convertView.setTag(childHolder);
 			} else {
 				childHolder = (ChildHolder) convertView.getTag();

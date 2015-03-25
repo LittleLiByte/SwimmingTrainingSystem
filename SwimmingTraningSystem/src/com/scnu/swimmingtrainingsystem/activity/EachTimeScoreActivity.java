@@ -281,6 +281,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 	 * @param i
 	 * @param result
 	 */
+	@SuppressWarnings("unchecked")
 	private void saveScore(int i, Map<String, Object> result) {
 		String curDistance = (String) result.get("distance");
 		int distance = Integer.parseInt(curDistance);
@@ -290,6 +291,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 		for (int l = 0; l < scoresNumber; l++) {
 			Score score = new Score();
 			score.setDate(date);
+			score.setType(Constants.NORMALSCORE);
 			score.setTimes(i + 1);
 			score.setDistance(distance);
 			score.setP(plan);

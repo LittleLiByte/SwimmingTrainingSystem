@@ -177,6 +177,7 @@ public class MatchScoreActivity extends Activity {
 			s.setDate(date);
 			s.setTimes(nowCurrent);
 			s.setScore(scores.get(i));
+			s.setType(Constants.NORMALSCORE);
 			s.setAthlete(a);
 			s.setDistance(distance);
 			s.setP(p);

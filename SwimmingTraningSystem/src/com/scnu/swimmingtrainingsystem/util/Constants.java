@@ -11,7 +11,20 @@ public class Constants {
 	 * 超时时间设置
 	 */
 	public static final int SOCKET_TIMEOUT = 100;
-
+	
+	/**
+	 * 成绩类型 1:普通成绩
+	 */
+	public static final int NORMALSCORE=1;
+	/**
+	 * 成绩类型 2:三次计频成绩
+	 */
+	public static final int FrequenceSCORE=2;
+	/**
+	 * 成绩类型 3:冲刺成绩
+	 */
+	public static final int SPRINTSCORE=3;
+	
 	/**
 	 * SharePreference所用的loginInfo的关键字
 	 */

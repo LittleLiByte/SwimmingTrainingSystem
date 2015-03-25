@@ -13,7 +13,6 @@ import com.scnu.swimmingtrainingsystem.model.Athlete;
 import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.Score;
 import com.scnu.swimmingtrainingsystem.model.Temp;
-import com.scnu.swimmingtrainingsystem.model.Upid;
 import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 

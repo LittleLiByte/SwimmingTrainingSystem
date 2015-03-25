@@ -47,7 +47,7 @@
         android:layout_toRightOf="@id/view_1"
         android:text="00分00秒000"
         android:textColor="@color/aliceblue"
-        android:textSize="12sp"
+        android:textSize="14sp"
         android:visibility="visible" />
 
     <TextView

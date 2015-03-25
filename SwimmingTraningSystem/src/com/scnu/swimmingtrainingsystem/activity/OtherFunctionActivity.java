@@ -1,10 +1,18 @@
 package com.scnu.swimmingtrainingsystem.activity;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.litepal.crud.DataSupport;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -12,6 +20,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,29 +33,45 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.Request.Method;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.scnu.swimmingtrainingsystem.R;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
+import com.scnu.swimmingtrainingsystem.http.JsonTools;
 import com.scnu.swimmingtrainingsystem.model.Athlete;
+import com.scnu.swimmingtrainingsystem.model.Score;
+import com.scnu.swimmingtrainingsystem.model.User;
+import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 import com.scnu.swimmingtrainingsystem.util.Constants;
+import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 
 /**
- * 计划界面
+ * 其他功能界面
  * 
  * @author LittleByte
  * 
  */
+@SuppressLint("SimpleDateFormat")
 public class OtherFunctionActivity extends Activity implements OnClickListener {
 	private MyApplication app;
 	private DBManager mDbManager;
+	// Volley请求队列
+	private RequestQueue mQueue;
 	// 点击表盘次数
 	private int clickCount = 0;
 	// 经过毫秒数
 	private long mlCount = 0;
 	// 秒表显示时间
 	private TextView tvTime;
-
-	private TextView time_title;
 	private Spinner fuctionSpinner;
 	private Spinner athleteSpinner;
 	private Button resetButton;
@@ -73,7 +98,11 @@ public class OtherFunctionActivity extends Activity implements OnClickListener {
 	private String strTime_count = "";
 	private long time_cur;
 	private long time_beg;
-
+	private List<Athlete> athletes;
+	private Long userID;
+	private Toast mToast;
+	private LoadingDialog loadingDialog;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -93,9 +122,9 @@ public class OtherFunctionActivity extends Activity implements OnClickListener {
 	private void initView() {
 		app = (MyApplication) getApplication();
 		mDbManager = DBManager.getInstance();
+		mQueue = Volley.newRequestQueue(this);
 		// 如果app中的全局变量被系统强制回收，通过以下改行代码会触发异常，直接将应用界面重启至登陆页面
-		long userID = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
-		time_title = (TextView) findViewById(R.id.time_title);
+		userID = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		tvTime = (TextView) findViewById(R.id.duocitvTime);
 		resetButton = (Button) findViewById(R.id.fuction_reset);
 		resetButton.setOnClickListener(this);
@@ -113,7 +142,7 @@ public class OtherFunctionActivity extends Activity implements OnClickListener {
 				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		fuctionSpinner.setAdapter(fuctionAdapter);
 		List<String> athleteNames = new ArrayList<String>();
-		List<Athlete> athletes = mDbManager.getAthletes(userID);
+		athletes = mDbManager.getAthletes(userID);
 		for (Athlete ath : athletes) {
 			athleteNames.add(ath.getName());
 		}
@@ -292,11 +321,100 @@ public class OtherFunctionActivity extends Activity implements OnClickListener {
 			resetTimer();
 			break;
 		case R.id.fuction_save:
-
+			saveScore();
 			break;
 		default:
 			break;
 		}
+	}
+
+	private void saveScore() {
+		// TODO Auto-generated method stub
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String date = sdf.format(new Date());
+		Athlete athlete=athletes.get(athleteSpinner.getSelectedItemPosition());
+		Score s=new Score();
+		s.setScore(tvTime.getText().toString());
+		s.setDate(date);
+		s.setDistance(0);
+		s.setTimes(1);
+		s.setType(fuctionSpinner.getSelectedItemPosition()+2);
+		s.setAthlete(athlete);
+		s.save();
+		boolean isConnect = (Boolean) app.getMap().get(
+				Constants.IS_CONNECT_SERVICE);
+		if (isConnect) {
+			int aid=athlete.getAid();
+			if (loadingDialog == null) {
+				loadingDialog = LoadingDialog.createDialog(this);
+				loadingDialog.setMessage("正在提交到服务器...");
+				loadingDialog.setCanceledOnTouchOutside(false);
+			}
+			loadingDialog.show();
+			addScoreRequest(aid);
+		}
+	}
+
+	private void addScoreRequest(final int aid) {
+		List<Score> scoresResult=new ArrayList<Score>();
+		scoresResult.add(DataSupport.findLast(Score.class));
+		User user = mDbManager.getUser(userID);
+		Map<String, Object> scoreMap = new HashMap<String, Object>();
+		scoreMap.put("score",scoresResult);
+		scoreMap.put("plan", null);
+		scoreMap.put("uid", user.getUid());
+		scoreMap.put("athlete_id", aid);
+		final String jsonString = JsonTools.creatJsonString(scoreMap);
+		StringRequest stringRequest = new StringRequest(Method.POST,
+				CommonUtils.HOSTURL + "addScores", new Listener<String>() {
+
+					@Override
+					public void onResponse(String response) {
+						// TODO Auto-generated method stub
+						Log.i("addScores", response);
+						loadingDialog.dismiss();
+						JSONObject obj;
+						try {
+							obj = new JSONObject(response);
+							int resCode = (Integer) obj.get("resCode");
+							if (resCode == 1) {
+								CommonUtils.showToast(
+										OtherFunctionActivity.this, mToast,
+										"成功同步至服务器!");
+							} else {
+								CommonUtils.showToast(
+										OtherFunctionActivity.this, mToast,
+										"同步失敗！");
+							}
+
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						finish();
+					}
+				}, new ErrorListener() {
+
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						// TODO Auto-generated method stub
+						// Log.e("addScores", error.getMessage());
+					}
+				}) {
+
+			@Override
+			protected Map<String, String> getParams() throws AuthFailureError {
+				// 设置请求参数
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("scoresJson", jsonString);
+				return map;
+			}
+		};
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+		mQueue.add(stringRequest);
 	}
 
 	public void othersGetBack(View v) {

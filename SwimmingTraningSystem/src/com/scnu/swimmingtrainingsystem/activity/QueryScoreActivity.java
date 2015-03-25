@@ -259,6 +259,7 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 									Score newScore = new Score();
 									newScore.setP(planResult);
 									newScore.setDate(string);
+									newScore.setType(Constants.NORMALSCORE);
 									newScore.setAthlete(ath);
 									newScore.setTimes(tempScore.getTimes());
 									newScore.setScore(tempScore.getScore());

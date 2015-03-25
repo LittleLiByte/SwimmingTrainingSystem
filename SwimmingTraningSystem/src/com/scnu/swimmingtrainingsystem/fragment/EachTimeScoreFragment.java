@@ -9,12 +9,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnSystemUiVisibilityChangeListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -31,7 +30,6 @@ import com.scnu.swimmingtrainingsystem.util.Constants;
 @SuppressLint("ValidFragment")
 public class EachTimeScoreFragment extends Fragment {
 	private MyApplication mApplication;
-	private Activity mContext;
 	private View view;
 	private List<ListView> viewList;
 	private AutoCompleteTextView acTextView;
@@ -95,17 +93,18 @@ public class EachTimeScoreFragment extends Fragment {
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		if (view == null) {
-			view = View.inflate(getActivity(), R.layout.fragment_modify_scores,
-					null);
-			
+			view = inflater.inflate(R.layout.fragment_modify_scores, null);
 			String[] autoStrings = new String[] { "25", "55", "75", "100",
 					"125", "150", "175", "200", "225", "250", "275", "300" };
-			acTextView = (AutoCompleteTextView) view
-					.findViewById(R.id.act_current_distance);
 			ArrayAdapter<String> tipsAdapter = new ArrayAdapter<String>(
 					getActivity(), android.R.layout.simple_dropdown_item_1line,
 					autoStrings);
+			acTextView = (AutoCompleteTextView) view
+					.findViewById(R.id.modify_act_current_distance);
+			// …Ë÷√AutoCompleteTextViewµƒAdapter
 			acTextView.setAdapter(tipsAdapter);
+			acTextView.setDropDownHeight(350);
+			acTextView.setThreshold(1);
 			
 			scListView = (DragSortListView) view
 					.findViewById(R.id.matchscore_list);
@@ -115,18 +114,8 @@ public class EachTimeScoreFragment extends Fragment {
 			dsListView.setDropListener(onDrop);
 			dsListView.setRemoveListener(onRemove);
 			dsListView.setDragScrollProfile(ssProfile);
-
 			acTextView.setText(this.distance + "");
 
-			acTextView
-					.setOnSystemUiVisibilityChangeListener(new OnSystemUiVisibilityChangeListener() {
-
-						@Override
-						public void onSystemUiVisibilityChange(int visibility) {
-							// TODO Auto-generated method stub
-
-						}
-					});
 			try {
 				JSONArray jsonArray = new JSONArray(scoreString);
 				for (int i = 0; i < jsonArray.length(); i++) {
@@ -158,6 +147,7 @@ public class EachTimeScoreFragment extends Fragment {
 				parent.removeView(view);
 			}
 		}
+
 		return view;
 	}
 
@@ -165,8 +155,7 @@ public class EachTimeScoreFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
-		mContext = getActivity();
-		mApplication = (MyApplication) mContext.getApplication();
+		mApplication = (MyApplication) getActivity().getApplication();
 	}
 
 	private class MyScrollListener implements OnScrollListener {

@@ -25,7 +25,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.scnu.swimmingtrainingsystem.fragment.ComputeFrequenceFragment;
-import com.scnu.swimmingtrainingsystem.fragment.CountDashFragment;
+import com.scnu.swimmingtrainingsystem.fragment.SprintFragment;
 
 /**
  * 计划界面
@@ -52,7 +52,7 @@ public class OtherFunctionActivity extends FragmentActivity implements OnClickLi
 	 * Fragment（页面）
 	 */
 	ComputeFrequenceFragment addPlanFragment;
-	CountDashFragment viewPlanFragment;
+	SprintFragment viewPlanFragment;
 	/**
 	 * 当前选中的项
 	 */
@@ -86,7 +86,7 @@ public class OtherFunctionActivity extends FragmentActivity implements OnClickLi
 	private void initData() {
 		initCursor(2);
 		addPlanFragment = new ComputeFrequenceFragment();
-		viewPlanFragment = new CountDashFragment();
+		viewPlanFragment = new SprintFragment();
 		fragmentList.add(viewPlanFragment);
 		fragmentList.add(addPlanFragment);
 		adapter = new MyFrageStatePagerAdapter(getSupportFragmentManager());

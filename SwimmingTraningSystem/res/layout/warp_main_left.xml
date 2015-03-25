@@ -11,7 +11,7 @@
     dslv:drag_enabled="true"
     dslv:drag_handle_id="@id/drag_handle"
     dslv:drag_scroll_start="0.33"
-    dslv:drag_start_mode="onLongPress"
+    dslv:drag_start_mode="onDown"
     dslv:float_alpha="0.6"
     dslv:max_drag_scroll_speed="0.5"
     dslv:remove_enabled="true"

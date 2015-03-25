@@ -116,7 +116,7 @@ public class MatchScoreActivity extends Activity {
 		// 设置数据源
 		String[] autoStrings = new String[] { "25", "55", "75", "100", "125",
 				"150", "175", "200", "225", "250", "275", "300" };
-		acTextView = (AutoCompleteTextView) findViewById(R.id.act_current_distance);
+		acTextView = (AutoCompleteTextView) findViewById(R.id.match_act_current_distance);
 		ArrayAdapter<String> tipsAdapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_dropdown_item_1line, autoStrings);
 		// 设置AutoCompleteTextView的Adapter

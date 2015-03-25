@@ -16,7 +16,7 @@
             android:text="本次成绩在" />
 
         <AutoCompleteTextView
-            android:id="@+id/act_each_current_distance"
+            android:id="@+id/modify_act_current_distance"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -34,7 +34,5 @@
         android:layout_height="0dp"
         android:layout_weight="1.0"
         layout="@layout/match_2_list" />
-
- 
 
 </LinearLayout>

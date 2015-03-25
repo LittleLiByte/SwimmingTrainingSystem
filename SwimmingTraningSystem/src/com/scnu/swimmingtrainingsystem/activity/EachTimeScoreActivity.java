@@ -38,7 +38,6 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.scnu.swimmingtrainingsystem.R;
 import com.scnu.swimmingtrainingsystem.adapter.ViewPargerAdpt;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
@@ -88,7 +87,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 	private void init() {
 		myApplication = (MyApplication) getApplication();
 		mDbManager = DBManager.getInstance();
-		mQueue = Volley.newRequestQueue(this);
+		// mQueue = Volley.newRequestQueue(getApplicationContext());
 		date = (String) myApplication.getMap().get(Constants.TEST_DATE);
 		userID = (Long) myApplication.getMap().get(Constants.CURRENT_USER_ID);
 		Long planId = (Long) myApplication.getMap().get(Constants.PLAN_ID);

@@ -42,7 +42,7 @@
             android:text="本次成绩在" />
 
         <AutoCompleteTextView
-            android:id="@+id/act_current_distance"
+            android:id="@+id/match_act_current_distance"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"

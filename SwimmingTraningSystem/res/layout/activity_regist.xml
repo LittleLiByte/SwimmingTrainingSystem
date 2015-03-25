@@ -59,6 +59,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_edit"
+                    android:hint="请填写用户名！"
                     android:padding="8dp" />
             </LinearLayout>
 
@@ -78,6 +79,7 @@
                     android:textSize="16sp" />
 
                 <EditText
+                    android:hint="请输入登陆密码"
                     android:id="@+id/et_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -102,6 +104,7 @@
                     android:textSize="16sp" />
 
                 <EditText
+                      android:hint="确认登陆密码"
                     android:id="@+id/et_password1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -130,7 +133,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_edit"
-                    android:inputType="text"
+                    android:inputType="textEmailAddress"
+                    android:hint="填写邮箱方便找回密码(可选)"
                     android:padding="8dp" />
             </LinearLayout>
 
@@ -154,7 +158,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_edit"
-                    android:inputType="number"
+                    android:inputType="phone"
+                    android:hint="(可选)"
                     android:padding="8dp" />
             </LinearLayout>
 

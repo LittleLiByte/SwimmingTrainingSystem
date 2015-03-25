@@ -27,7 +27,7 @@ import android.widget.Toast;
 import com.scnu.swimmingtrainingsystem.R;
 import com.scnu.swimmingtrainingsystem.adapter.TimeLineListAdapter;
 import com.scnu.swimmingtrainingsystem.util.Constants;
-import com.scnu.swimmingtrainingsystem.util.XUtils;
+import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 
 /**
  * 计时秒表界面
@@ -159,13 +159,13 @@ public class TimerActivity extends Activity {
 						tvTip.setVisibility(View.GONE);
 						setlistview();
 						if (athletes == (athleteNumber + 1)) {
-							XUtils.showToast(TimerActivity.this, toast,
+							CommonUtils.showToast(TimerActivity.this, toast,
 									"成绩全部记录完成！");
 						}
 					}
 				} else {
 					timerStop();
-					XUtils.showToast(TimerActivity.this, toast,
+					CommonUtils.showToast(TimerActivity.this, toast,
 							"请不要保存太多不必要的成绩！");
 				}
 			}
@@ -213,7 +213,7 @@ public class TimerActivity extends Activity {
 		time.add(athletes - 1, tvTime.getText().toString());
 		if (athletes > 1) {
 			// 两个成绩之差
-			String substracion = XUtils.getScoreSubtraction(
+			String substracion = CommonUtils.getScoreSubtraction(
 					time.get(athletes - 1), time.get(athletes - 2));
 			timesub.add(substracion);
 		}
@@ -344,7 +344,7 @@ public class TimerActivity extends Activity {
 			startActivity(intent);
 			finish();
 		} else {
-			XUtils.showToast(this, toast, "请开始计时并记录至少一次成绩！");
+			CommonUtils.showToast(this, toast, "请开始计时并记录至少一次成绩！");
 		}
 	}
 

@@ -6,7 +6,6 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.scnu.swimmingtrainingsystem.R;
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,10 +25,11 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.scnu.swimmingtrainingsystem.R;
 import com.scnu.swimmingtrainingsystem.http.JsonTools;
 import com.scnu.swimmingtrainingsystem.model.User;
+import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 import com.scnu.swimmingtrainingsystem.util.Constants;
-import com.scnu.swimmingtrainingsystem.util.XUtils;
 import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 
 /**
@@ -76,7 +76,7 @@ public class RegistAcyivity extends Activity {
 	 * @param v
 	 */
 	public void quick_regist(View v) {
-		if (XUtils.isFastDoubleClick()) {
+		if (CommonUtils.isFastDoubleClick()) {
 			return;
 		} else {
 			final String user = username.getText().toString().trim();
@@ -85,12 +85,16 @@ public class RegistAcyivity extends Activity {
 			final String Email = email.getText().toString().trim();
 			final String cellphone = phone.getText().toString().trim();
 			if (TextUtils.isEmpty(user)) {
-				XUtils.showToast(this, toast, "用户名不能为空");
+				CommonUtils.showToast(this, toast, "用户名不能为空");
 			} else if (TextUtils.isEmpty(pass)) {
-				XUtils.showToast(this, toast, "密码不能为空");
+				CommonUtils.showToast(this, toast, "密码不能为空");
 			} else if (TextUtils.isEmpty(pass1) || !pass.equals(pass1)) {
-				XUtils.showToast(this, toast, "两次输入密码不一致");
-			} else {
+				CommonUtils.showToast(this, toast, "两次输入密码不一致");
+			} else if (!CommonUtils.isEmail(email.getText().toString().trim())) {
+				CommonUtils.showToast(this, toast, "邮箱格式错误");
+			}else if (!CommonUtils.isMobileNO(phone.getText().toString().trim())) {
+				CommonUtils.showToast(this, toast, "手机号码格式错误");
+			}else {
 				// 如果处在联网状态，则发送至服务器
 				boolean isConnect = (Boolean) app.getMap().get(
 						Constants.IS_CONNECT_SERVICE);
@@ -100,7 +104,6 @@ public class RegistAcyivity extends Activity {
 					newUser.setPassword(pass);
 					newUser.setEmail(Email);
 					newUser.setPhone(cellphone);
-
 					// 发送至服务器
 					registRequest(newUser);
 				}
@@ -123,7 +126,7 @@ public class RegistAcyivity extends Activity {
 		final String jsonInfo = JsonTools.creatJsonString(user);
 
 		StringRequest stringRequest = new StringRequest(Method.POST,
-				XUtils.HOSTURL + "regist", new Listener<String>() {
+				CommonUtils.HOSTURL + "regist", new Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {
@@ -134,22 +137,20 @@ public class RegistAcyivity extends Activity {
 							JSONObject obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
 							if (resCode == 1) {
-								XUtils.showToast(RegistAcyivity.this, toast,
-										"注册成功");
+								CommonUtils.showToast(RegistAcyivity.this,
+										toast, "注册成功");
 								String uid = obj.get("uid").toString();
-								// User user = JsonTools.getObject(userJson,
-								// User.class);
 								user.setUid(Integer.parseInt(uid));
 								user.save();
 								overridePendingTransition(R.anim.slide_up_in,
 										R.anim.slide_down_out);
 								finish();
 							} else if (resCode == 2) {
-								XUtils.showToast(RegistAcyivity.this, toast,
-										"用户名已经存在！");
+								CommonUtils.showToast(RegistAcyivity.this,
+										toast, "用户名已经存在！");
 							} else {
-								XUtils.showToast(RegistAcyivity.this, toast,
-										"服务器错误！");
+								CommonUtils.showToast(RegistAcyivity.this,
+										toast, "服务器错误！");
 							}
 
 						} catch (JSONException e) {
@@ -164,7 +165,7 @@ public class RegistAcyivity extends Activity {
 					public void onErrorResponse(VolleyError error) {
 						// TODO Auto-generated method stub
 						loadingDialog.dismiss();
-						XUtils.showToast(RegistAcyivity.this, toast,
+						CommonUtils.showToast(RegistAcyivity.this, toast,
 								"无法连接服务器！请使用默认账号试用");
 
 					}

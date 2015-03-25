@@ -15,7 +15,7 @@ import com.scnu.swimmingtrainingsystem.model.Score;
 import com.scnu.swimmingtrainingsystem.model.Temp;
 import com.scnu.swimmingtrainingsystem.model.Upid;
 import com.scnu.swimmingtrainingsystem.model.User;
-import com.scnu.swimmingtrainingsystem.util.XUtils;
+import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 
 /**
  * 数据库操作类
@@ -250,17 +250,6 @@ public class DBManager {
 	}
 
 	/**
-	 * 删除选定的计划
-	 * 
-	 * @param plans
-	 */
-	public void deletePlans(List<Plan> plans) {
-		for (Plan p : plans) {
-			DataSupport.delete(Plan.class, p.getId());
-		}
-	}
-
-	/**
 	 * 查找table_plan中当前用户的所有计划
 	 * 
 	 * @return 计划列表
@@ -293,17 +282,6 @@ public class DBManager {
 		return plan;
 	}
 
-	public List<Upid> getdeletePlanId(List<Plan> plans) {
-		List<Upid> upids = new ArrayList<Upid>();
-		for (Plan p : plans) {
-			Upid upid = new Upid();
-			Plan enity = DataSupport.find(Plan.class, p.getId(), true);
-			upid.setPid(enity.getPid());
-			upid.setUid(enity.getUser().getUid());
-			upids.add(upid);
-		}
-		return upids;
-	}
 
 	/**
 	 * 通过计划名字获取计划对象
@@ -488,7 +466,7 @@ public class DBManager {
 
 			Temp p = new Temp();
 			p.setAthleteName(DataSupport.find(Athlete.class, id).getName());
-			p.setScore(XUtils.scoreSum(sum));
+			p.setScore(CommonUtils.scoreSum(sum));
 			temps.add(p);
 		}
 		Collections.sort(temps, new ScoreComparable());

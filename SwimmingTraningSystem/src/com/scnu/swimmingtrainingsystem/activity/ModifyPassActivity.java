@@ -25,7 +25,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
 import com.scnu.swimmingtrainingsystem.util.Constants;
-import com.scnu.swimmingtrainingsystem.util.XUtils;
+import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 
 public class ModifyPassActivity extends Activity {
 	private MyApplication app;
@@ -75,20 +75,20 @@ public class ModifyPassActivity extends Activity {
 		String name = dbManager.getUser(userId).getUsername();
 		String userPass = dbManager.getUser(userId).getPassword();
 		if (TextUtils.isEmpty(oldPassword)) {
-			XUtils.showToast(this, toast, "原密码不能为空！");
+			CommonUtils.showToast(this, toast, "原密码不能为空！");
 		} else if (TextUtils.isEmpty(newPassword)) {
-			XUtils.showToast(this, toast, "新密码不能为空！");
+			CommonUtils.showToast(this, toast, "新密码不能为空！");
 		} else if (TextUtils.isEmpty(comfPassword)) {
-			XUtils.showToast(this, toast, "确认密码不能为空！");
+			CommonUtils.showToast(this, toast, "确认密码不能为空！");
 		} else if (!userPass.equals(oldPassword)) {
-			XUtils.showToast(this, toast, "原密码错误！");
+			CommonUtils.showToast(this, toast, "原密码错误！");
 		} else if (userPass.equals(newPassword)) {
-			XUtils.showToast(this, toast, "原密码与新密码相同，无需修改！");
+			CommonUtils.showToast(this, toast, "原密码与新密码相同，无需修改！");
 		} else if (name.equals("defaultUser")) {
-			XUtils.showToast(this, toast, "当前为系统默认帐号，不能修改密码！");
+			CommonUtils.showToast(this, toast, "当前为系统默认帐号，不能修改密码！");
 		} else {
 			dbManager.modifyUserPassword(userId, comfPassword);
-			XUtils.showToast(this, toast, "修改密码成功！");
+			CommonUtils.showToast(this, toast, "修改密码成功！");
 			// 如果处在联网状态，则发送至服务器
 			boolean isConnect = (Boolean) app.getMap().get(
 					Constants.IS_CONNECT_SERVICE);
@@ -113,7 +113,7 @@ public class ModifyPassActivity extends Activity {
 	public void modifyRequest(final String oldPassword,
 			final String newPassword, final String comfPassword) {
 		StringRequest stringRequest = new StringRequest(Method.POST,
-				XUtils.HOSTURL + "modifyPass", new Listener<String>() {
+				CommonUtils.HOSTURL + "modifyPass", new Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {

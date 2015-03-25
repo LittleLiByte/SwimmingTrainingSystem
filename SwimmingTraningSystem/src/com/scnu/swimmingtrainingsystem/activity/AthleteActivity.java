@@ -44,7 +44,7 @@ import com.scnu.swimmingtrainingsystem.http.JsonTools;
 import com.scnu.swimmingtrainingsystem.model.Athlete;
 import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.Constants;
-import com.scnu.swimmingtrainingsystem.util.XUtils;
+import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 import com.scnu.swimmingtrainingsystem.view.Switch;
 
@@ -59,7 +59,6 @@ public class AthleteActivity extends Activity {
 	private static final String ADD_ATHLETE_TITLE_STRING = "添加运动员";
 	private static final String NAME_CANNOT_BE_EMPTY_STRING = "运动员名字不能为空";
 	private static final String NAME_CANNOT_BE_REPEATE_STRING = "存在运动员名字重复，请更改";
-	private static final String AGE_CANNOT_BE_EMPTY_STRING = "年龄不能为空";
 	private static final String ADDATHLETE = "addAthlete";
 	private static final String GETATHLETES = "getAthletes";
 
@@ -135,8 +134,8 @@ public class AthleteActivity extends Activity {
 
 		// 如果第一次打开应用并且可以连接服务器，就会尝试从服务器获取运动员信息
 		if (isConnect && isFirst && userFirstLogin) {
-			XUtils.initAthletes(this, false);
-			XUtils.saveIsThisUserFirstLogin(this, false);
+			CommonUtils.initAthletes(this, false);
+			CommonUtils.saveIsThisUserFirstLogin(this, false);
 			if (loadingDialog == null) {
 				loadingDialog = LoadingDialog.createDialog(this);
 				loadingDialog.setMessage("正在同步...");
@@ -185,7 +184,6 @@ public class AthleteActivity extends Activity {
 
 						boolean isCheck = mGenderSwitch.isChecked();
 
-						System.out.println("isCheck--->" + isCheck);
 						String gender = "男";
 						if (!isCheck) {
 							gender = "女";
@@ -193,14 +191,11 @@ public class AthleteActivity extends Activity {
 						boolean isExit = mDbManager.isAthleteNameExsit(mUserId,
 								name);
 						if (TextUtils.isEmpty(name)) {
-							XUtils.showToast(AthleteActivity.this, mToast,
+							CommonUtils.showToast(AthleteActivity.this, mToast,
 									NAME_CANNOT_BE_EMPTY_STRING);
 						} else if (isExit) {
-							XUtils.showToast(AthleteActivity.this, mToast,
+							CommonUtils.showToast(AthleteActivity.this, mToast,
 									NAME_CANNOT_BE_REPEATE_STRING);
-						} else if (TextUtils.isEmpty(ageString)) {
-							XUtils.showToast(AthleteActivity.this, mToast,
-									AGE_CANNOT_BE_EMPTY_STRING);
 						} else {
 							int age = Integer.parseInt(ageString);
 							addAthlete(name, age, gender, phone, other);
@@ -246,7 +241,7 @@ public class AthleteActivity extends Activity {
 		} else {
 			a.setUser(mUser);
 			a.save();
-			XUtils.showToast(AthleteActivity.this, mToast,
+			CommonUtils.showToast(AthleteActivity.this, mToast,
 					Constants.ADD_SUCCESS_STRING);
 			mAthletes = mDbManager.getAthletes(mUserId);
 			mAthleteListAdapter.setDatas(mAthletes);
@@ -265,7 +260,7 @@ public class AthleteActivity extends Activity {
 		jsonMap.put("athlete", a);
 		jsonMap.put("uid", mUser.getUid());
 		final String athleteJson = JsonTools.creatJsonString(jsonMap);
-		StringRequest request = new StringRequest(Method.POST, XUtils.HOSTURL
+		StringRequest request = new StringRequest(Method.POST, CommonUtils.HOSTURL
 				+ ADDATHLETE, new Listener<String>() {
 
 			@Override
@@ -276,7 +271,7 @@ public class AthleteActivity extends Activity {
 					JSONObject obj = new JSONObject(response);
 					int resCode = (Integer) obj.get("resCode");
 					if (resCode == 1) {
-						XUtils.showToast(AthleteActivity.this, mToast,
+						CommonUtils.showToast(AthleteActivity.this, mToast,
 								Constants.ADD_SUCCESS_STRING);
 						int aid = (Integer) obj.get("athlete_id");
 						a.setAid(aid);
@@ -322,7 +317,7 @@ public class AthleteActivity extends Activity {
 	 */
 	private void getAthleteRequest() {
 		StringRequest getrequest = new StringRequest(Method.POST,
-				XUtils.HOSTURL + GETATHLETES, new Listener<String>() {
+				CommonUtils.HOSTURL + GETATHLETES, new Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {
@@ -354,10 +349,10 @@ public class AthleteActivity extends Activity {
 								mAthletes = mDbManager.getAthletes(mUserId);
 								mAthleteListAdapter.setDatas(mAthletes);
 								mAthleteListAdapter.notifyDataSetChanged();
-								XUtils.showToast(AthleteActivity.this, mToast,
+								CommonUtils.showToast(AthleteActivity.this, mToast,
 										"同步成功！");
 							} else {
-								XUtils.showToast(AthleteActivity.this, mToast,
+								CommonUtils.showToast(AthleteActivity.this, mToast,
 										UNKNOW_ERROR);
 							}
 

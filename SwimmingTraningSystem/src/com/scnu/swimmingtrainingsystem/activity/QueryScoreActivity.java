@@ -60,7 +60,7 @@ import com.scnu.swimmingtrainingsystem.model.Temp;
 import com.scnu.swimmingtrainingsystem.model.TempScore;
 import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.Constants;
-import com.scnu.swimmingtrainingsystem.util.XUtils;
+import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 
 /**
@@ -229,7 +229,7 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 		final String dateJson = JsonTools.creatJsonString(jsonMap);
 
 		StringRequest getScoreDateList = new StringRequest(Method.POST,
-				XUtils.HOSTURL + "getScores", new Listener<String>() {
+				CommonUtils.HOSTURL + "getScores", new Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {
@@ -425,10 +425,10 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 					mExpandableListView.expandGroup(i);
 				}
 			} else if (!isComplete) {
-				XUtils.showToast(QueryScoreActivity.this, mToast,
+				CommonUtils.showToast(QueryScoreActivity.this, mToast,
 						NOT_CORRECT_STRING);
 			} else {
-				XUtils.showToast(QueryScoreActivity.this, mToast,
+				CommonUtils.showToast(QueryScoreActivity.this, mToast,
 						NO_SUCH_RECORDS_STRING);
 			}
 			mLoadingDialog.dismiss();
@@ -637,7 +637,7 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 		final String jsonString = JsonTools.creatJsonString(jsonMap);
 
 		StringRequest getScoreDateList = new StringRequest(Method.POST,
-				XUtils.HOSTURL + "getScoreDateList", new Listener<String>() {
+				CommonUtils.HOSTURL + "getScoreDateList", new Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {
@@ -672,7 +672,7 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 								progressBar.setVisibility(View.GONE);
 								// 按钮可见
 								loadmoreButton.setVisibility(View.GONE);
-								XUtils.showToast(QueryScoreActivity.this,
+								CommonUtils.showToast(QueryScoreActivity.this,
 										mToast, "数据已全部加载完成！");
 							}
 						} catch (JSONException e) {

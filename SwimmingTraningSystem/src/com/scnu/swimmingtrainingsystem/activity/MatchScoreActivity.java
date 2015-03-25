@@ -31,7 +31,7 @@ import com.scnu.swimmingtrainingsystem.model.Athlete;
 import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.Score;
 import com.scnu.swimmingtrainingsystem.util.Constants;
-import com.scnu.swimmingtrainingsystem.util.XUtils;
+import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 
 public class MatchScoreActivity extends Activity {
 
@@ -206,10 +206,10 @@ public class MatchScoreActivity extends Activity {
 
 		if (nowCurrent == 1) {
 			if (crrentDistance == 0 && TextUtils.isEmpty(actv)) {
-				XUtils.showToast(this, toast, "请填写记录当前成绩的距离！");
+				CommonUtils.showToast(this, toast, "请填写记录当前成绩的距离！");
 				return;
 			} else if (scoresNumber != athleteNumber) {
-				XUtils.showToast(this, toast, "成绩数目与运动员数目不相等！");
+				CommonUtils.showToast(this, toast, "成绩数目与运动员数目不相等！");
 				return;
 			} else {
 				i = new Intent(this, ShowScoreActivity.class);
@@ -221,7 +221,7 @@ public class MatchScoreActivity extends Activity {
 			// 如果这是第一趟并且成绩数目与运动员数目不相等,则先保存到sp中，统计再做调整
 			String scoresString = JsonTools.creatJsonString(scores);
 			String athleteJson = JsonTools.creatJsonString(dragDatas);
-			XUtils.saveCurrentScoreAndAthlete(this, nowCurrent, crrentDistance,
+			CommonUtils.saveCurrentScoreAndAthlete(this, nowCurrent, crrentDistance,
 					scoresString, athleteJson);
 		}
 		startActivity(i);
@@ -264,7 +264,7 @@ public class MatchScoreActivity extends Activity {
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
 				//暂时保存到SharePreferences
-				XUtils.saveCurrentScoreAndAthlete(context, i, crrentDistance,
+				CommonUtils.saveCurrentScoreAndAthlete(context, i, crrentDistance,
 						scoreString, athleteString);
 				Intent intent = new Intent(MatchScoreActivity.this,
 						TimerActivity.class);

@@ -49,7 +49,7 @@ import com.scnu.swimmingtrainingsystem.model.Score;
 import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.ScreenUtils;
-import com.scnu.swimmingtrainingsystem.util.XUtils;
+import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 
 public class EachTimeScoreActivity extends FragmentActivity {
@@ -238,11 +238,11 @@ public class EachTimeScoreActivity extends FragmentActivity {
 			int position = (Integer) result.get("position");
 			if (resCode == 1 && number != length) {
 				viewPager.setCurrentItem(position);
-				XUtils.showToast(this, mToast, "该趟成绩当前成绩距离为0！");
+				CommonUtils.showToast(this, mToast, "该趟成绩当前成绩距离为0！");
 				break;
 			} else if (resCode == 2 && number != length) {
 				viewPager.setCurrentItem(position);
-				XUtils.showToast(this, mToast, "成绩与运动员人数不对应！");
+				CommonUtils.showToast(this, mToast, "成绩与运动员人数不对应！");
 				break;
 			} else if (resCode == 0 && number != length) {
 				// 以下只是保存length-1次
@@ -251,7 +251,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 			} else if (resCode == 0 && number == length) {
 				saveScore(i, result);
 				viewPager.setCurrentItem(length - 1);
-				XUtils.showToast(this, mToast, "匹配完成！");
+				CommonUtils.showToast(this, mToast, "匹配完成！");
 
 				boolean isConnect = (Boolean) myApplication.getMap().get(
 						Constants.IS_CONNECT_SERVICE);
@@ -318,7 +318,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 		scoreMap.put("athlete_id", aidList);
 		final String jsonString = JsonTools.creatJsonString(scoreMap);
 		StringRequest stringRequest = new StringRequest(Method.POST,
-				XUtils.HOSTURL + "addScores", new Listener<String>() {
+				CommonUtils.HOSTURL + "addScores", new Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {
@@ -330,10 +330,10 @@ public class EachTimeScoreActivity extends FragmentActivity {
 							obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
 							if (resCode == 1) {
-								XUtils.showToast(EachTimeScoreActivity.this,
+								CommonUtils.showToast(EachTimeScoreActivity.this,
 										mToast, "成功同步至服务器!");
 							} else {
-								XUtils.showToast(EachTimeScoreActivity.this,
+								CommonUtils.showToast(EachTimeScoreActivity.this,
 										mToast, "同步失敗！");
 							}
 

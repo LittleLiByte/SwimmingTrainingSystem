@@ -59,7 +59,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_edit"
-                    android:padding="16dp" />
+                    android:hint="请填写用户名！"
+                    android:padding="16dp"
+                    android:textSize="20sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -82,8 +84,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_edit"
+                    android:hint="请输入您的登陆密码"
                     android:inputType="textPassword"
-                    android:padding="16dp" />
+                    android:padding="16dp"
+                    android:textSize="20sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -106,8 +110,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_edit"
+                    android:hint="确认登陆密码"
                     android:inputType="textPassword"
-                    android:padding="16dp" />
+                    android:padding="16dp"
+                    android:textSize="20sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -130,7 +136,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_edit"
-                    android:inputType="text"
+                    android:hint="填写邮箱方便找回密码(可选)"
+                    android:inputType="textEmailAddress"
                     android:padding="16dp" />
             </LinearLayout>
 
@@ -154,8 +161,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_edit"
-                    android:inputType="number"
-                    android:padding="16dp" />
+                    android:hint="(可选)"
+                    android:inputType="phone"
+                    android:padding="16dp"
+                    android:textSize="20sp" />
             </LinearLayout>
 
             <Button

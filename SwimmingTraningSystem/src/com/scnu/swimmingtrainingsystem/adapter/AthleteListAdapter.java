@@ -40,7 +40,7 @@ import com.scnu.swimmingtrainingsystem.effect.NiftyDialogBuilder;
 import com.scnu.swimmingtrainingsystem.http.JsonTools;
 import com.scnu.swimmingtrainingsystem.model.Athlete;
 import com.scnu.swimmingtrainingsystem.util.Constants;
-import com.scnu.swimmingtrainingsystem.util.XUtils;
+import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 import com.scnu.swimmingtrainingsystem.view.Switch;
 
 /**
@@ -217,7 +217,7 @@ public class AthleteListAdapter extends BaseAdapter {
 					ath_gender, ath_phone, ath_extras);
 			setDatas(dbManager.getAthletes(userID));
 			notifyDataSetChanged();
-			XUtils.showToast(context, toast, "修改成功");
+			CommonUtils.showToast(context, toast, "修改成功");
 			// 如果处在联网状态，则发送至服务器
 			boolean isConnect = (Boolean) app.getMap().get(
 					Constants.IS_CONNECT_SERVICE);
@@ -281,7 +281,7 @@ public class AthleteListAdapter extends BaseAdapter {
 								}
 								setDatas(dbManager.getAthletes(userID));
 								notifyDataSetChanged();
-								XUtils.showToast(context, toast, "删除成功");
+								CommonUtils.showToast(context, toast, "删除成功");
 							}
 						}
 					});
@@ -311,7 +311,7 @@ public class AthleteListAdapter extends BaseAdapter {
 		obj = DataSupport.find(Athlete.class, obj.getId(), true);
 		final String athleteJson = JsonTools.creatJsonString(obj);
 		StringRequest stringRequest = new StringRequest(Method.POST,
-				XUtils.HOSTURL + "modifyAthlete", new Listener<String>() {
+				CommonUtils.HOSTURL + "modifyAthlete", new Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {
@@ -322,9 +322,9 @@ public class AthleteListAdapter extends BaseAdapter {
 							obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
 							if (resCode == 1) {
-								XUtils.showToast(context, toast, "修改成功");
+								CommonUtils.showToast(context, toast, "修改成功");
 							} else {
-								XUtils.showToast(context, toast, "修改失败");
+								CommonUtils.showToast(context, toast, "修改失败");
 							}
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block
@@ -366,7 +366,7 @@ public class AthleteListAdapter extends BaseAdapter {
 
 		final String jsonString = JsonTools.creatJsonString(a);
 		StringRequest stringRequest2 = new StringRequest(Method.POST,
-				XUtils.HOSTURL + "deleteAthlete", new Listener<String>() {
+				CommonUtils.HOSTURL + "deleteAthlete", new Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {
@@ -377,9 +377,9 @@ public class AthleteListAdapter extends BaseAdapter {
 							obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
 							if (resCode == 1) {
-								XUtils.showToast(context, toast, "删除成功");
+								CommonUtils.showToast(context, toast, "删除成功");
 							} else {
-								XUtils.showToast(context, toast, "删除失败");
+								CommonUtils.showToast(context, toast, "删除失败");
 							}
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block

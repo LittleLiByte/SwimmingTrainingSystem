@@ -6,7 +6,6 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.R.fraction;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -38,7 +37,7 @@ import com.scnu.swimmingtrainingsystem.effect.NiftyDialogBuilder;
 import com.scnu.swimmingtrainingsystem.http.JsonTools;
 import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.Constants;
-import com.scnu.swimmingtrainingsystem.util.XUtils;
+import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 
 /**
@@ -98,13 +97,13 @@ public class LoginActivity extends Activity {
 			defaulrUser.setPassword(DEFAULT_PASSWORD);
 			defaulrUser.save();
 			showSettingDialog(this);
-			XUtils.SaveLoginInfo(this, false);
+			CommonUtils.SaveLoginInfo(this, false);
 		}
 
 		// 从SharedPreferences读取服务器地址信息
 		SharedPreferences hostSp = getSharedPreferences(Constants.LOGININFO,
 				Context.MODE_PRIVATE);
-		XUtils.HOSTURL = hostSp
+		CommonUtils.HOSTURL = hostSp
 				.getString("hostInfo",
 						"http://192.168.1.230:8080/SWIMYUE33/httpPost.action?action_flag=");
 		testRequest();
@@ -146,17 +145,17 @@ public class LoginActivity extends Activity {
 	 * @param v
 	 */
 	public void onLogin(View v) {
-		if (XUtils.isFastDoubleClick()) {
+		if (CommonUtils.isFastDoubleClick()) {
 			return;
 		} else {
 			String loginString = etLogin.getText().toString().trim();
 			String passwordString = etPassword.getText().toString().trim();
 			if (TextUtils.isEmpty(loginString)
 					|| TextUtils.isEmpty(passwordString)) {
-				XUtils.showToast(this, toast, "用户名或密码不能为空");
+				CommonUtils.showToast(this, toast, "用户名或密码不能为空");
 			} else {
 				// 保存登录信息
-				XUtils.SaveLoginInfo(this, loginString, passwordString);
+				CommonUtils.SaveLoginInfo(this, loginString, passwordString);
 				boolean tryConnect = (Boolean) app.getMap().get(
 						Constants.IS_CONNECT_SERVICE);
 				if (tryConnect) {
@@ -185,7 +184,7 @@ public class LoginActivity extends Activity {
 	public void loginRequest(final String s1, final String s2) {
 
 		StringRequest loginRequest = new StringRequest(Method.POST,
-				XUtils.HOSTURL + "login", new Listener<String>() {
+				CommonUtils.HOSTURL + "login", new Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {
@@ -196,7 +195,7 @@ public class LoginActivity extends Activity {
 							JSONObject obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
 							if (resCode == 1) {
-								XUtils.showToast(LoginActivity.this, toast,
+								CommonUtils.showToast(LoginActivity.this, toast,
 										"登录成功");
 								String userJson = obj.get("user").toString();
 								User user = JsonTools.getObject(userJson,
@@ -209,7 +208,7 @@ public class LoginActivity extends Activity {
 									app.getMap().put(Constants.CURRENT_USER_ID,
 											user.getId());
 									//用户第一次登陆
-									XUtils.saveIsThisUserFirstLogin(LoginActivity.this, true);
+									CommonUtils.saveIsThisUserFirstLogin(LoginActivity.this, true);
 								} else {
 									// 如果该用户信息已存在本地数据库，则取出当前id作为全局变量
 									long currentId = dbManager.getUserByName(
@@ -218,13 +217,13 @@ public class LoginActivity extends Activity {
 											currentId);
 								}
 							} else if (resCode == 2) {
-								XUtils.showToast(LoginActivity.this, toast,
+								CommonUtils.showToast(LoginActivity.this, toast,
 										"用户名不存在！");
 							} else if (resCode == 3) {
-								XUtils.showToast(LoginActivity.this, toast,
+								CommonUtils.showToast(LoginActivity.this, toast,
 										"密码错误！");
 							} else {
-								XUtils.showToast(LoginActivity.this, toast,
+								CommonUtils.showToast(LoginActivity.this, toast,
 										"服务器错误！");
 							}
 
@@ -233,7 +232,7 @@ public class LoginActivity extends Activity {
 							e.printStackTrace();
 						}
 
-						XUtils.showToast(LoginActivity.this, toast, "登陆成功");
+						CommonUtils.showToast(LoginActivity.this, toast, "登陆成功");
 					
 						Handler handler = new Handler();
 						Runnable updateThread = new Runnable() {
@@ -323,15 +322,15 @@ public class LoginActivity extends Activity {
 				String hostIp = tv_ip.getText().toString().trim();
 				String hostPort = tv_port.getText().toString().trim();
 				if (TextUtils.isEmpty(hostIp) || TextUtils.isEmpty(hostPort)) {
-					XUtils.showToast(LoginActivity.this, toast, "ip与端口地址均不可为空！");
+					CommonUtils.showToast(LoginActivity.this, toast, "ip与端口地址均不可为空！");
 				} else {
 					String hostUrl = "http://" + hostIp + ":" + hostPort
 							+ "/SWIMYUE33/httpPost.action?action_flag=";
 					// 保存服务器ip和端口地址到sp
-					XUtils.HOSTURL = hostUrl;
-					XUtils.SaveLoginInfo(LoginActivity.this, hostUrl, hostIp,
+					CommonUtils.HOSTURL = hostUrl;
+					CommonUtils.SaveLoginInfo(LoginActivity.this, hostUrl, hostIp,
 							hostPort);
-					XUtils.showToast(LoginActivity.this, toast, "设置成功!");
+					CommonUtils.showToast(LoginActivity.this, toast, "设置成功!");
 					settingDialog.dismiss();
 				}
 			}
@@ -363,7 +362,7 @@ public class LoginActivity extends Activity {
 						etLogin.setText("defaultUser");
 						etPassword.setText("123456asdjkl");
 						// 保存登录信息
-						XUtils.SaveLoginInfo(LoginActivity.this, "defaultUser",
+						CommonUtils.SaveLoginInfo(LoginActivity.this, "defaultUser",
 								"123456asdjkl");
 						userDialog.dismiss();
 						offlineLogin();
@@ -385,7 +384,7 @@ public class LoginActivity extends Activity {
 	 */
 	private void offlineLogin() {
 		// 连接服务器失败，则会使用离线功能登录，可以保存数据但暂时无法上传,只是功能试用
-		XUtils.showToast(LoginActivity.this, toast, "登陆成功,立即跳转");
+		CommonUtils.showToast(LoginActivity.this, toast, "登陆成功,立即跳转");
 		// 将当前用户id保存为全局变量
 		User user = dbManager.getUserByName("defaultUser");
 		app.getMap().put(Constants.CURRENT_USER_ID, user.getId());
@@ -409,7 +408,7 @@ public class LoginActivity extends Activity {
 	public void testRequest() {
 
 		StringRequest testRequest = new StringRequest(Method.POST,
-				XUtils.HOSTURL + "connectionTest", new Listener<String>() {
+				CommonUtils.HOSTURL + "connectionTest", new Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {

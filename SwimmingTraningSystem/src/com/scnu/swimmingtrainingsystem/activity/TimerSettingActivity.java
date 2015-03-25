@@ -34,7 +34,7 @@ import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.PlanHolder;
 import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.Constants;
-import com.scnu.swimmingtrainingsystem.util.XUtils;
+import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 
 /**
  * 开始计时前设定的Activity，即选择运动员以及其他添加其他信息并开始计时
@@ -213,8 +213,8 @@ public class TimerSettingActivity extends Activity {
 
 		if (chosenAthletes.size() != 0) {
 			// 保存上一次的配置
-			XUtils.saveSelectedPool(this, poolSpinner.getSelectedItemPosition());
-			XUtils.saveDistance(this, distanceEditText.getText().toString());
+			CommonUtils.saveSelectedPool(this, poolSpinner.getSelectedItemPosition());
+			CommonUtils.saveDistance(this, distanceEditText.getText().toString());
 
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String date = sdf.format(new Date());
@@ -239,7 +239,7 @@ public class TimerSettingActivity extends Activity {
 			startActivity(i);
 			finish();
 		} else {
-			XUtils.showToast(this, toast, "请添加运动员后再开始计时！");
+			CommonUtils.showToast(this, toast, "请添加运动员后再开始计时！");
 		}
 
 	}

@@ -1,9 +1,9 @@
 package com.scnu.swimmingtrainingsystem.util;
 
 import java.util.List;
-import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import android.R.integer;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -19,7 +19,7 @@ import com.scnu.swimmingtrainingsystem.R;
  * @author Littleyte
  * 
  */
-public class XUtils {
+public class CommonUtils {
 
 	public static String HOSTURL = "";
 
@@ -176,7 +176,7 @@ public class XUtils {
 			hour += h;
 		}
 		second += millisecond / 1000;
-		millisecond = millisecond % 1000/10;
+		millisecond = millisecond % 1000 / 10;
 		minute += second / 60;
 		second = second % 60;
 		hour += minute / 60;
@@ -219,8 +219,8 @@ public class XUtils {
 		// ∫¡√Î
 		long msec = totalMsec % 1000 / 10;
 
-		return String.format("%1$01d:%2$02d'%3$02d''%4$02d",
-				hour, min, sec, msec);
+		return String.format("%1$01d:%2$02d'%3$02d''%4$02d", hour, min, sec,
+				msec);
 		// %1$01d:%2$02d'%3$ 03d''%4$ 03d
 	}
 
@@ -260,5 +260,19 @@ public class XUtils {
 		}
 		lastClickTime = time;
 		return false;
+	}
+
+	public static boolean isMobileNO(String mobiles) {
+		Pattern p = Pattern
+				.compile("^((13[0-9])|(15[^4,\\D])|(18[0,5-9]))\\d{8}$");
+		Matcher m = p.matcher(mobiles);
+		return m.matches();
+	}
+
+	public static boolean isEmail(String email) {
+		String str = "^([a-zA-Z0-9]*[-_]?[a-zA-Z0-9]+)*@([a-zA-Z0-9]*[-_]?[a-zA-Z0-9]+)+[\\.][A-Za-z]{2,3}([\\.][A-Za-z]{2})?$";
+		Pattern p = Pattern.compile(str);
+		Matcher m = p.matcher(email);
+		return m.matches();
 	}
 }

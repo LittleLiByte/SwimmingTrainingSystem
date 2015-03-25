@@ -5,7 +5,7 @@
     android:background="@drawable/clock_main_bg" >
 
     <RelativeLayout
-        android:id="@+id/plan_headbar"
+        android:id="@+id/timer_headbar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
@@ -48,7 +48,7 @@
         android:id="@+id/clcokview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/plan_headbar" >
+        android:layout_below="@id/timer_headbar" >
 
         <ImageView
             android:id="@+id/duocimin_dial"

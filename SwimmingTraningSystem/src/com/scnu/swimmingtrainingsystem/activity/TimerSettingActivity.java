@@ -3,7 +3,6 @@ package com.scnu.swimmingtrainingsystem.activity;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import android.annotation.SuppressLint;
@@ -11,10 +10,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -22,8 +20,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -51,7 +47,6 @@ public class TimerSettingActivity extends Activity {
 
 	private MyApplication app;
 	private DBManager dbManager;
-	private RelativeLayout headLayout;
 	private EditText distanceEditText;
 	private EditText remarksEditText;
 	/**
@@ -83,7 +78,7 @@ public class TimerSettingActivity extends Activity {
 	private Spinner poolSpinner;
 
 	private Toast toast;
-	private HashMap<Integer, Boolean> map = new HashMap<Integer, Boolean>();
+	private SparseBooleanArray map = new SparseBooleanArray();
 	private Long userid;
 
 	@Override
@@ -107,7 +102,6 @@ public class TimerSettingActivity extends Activity {
 		// TODO Auto-generated method stub
 		app = (MyApplication) getApplication();
 		dbManager = DBManager.getInstance();
-		headLayout = (RelativeLayout) findViewById(R.id.clockset_headbar);
 		chosenListView = (ListView) findViewById(R.id.list_choosed);
 		poolSpinner = (Spinner) findViewById(R.id.pool_length);
 		distanceEditText = (EditText) findViewById(R.id.tv_distance);
@@ -267,20 +261,6 @@ public class TimerSettingActivity extends Activity {
 	public void clcokset_back(View v) {
 		finish();
 		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);
-	}
-
-	@SuppressWarnings("deprecation")
-	public void showConfigCommand(View v) {
-		View view = LayoutInflater.from(this).inflate(
-				R.layout.popupwindow_config_listview, null);
-		PopupWindow mPopWin = new PopupWindow(view,
-				RelativeLayout.LayoutParams.WRAP_CONTENT,
-				RelativeLayout.LayoutParams.WRAP_CONTENT, true);
-		// 这句是为了防止弹出菜单获取焦点之后，点击activity的其他组件没有响应
-		mPopWin.setBackgroundDrawable(new BitmapDrawable());
-		mPopWin.showAsDropDown(headLayout,
-				headLayout.getRight() - mPopWin.getWidth(), 1);
-		mPopWin.update();
 	}
 
 	@Override

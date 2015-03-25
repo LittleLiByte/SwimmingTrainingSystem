@@ -1,10 +1,9 @@
 package com.scnu.swimmingtrainingsystem.adapter;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import android.content.Context;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -23,10 +22,10 @@ import com.scnu.swimmingtrainingsystem.model.PlanHolder;
 public class ChooseAthleteAdapter extends BaseAdapter {
 	private Context context;
 	private List<String> list;
-	private Map<Integer, Boolean> map;
+	private SparseBooleanArray map;
 
 	public ChooseAthleteAdapter(Context context, List<String> list,
-			HashMap<Integer, Boolean> map) {
+			SparseBooleanArray map) {
 		this.context = context;
 		this.list = list;
 		this.map = map;

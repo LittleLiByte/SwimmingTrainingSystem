@@ -31,6 +31,11 @@ public class Score extends DataSupport {
 	 * 创建本次成绩时运动员游泳的距离
 	 */
 	private int distance;
+	
+	/**
+	 * 成绩类型
+	 */
+	private int type;
 
 	/**
 	 * 本次成绩所属的运动员

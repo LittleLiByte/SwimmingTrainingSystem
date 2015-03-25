@@ -22,7 +22,7 @@
             android:textSize="28sp" />
 
         <ImageButton
-            android:id="@+id/regist_back"
+            android:id="@+id/timer_back"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"

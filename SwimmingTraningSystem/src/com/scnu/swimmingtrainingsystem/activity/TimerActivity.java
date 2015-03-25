@@ -210,18 +210,14 @@ public class TimerActivity extends Activity {
 		// TODO Auto-generated method stub
 		okclear = true;
 		// 如果超过60分钟
-		if ((int) (mlCount) / 60000 >= 60) {
-			time.add(athletes - 1, "超出计时范围！");
-		} else {
-			time.add(athletes - 1, tvTime.getText().toString());
-			if (athletes > 1) {
-				// 两个成绩之差
-				String substracion = XUtils.getScoreSubtraction(
-						time.get(athletes - 1), time.get(athletes - 2));
-				timesub.add(substracion);
-			}
-
+		time.add(athletes - 1, tvTime.getText().toString());
+		if (athletes > 1) {
+			// 两个成绩之差
+			String substracion = XUtils.getScoreSubtraction(
+					time.get(athletes - 1), time.get(athletes - 2));
+			timesub.add(substracion);
 		}
+
 		ArrayList<HashMap<String, String>> listItem = new ArrayList<HashMap<String, String>>();
 		for (int i = 1; i <= athletes; i++) {
 			HashMap<String, String> map = new HashMap<String, String>();
@@ -252,7 +248,7 @@ public class TimerActivity extends Activity {
 	/**
 	 * 设置动画
 	 */
-	public void setAnimation() {
+	private void setAnimation() {
 		rotateAnimation = new RotateAnimation(predegree,
 				(float) (0.006 * mlCount), Animation.RELATIVE_TO_SELF, 0.5f,
 				Animation.RELATIVE_TO_SELF, 0.5f);
@@ -292,11 +288,10 @@ public class TimerActivity extends Activity {
 		// 秒
 		long sec = time_count_s - hour * 3600 - min * 60;
 		// 毫秒
-		long msec = mlCount % 1000/10;
+		long msec = mlCount % 1000 / 10;
 
 		return strTime_count = String.format("%1$01d:%2$02d'%3$02d''%4$02d",
 				hour, min, sec, msec);
-		// %1$01d:%2$02d'%3$ 03d''%4$ 03d
 	}
 
 	/**

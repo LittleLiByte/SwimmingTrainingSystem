@@ -217,7 +217,7 @@ public class QueryScoreActivity extends Activity {
 
 				details.setVisibility(View.VISIBLE);
 				details.setText(plan.getPool() + "  共" + maxTime + "趟  "
-						+ "  目标总距离：" + plan.getDistance());
+						+ "  目标总距离：" + plan.getDistance()+"米");
 				details.setOnClickListener(new OnClickListener() {
 
 					@Override

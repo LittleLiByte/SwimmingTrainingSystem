@@ -9,7 +9,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -94,7 +93,7 @@ public class EachTimeScoreFragment extends Fragment {
 		// TODO Auto-generated method stub
 		if (view == null) {
 			view = inflater.inflate(R.layout.fragment_modify_scores, null);
-			String[] autoStrings = new String[] { "25", "55", "75", "100",
+			String[] autoStrings = new String[] { "25", "50", "75", "100",
 					"125", "150", "175", "200", "225", "250", "275", "300" };
 			ArrayAdapter<String> tipsAdapter = new ArrayAdapter<String>(
 					getActivity(), android.R.layout.simple_dropdown_item_1line,

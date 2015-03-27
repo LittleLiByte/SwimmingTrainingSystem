@@ -32,11 +32,6 @@
             android:text="请选择日期进行查询"
             android:textColor="@color/huise"
             android:textSize="18sp" />
-
-        <Spinner
-            android:id="@+id/search_category"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <RadioGroup
@@ -56,7 +51,7 @@
             android:checked="true"
             android:gravity="center"
             android:padding="3dp"
-            android:text="多趟成绩"
+            android:text="本地查询"
             android:textColor="@color/aliceblue"
             android:textSize="17.0sp" />
 
@@ -70,21 +65,7 @@
             android:button="@null"
             android:gravity="center"
             android:padding="3dp"
-            android:text="计频成绩"
-            android:textColor="@color/aliceblue"
-            android:textSize="17.0sp" />
-
-        <RadioButton
-            android:id="@+id/btn_2"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_weight="1"
-            android:background="@drawable/radio"
-            android:button="@null"
-            android:gravity="center"
-            android:padding="3dp"
-            android:text="冲刺成绩"
+            android:text="联网查询"
             android:textColor="@color/aliceblue"
             android:textSize="17.0sp" />
     </RadioGroup>

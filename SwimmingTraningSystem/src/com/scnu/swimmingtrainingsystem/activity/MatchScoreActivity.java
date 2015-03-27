@@ -141,7 +141,7 @@ public class MatchScoreActivity extends Activity {
 		Long planId = (Long) app.getMap().get(Constants.PLAN_ID);
 		plan = DataSupport.find(Plan.class, planId);
 		// 设置数据源
-		String[] autoStrings = new String[] { "25", "55", "75", "100", "125",
+		String[] autoStrings = new String[] { "25", "50", "75", "100", "125",
 				"150", "175", "200", "225", "250", "275", "300" };
 		acTextView = (AutoCompleteTextView) findViewById(R.id.match_act_current_distance);
 		ArrayAdapter<String> tipsAdapter = new ArrayAdapter<String>(this,

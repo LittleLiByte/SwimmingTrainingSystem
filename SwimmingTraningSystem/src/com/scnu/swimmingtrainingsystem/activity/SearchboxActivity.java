@@ -19,11 +19,9 @@ import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -61,7 +59,6 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 	private RequestQueue mQueue;
 
 	private RadioGroup radioGroup;
-	private Spinner spinner;
 	private XListView mListView;
 	private LoadingDialog mLoadingDialog;
 	private Toast mToast;
@@ -71,12 +68,9 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 	private boolean isConnected;
 	// 默认本地搜索
 	private boolean searchType = false;
-	private int scoreType = 0;
 	private int resultCode = 0x11;
-	private int offset = 0;
-	private int offset2 = 0;
-	private int offset3 = 0;
 	private List<String> dateList = new ArrayList<String>();
+	private int offset;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +98,6 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 		isConnected = (Boolean) myApplication.getMap().get(
 				Constants.IS_CONNECT_SERVER);
 
-		spinner = (Spinner) findViewById(R.id.search_category);
 		radioGroup = (RadioGroup) findViewById(R.id.radiogroup1);
 		mListView = (XListView) findViewById(R.id.search_date_list);
 		mAdapter = new ArrayAdapter<String>(this, R.layout.xlist_item, dateList);
@@ -112,51 +105,6 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 		mListView.setPullRefreshEnable(false);
 		mListView.setPullLoadEnable(true);
 		mListView.setXListViewListener(this);
-
-		List<String> searchWay = new ArrayList<String>();
-		searchWay.add("本地搜索");
-		searchWay.add("联网搜索");
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_list_item_1, searchWay);
-		spinner.setAdapter(adapter);
-		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view,
-					int position, long id) {
-				// TODO Auto-generated method stub
-				if (position == 1) {
-					// 选择联网搜索
-					searchType = true;
-					if (isConnected) {
-						dateList.clear();
-						radioGroup.check(R.id.btn_0);
-						offset = 0;
-						offset2 = 0;
-						offset3 = 0;
-						onLoad(1, offset);
-					} else {
-						CommonUtils.showToast(SearchboxActivity.this, mToast,
-								"没有连接服务器！");
-					}
-				} else {
-					dateList.clear();
-					radioGroup.check(R.id.btn_0);
-					searchType = false;
-					offset = 0;
-					offset2 = 0;
-					offset3 = 0;
-					onLoad(1, offset);
-				}
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-				// TODO Auto-generated method stub
-
-			}
-		});
-
 		radioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
@@ -174,8 +122,6 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 				// TODO Auto-generated method stub
 				Intent data = new Intent();
 				data.putExtra("date", dateList.get(position - 1));
-				System.out.println("dateList.get(position - 1)"
-						+ dateList.get(position - 1));
 				if (searchType) {
 					resultCode = 1;
 				} else {
@@ -186,6 +132,7 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 			}
 		});
 
+		new QueryDatesTask().execute(offset);
 	}
 
 	/**
@@ -197,43 +144,19 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 		// TODO Auto-generated method stub
 		dateList.clear();
 		mAdapter.notifyDataSetChanged();
-		if (searchType) {
-			// 联网搜索
-			switch (checkedId) {
-			case R.id.btn_0:
-				scoreType = 1;
-				onLoad(scoreType, offset);
-				break;
-			case R.id.btn_1:
-				scoreType = 2;
-				onLoad(scoreType, offset2);
-				break;
-			case R.id.btn_2:
-				scoreType = 3;
-				onLoad(scoreType, offset3);
-				break;
-			default:
-				break;
-			}
-		} else {
-			// 本地搜索
-			switch (checkedId) {
-			case R.id.btn_0:
-				scoreType = 1;
-				onLoad(scoreType, offset);
-				break;
-			case R.id.btn_1:
-				scoreType = 2;
-				onLoad(scoreType, offset2);
-				break;
-			case R.id.btn_2:
-				scoreType = 3;
-				onLoad(scoreType, offset3);
-				break;
-			default:
-				break;
-			}
+		switch (checkedId) {
+		case R.id.btn_0:
+			searchType = false;
+			offset = 0;
+			break;
+		case R.id.btn_1:
+			searchType = true;
+			offset = 0;
+			break;
+		default:
+			break;
 		}
+		onLoad(offset);
 	}
 
 	public void back(View v) {
@@ -253,7 +176,7 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 		protected List<String> doInBackground(Integer... params) {
 			// TODO Auto-generated method stub
 			List<String> list = new ArrayList<String>();
-			list = mDbManager.getScoresByUserId(userid, params[0], params[1]);
+			list = mDbManager.getScoresByUserId(userid, 1, params[0]);
 			return list;
 		}
 
@@ -282,25 +205,22 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 	@Override
 	public void onLoadMore() {
 		// TODO Auto-generated method stub
-		if (scoreType == 0) {
-			offset += 20;
-			onLoad(scoreType, offset);
-		} else if (scoreType == 1) {
-			offset2 += 20;
-			onLoad(scoreType, offset2);
-		} else {
-			offset3 += 20;
-			onLoad(scoreType, offset3);
-		}
-
+		offset += 20;
+		onLoad(offset);
 	}
 
-	private void onLoad(int scoreType, int off) {
+	private void onLoad(int off) {
 		// TODO Auto-generated method stub
 		if (searchType) {
-			getScoreDateListReqeust(scoreType, off);
+			if (isConnected) {
+				getScoreDateListReqeust(off);
+			} else {
+				CommonUtils.showToast(SearchboxActivity.this, mToast,
+						"没有连接服务器！");
+				mListView.stopLoadMore();
+			}
 		} else {
-			new QueryDatesTask().execute(scoreType, off);
+			new QueryDatesTask().execute(off);
 		}
 
 	}
@@ -311,7 +231,7 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 	 * @param curPage
 	 *            当前页
 	 */
-	protected void getScoreDateListReqeust(int type, int curPage) {
+	protected void getScoreDateListReqeust(int curPage) {
 		if (mLoadingDialog == null) {
 			mLoadingDialog = LoadingDialog.createDialog(SearchboxActivity.this);
 			mLoadingDialog.setMessage("正在努力查询...");
@@ -322,7 +242,6 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 		Map<String, Object> jsonMap = new HashMap<String, Object>();
 		jsonMap.put("curPage", curPage);
 		jsonMap.put("uid", user.getUid());
-		jsonMap.put("type", type);
 		final String jsonString = JsonTools.creatJsonString(jsonMap);
 
 		StringRequest getScoreDateList = new StringRequest(Method.POST,
@@ -396,7 +315,7 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(getScoreDateList);
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {

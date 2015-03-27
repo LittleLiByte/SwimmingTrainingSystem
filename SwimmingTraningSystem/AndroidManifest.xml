@@ -16,7 +16,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppThemeLight" >
+        android:theme="@style/AppBaseTheme" >
         <activity
             android:name="com.scnu.swimmingtrainingsystem.activity.WlecomeActivity"
             android:label="@string/app_name"
@@ -64,7 +64,7 @@
         <activity
             android:name="com.scnu.swimmingtrainingsystem.activity.QueryScoreActivity"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >
+            android:theme="@android:style/Theme.Light.NoTitleBar" >
         </activity>
         <activity
             android:name="com.scnu.swimmingtrainingsystem.activity.SettingActivity"
@@ -89,6 +89,14 @@
         </activity>
         <activity
             android:name="com.scnu.swimmingtrainingsystem.activity.EachTimeScoreActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.SearchboxActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.RetrievePasswordActivity"
             android:screenOrientation="portrait" >
         </activity>
     </application>

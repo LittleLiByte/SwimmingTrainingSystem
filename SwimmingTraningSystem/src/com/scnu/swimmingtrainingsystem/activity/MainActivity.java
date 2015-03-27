@@ -144,6 +144,6 @@ public class MainActivity extends Activity {
 		app.getMap().put(Constants.TEST_DATE, "");
 		app.getMap().put(Constants.DRAG_NAME_LIST, null);
 		app.getMap().put(Constants.CURRENT_USER_ID, "");
-		app.getMap().put(Constants.IS_CONNECT_SERVICE, true);
+		app.getMap().put(Constants.IS_CONNECT_SERVER, true);
 	}
 }

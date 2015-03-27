@@ -102,7 +102,7 @@ public class OtherFunctionActivity extends Activity implements OnClickListener {
 	private Long userID;
 	private Toast mToast;
 	private LoadingDialog loadingDialog;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -332,19 +332,21 @@ public class OtherFunctionActivity extends Activity implements OnClickListener {
 		// TODO Auto-generated method stub
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String date = sdf.format(new Date());
-		Athlete athlete=athletes.get(athleteSpinner.getSelectedItemPosition());
-		Score s=new Score();
+		Athlete athlete = athletes
+				.get(athleteSpinner.getSelectedItemPosition());
+		Score s = new Score();
 		s.setScore(tvTime.getText().toString());
 		s.setDate(date);
 		s.setDistance(0);
 		s.setTimes(1);
-		s.setType(fuctionSpinner.getSelectedItemPosition()+2);
+		s.setType(fuctionSpinner.getSelectedItemPosition() + 2);
 		s.setAthlete(athlete);
+		s.setUser(mDbManager.getUser(userID));
 		s.save();
 		boolean isConnect = (Boolean) app.getMap().get(
-				Constants.IS_CONNECT_SERVICE);
+				Constants.IS_CONNECT_SERVER);
 		if (isConnect) {
-			int aid=athlete.getAid();
+			int aid = athlete.getAid();
 			if (loadingDialog == null) {
 				loadingDialog = LoadingDialog.createDialog(this);
 				loadingDialog.setMessage("正在提交到服务器...");
@@ -356,11 +358,11 @@ public class OtherFunctionActivity extends Activity implements OnClickListener {
 	}
 
 	private void addScoreRequest(final int aid) {
-		List<Score> scoresResult=new ArrayList<Score>();
+		List<Score> scoresResult = new ArrayList<Score>();
 		scoresResult.add(DataSupport.findLast(Score.class));
 		User user = mDbManager.getUser(userID);
 		Map<String, Object> scoreMap = new HashMap<String, Object>();
-		scoreMap.put("score",scoresResult);
+		scoreMap.put("score", scoresResult);
 		scoreMap.put("plan", null);
 		scoreMap.put("uid", user.getUid());
 		scoreMap.put("athlete_id", aid);

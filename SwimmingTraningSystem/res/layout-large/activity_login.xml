@@ -67,7 +67,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/tv_password"
         android:layout_marginBottom="20dp"
-        android:onClick="onForget"
         android:text="忘记密码？"
         android:textColor="#7D7D7D"
         android:textSize="22sp" />
@@ -79,7 +78,6 @@
         android:layout_alignBaseline="@+id/forget_password"
         android:layout_alignBottom="@+id/forget_password"
         android:layout_alignLeft="@+id/tv_password"
-        android:onClick="onForget"
         android:text="设置服务器地址和端口"
         android:textColor="#7D7D7D"
         android:textSize="22sp" />

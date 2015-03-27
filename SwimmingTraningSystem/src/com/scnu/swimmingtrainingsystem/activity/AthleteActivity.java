@@ -125,7 +125,7 @@ public class AthleteActivity extends Activity {
 		mQueue = Volley.newRequestQueue(this);
 		// 根据是否能够连接服务器来操作，如果能够连接服务器，则使用服务返回的数据，否则将数据保存到本地使用
 		isConnect = (Boolean) mApplication.getMap().get(
-				Constants.IS_CONNECT_SERVICE);
+				Constants.IS_CONNECT_SERVER);
 		SharedPreferences sp = getSharedPreferences(Constants.LOGININFO,
 				Context.MODE_PRIVATE);
 		boolean isFirst = sp.getBoolean(Constants.FISRTOPENATHLETE, true);

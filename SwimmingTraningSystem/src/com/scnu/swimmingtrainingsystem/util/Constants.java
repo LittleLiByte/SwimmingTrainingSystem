@@ -10,7 +10,7 @@ public class Constants {
 	/**
 	 * 超时时间设置
 	 */
-	public static final int SOCKET_TIMEOUT = 100;
+	public static final int SOCKET_TIMEOUT = 1500;
 	
 	/**
 	 * 成绩类型 1:普通成绩
@@ -58,7 +58,7 @@ public class Constants {
 	/**
 	 * 保存当前是否可以连接服务器的状态
 	 */
-	public static final String IS_CONNECT_SERVICE = "isConnect";
+	public static final String IS_CONNECT_SERVER = "isConnect";
 
 	/**
 	 * 上次登陆的user_id

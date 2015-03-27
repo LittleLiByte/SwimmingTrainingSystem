@@ -220,7 +220,7 @@ public class AthleteListAdapter extends BaseAdapter {
 			CommonUtils.showToast(context, toast, "修改成功");
 			// 如果处在联网状态，则发送至服务器
 			boolean isConnect = (Boolean) app.getMap().get(
-					Constants.IS_CONNECT_SERVICE);
+					Constants.IS_CONNECT_SERVER);
 			if (isConnect) {
 				// 同步服务器
 				modifyAthRequest(athletes, position);
@@ -274,7 +274,7 @@ public class AthleteListAdapter extends BaseAdapter {
 							if (result != 0) {
 								// 如果处在联网状态，则发送至服务器
 								boolean isConnect = (Boolean) app.getMap().get(
-										Constants.IS_CONNECT_SERVICE);
+										Constants.IS_CONNECT_SERVER);
 								if (isConnect) {
 									// 同步服务器
 									deleteAthRequest(athletes.get(position));

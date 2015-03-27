@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.KeyEvent;
 import android.view.View;
@@ -31,7 +32,7 @@ import com.scnu.swimmingtrainingsystem.effect.Effectstype;
 import com.scnu.swimmingtrainingsystem.effect.NiftyDialogBuilder;
 import com.scnu.swimmingtrainingsystem.model.Athlete;
 import com.scnu.swimmingtrainingsystem.model.Plan;
-import com.scnu.swimmingtrainingsystem.model.PlanHolder;
+import com.scnu.swimmingtrainingsystem.model.AdapterHolder;
 import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.CommonUtils;
@@ -158,7 +159,7 @@ public class TimerSettingActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				PlanHolder holder = (PlanHolder) arg1.getTag();
+				AdapterHolder holder = (AdapterHolder) arg1.getTag();
 				// 改变CheckBox的状态
 				holder.cb.toggle();
 				if (holder.cb.isChecked()) {
@@ -213,8 +214,10 @@ public class TimerSettingActivity extends Activity {
 
 		if (chosenAthletes.size() != 0) {
 			// 保存上一次的配置
-			CommonUtils.saveSelectedPool(this, poolSpinner.getSelectedItemPosition());
-			CommonUtils.saveDistance(this, distanceEditText.getText().toString());
+			CommonUtils.saveSelectedPool(this,
+					poolSpinner.getSelectedItemPosition());
+			CommonUtils.saveDistance(this, distanceEditText.getText()
+					.toString());
 
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String date = sdf.format(new Date());
@@ -233,6 +236,9 @@ public class TimerSettingActivity extends Activity {
 			String poolString = (String) poolSpinner.getSelectedItem();
 			String distance = distanceEditText.getText().toString().trim();
 			String extra = remarksEditText.getText().toString();
+			if (TextUtils.isEmpty(distance)) {
+				distance = "0";
+			}
 			// 将配置保存到数据库计划表中
 			savePlan(poolString, distance, extra, chosenPersons);
 			Intent i = new Intent(this, TimerActivity.class);
@@ -250,7 +256,7 @@ public class TimerSettingActivity extends Activity {
 		User user = dbManager.getUser(userid);
 		Plan plan = new Plan();
 		plan.setPool(pool);
-		plan.setDistance(distance);
+		plan.setDistance(Integer.parseInt(distance));
 		plan.setExtra(extra);
 		plan.setUser(user);
 		plan.setAthlete(athlete);

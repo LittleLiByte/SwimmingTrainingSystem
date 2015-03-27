@@ -97,7 +97,7 @@ public class RegistAcyivity extends Activity {
 			}else {
 				// 如果处在联网状态，则发送至服务器
 				boolean isConnect = (Boolean) app.getMap().get(
-						Constants.IS_CONNECT_SERVICE);
+						Constants.IS_CONNECT_SERVER);
 				if (isConnect) {
 					User newUser = new User();
 					newUser.setUsername(user);

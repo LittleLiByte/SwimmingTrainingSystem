@@ -10,7 +10,7 @@
     <LinearLayout
         android:id="@+id/scroe_headbar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
         android:background="#3D8BFF"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -24,46 +24,30 @@
             android:onClick="back"
             android:src="@drawable/btn_back" />
 
-        <LinearLayout
-            android:id="@+id/total_category"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/text_category"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_weight="1.0"
             android:background="@drawable/bg_query_score_pressed"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
-
-            <TextView
-                android:id="@+id/text_category"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.0"
-                android:padding="5dp"
-                android:text="请选择日期进行查询"
-                android:textColor="@color/huise"
-                android:textSize="18sp" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|right"
-                android:background="@drawable/selector_arrow_dropdown" />
-        </LinearLayout>
+            android:padding="7dp"
+            android:text="请选择日期进行查询"
+            android:textColor="@color/huise"
+            android:textSize="18sp" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/show_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/aliceblue"
+        android:background="@color/color_train"
         android:paddingBottom="5dp"
         android:paddingLeft="15dp"
         android:paddingTop="5dp"
         android:singleLine="true"
         android:text="时间---计划详细"
-        android:textColor="@color/white"
+        android:textColor="@color/aliceblue"
         android:textSize="18sp"
         android:visibility="gone" />
 

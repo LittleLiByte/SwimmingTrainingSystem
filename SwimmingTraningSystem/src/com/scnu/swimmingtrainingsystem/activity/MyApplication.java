@@ -35,7 +35,7 @@ public class MyApplication extends LitePalApplication {
 		// 保存当前登录的用户id
 		mMap.put(Constants.CURRENT_USER_ID, "");
 		// 保存打开登录页面时检查是否可以连接服务器的状态
-		mMap.put(Constants.IS_CONNECT_SERVICE, true);
+		mMap.put(Constants.IS_CONNECT_SERVER, true);
 		//保存匹配完成的成绩（趟数）
 		mMap.put(Constants.COMPLETE_NUMBER, 0);
 	}

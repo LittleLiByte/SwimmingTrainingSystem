@@ -11,7 +11,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.scnu.swimmingtrainingsystem.R;
-import com.scnu.swimmingtrainingsystem.model.PlanHolder;
+import com.scnu.swimmingtrainingsystem.model.AdapterHolder;
 
 /**
  * 选择运动员数据适配器
@@ -52,16 +52,16 @@ public class ChooseAthleteAdapter extends BaseAdapter {
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
 		// TODO Auto-generated method stub
-		PlanHolder holder = null;
+		AdapterHolder holder = null;
 		if (convertView == null) {
-			holder = new PlanHolder();
+			holder = new AdapterHolder();
 			convertView = View
 					.inflate(context, R.layout.choose_list_item, null);
 			holder.tv = (TextView) convertView.findViewById(R.id.ath_name);
 			holder.cb = (CheckBox) convertView.findViewById(R.id.tick);
 			convertView.setTag(holder);
 		} else {
-			holder = (PlanHolder) convertView.getTag();
+			holder = (AdapterHolder) convertView.getTag();
 		}
 
 		holder.tv.setText(list.get(position));

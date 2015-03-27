@@ -3,7 +3,7 @@
     android:id="@+id/item1"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#3D3D3D"
+    android:background="@color/orange"
     android:paddingBottom="6dp"
     android:paddingLeft="5dp"
     android:paddingTop="6dp" >
@@ -13,8 +13,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:text="2014-12-31"
-        android:textColor="@color/white"
+        android:text="第一趟"
+        android:textColor="@color/brown"
         android:textSize="18sp" />
 
     <TextView
@@ -24,7 +24,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="20dp"
-        android:textColor="@color/white"
-        android:textSize="15sp" />
+        android:textColor="@color/black"
+        android:textSize="18sp" />
 
 </RelativeLayout>

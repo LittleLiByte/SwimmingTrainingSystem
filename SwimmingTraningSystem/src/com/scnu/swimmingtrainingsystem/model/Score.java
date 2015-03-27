@@ -31,7 +31,7 @@ public class Score extends DataSupport {
 	 * 创建本次成绩时运动员游泳的距离
 	 */
 	private int distance;
-	
+
 	/**
 	 * 成绩类型
 	 */
@@ -45,58 +45,86 @@ public class Score extends DataSupport {
 	 * 本次成绩对应的计划
 	 */
 	private Plan p;
+
+	private User user;
+
 	public long getId() {
 		return id;
 	}
+
 	public void setId(long id) {
 		this.id = id;
 	}
+
 	public int getTimes() {
 		return times;
 	}
+
 	public void setTimes(int times) {
 		this.times = times;
 	}
+
 	public String getScore() {
 		return score;
 	}
+
 	public void setScore(String score) {
 		this.score = score;
 	}
+
 	public String getDate() {
 		return date;
 	}
+
 	public void setDate(String date) {
 		this.date = date;
 	}
+
 	public int getDistance() {
 		return distance;
 	}
+
 	public void setDistance(int distance) {
 		this.distance = distance;
 	}
+
 	public int getType() {
 		return type;
 	}
+
 	public void setType(int type) {
 		this.type = type;
 	}
+
 	public Athlete getAthlete() {
 		return athlete;
 	}
+
 	public void setAthlete(Athlete athlete) {
 		this.athlete = athlete;
 	}
+
 	public Plan getP() {
 		return p;
 	}
+
 	public void setP(Plan p) {
 		this.p = p;
 	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	@Override
 	public String toString() {
 		return "Score [id=" + id + ", times=" + times + ", score=" + score
 				+ ", date=" + date + ", distance=" + distance + ", type="
-				+ type + ", athlete=" + athlete + ", p=" + p + "]";
+				+ type + "]";
 	}
+
 }

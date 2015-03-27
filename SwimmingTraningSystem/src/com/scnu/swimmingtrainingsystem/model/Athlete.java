@@ -132,8 +132,7 @@ public class Athlete extends DataSupport {
 	public String toString() {
 		return "Athlete [id=" + id + ", aid=" + aid + ", name=" + name
 				+ ", age=" + age + ", gender=" + gender + ", phone=" + phone
-				+ ", extras=" + extras + ", user=" + user.getUid() + ", plans="
-				+ plans + ", scores=" + scores + "]";
+				+ ", extras=" + extras + "]";
 	}
 
 }

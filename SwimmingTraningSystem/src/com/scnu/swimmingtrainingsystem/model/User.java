@@ -33,9 +33,10 @@ public class User extends DataSupport {
 	 * 用户手机
 	 */
 	private String phone;
-	
+
 	private List<Athlete> athletes = new ArrayList<Athlete>();
 	private List<Plan> plans = new ArrayList<Plan>();
+	private List<Score> scores = new ArrayList<Score>();
 
 	public long getId() {
 		return id;
@@ -101,11 +102,19 @@ public class User extends DataSupport {
 		this.plans = plans;
 	}
 
+	public List<Score> getScores() {
+		return scores;
+	}
+
+	public void setScores(List<Score> scores) {
+		this.scores = scores;
+	}
+
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", uid=" + uid + ", username=" + username
 				+ ", password=" + password + ", Email=" + Email + ", phone="
-				+ phone + ", athletes=" + athletes + ", plans=" + plans + "]";
+				+ phone + ", athletes=" + athletes + ", plans=" + plans
+				+ ", scores=" + scores + "]";
 	}
-
 }

@@ -8,11 +8,12 @@ import java.util.List;
 import org.litepal.crud.DataSupport;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 
 import com.scnu.swimmingtrainingsystem.model.Athlete;
 import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.Score;
-import com.scnu.swimmingtrainingsystem.model.Temp;
+import com.scnu.swimmingtrainingsystem.model.ScoreSum;
 import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 
@@ -281,7 +282,6 @@ public class DBManager {
 		return plan;
 	}
 
-
 	/**
 	 * 通过计划名字获取计划对象
 	 * 
@@ -328,7 +328,9 @@ public class DBManager {
 	 * @return
 	 */
 	public List<Score> getScoreByDate(String date) {
-		List<Score> list = DataSupport.where("date=?", date).find(Score.class);
+		List<Score> list = DataSupport
+				.select("score", "distance", "type", "date", "times")
+				.where("date=?", date).find(Score.class);
 		return list;
 	}
 
@@ -387,21 +389,6 @@ public class DBManager {
 	}
 
 	/**
-	 * 通过日期获取关联成绩的计划，然后获取其趟数
-	 * 
-	 * @param date
-	 * @return
-	 */
-	public Plan getPlanInScoreByDate(String date) {
-		List<Score> scores = DataSupport.where("date=?", date).find(
-				Score.class, true);
-		if (scores.size() != 0) {
-			return scores.get(0).getP();
-		}
-		return null;
-	}
-
-	/**
 	 * 通过查找成绩表中的日期获得对应计划id
 	 * 
 	 * @param date
@@ -450,11 +437,10 @@ public class DBManager {
 	 *            日期
 	 * @return
 	 */
-	public List<Temp> getAthleteIdInScoreByDate(String date, List<Long> list) {
-		List<Temp> temps = new ArrayList<Temp>();
-		List<Score> scores = new ArrayList<Score>();
+	public List<ScoreSum> getAthleteIdInScoreByDate(String date, List<Long> list) {
+		List<ScoreSum> temps = new ArrayList<ScoreSum>();
 		for (long id : list) {
-			scores = DataSupport.select("score", "athlete_id")
+			List<Score> scores = DataSupport.select("score", "athlete_id")
 					.where("date=? and athlete_id=?", date, String.valueOf(id))
 					.find(Score.class, true);
 
@@ -462,8 +448,7 @@ public class DBManager {
 			for (Score s : scores) {
 				sum.add(s.getScore());
 			}
-
-			Temp p = new Temp();
+			ScoreSum p = new ScoreSum();
 			p.setAthleteName(DataSupport.find(Athlete.class, id).getName());
 			p.setScore(CommonUtils.scoreSum(sum));
 			temps.add(p);
@@ -473,25 +458,46 @@ public class DBManager {
 	}
 
 	/**
-	 * 通过运动员ID查找对应成绩
+	 * 获取属于该用户指定类型的成绩日期
 	 * 
-	 * @param athIDs
+	 * @param userId
+	 * @param type
+	 * @param offset
 	 * @return
 	 */
-	public List<String> getScoresByAthleteId(List<Long> athIDs) {
+	public List<String> getScoresByUserId(long userId, int type, int offset) {
+		String userString = String.valueOf(userId);
+		String typeString = String.valueOf(type);
 		List<String> dates = new ArrayList<String>();
-		List<Score> scores = new ArrayList<Score>();
-		for (long athId : athIDs) {
-			scores.addAll(DataSupport.where("athlete_id=?",
-					String.valueOf(athId)).find(Score.class, true));
+		String sql = "select distinct date from score where user_id='"
+				+ userString + "' and type='" + typeString
+				+ "' order by date desc limit " + offset + ",20";
+		Cursor cursor = DataSupport.findBySQL(sql);
+		while (cursor.moveToNext()) {
+			String date = cursor.getString(cursor.getColumnIndex("date"));
+			dates.add(date);
 		}
-		for (Score s : scores) {
-			if (!dates.contains(s.getDate()))
-				dates.add(s.getDate());
-		}
-		Collections.sort(dates, new DateComparable());
-		return dates;
 
+		return dates;
+	}
+
+	/**
+	 * 获取指定日期该轮的所有运动员id
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public List<Long> getAthleteIdInScoreByDate(String date) {
+		List<Long> athleteIds = new ArrayList<Long>();
+		String sql = "select distinct athlete_id from score where date='"
+				+ date + "'";
+		Cursor cursor = DataSupport.findBySQL(sql);
+		while (cursor.moveToNext()) {
+			long athlete_id = cursor.getLong(cursor
+					.getColumnIndex("athlete_id"));
+			athleteIds.add(athlete_id);
+		}
+		return athleteIds;
 	}
 
 	/**
@@ -500,13 +506,13 @@ public class DBManager {
 	 * @author LittleByte
 	 * 
 	 */
-	class ScoreComparable implements Comparator<Temp> {
+	class ScoreComparable implements Comparator<ScoreSum> {
 
 		@Override
-		public int compare(Temp lhs, Temp rhs) {
+		public int compare(ScoreSum lhs, ScoreSum rhs) {
 			// TODO Auto-generated method stub
-			Temp temp1 = lhs;
-			Temp temp2 = rhs;
+			ScoreSum temp1 = lhs;
+			ScoreSum temp2 = rhs;
 			int num = temp1.getScore().compareTo(temp2.getScore());
 			if (num == 0)
 				return temp1.getAthleteName().compareTo(temp2.getAthleteName());

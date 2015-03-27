@@ -21,7 +21,7 @@ import com.scnu.swimmingtrainingsystem.R;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
 import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.Score;
-import com.scnu.swimmingtrainingsystem.model.Temp;
+import com.scnu.swimmingtrainingsystem.model.ScoreSum;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 
@@ -41,7 +41,7 @@ public class ShowScoreActivity extends Activity {
 	private ShowScoreListAdapter adapter;
 	private String date;
 	private Integer times = 0;
-	private List<Temp> mScoreSum = new ArrayList<Temp>();
+	private List<ScoreSum> mScoreSum = new ArrayList<ScoreSum>();
 	private List<List<Score>> list = new ArrayList<List<Score>>();
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +111,7 @@ public class ShowScoreActivity extends Activity {
 			TempClass tempScore = new TempClass();
 			List<Long> athIds = mDbManager
 					.getAthleteNumberInScoreByDate(params[0]);
-			List<Temp> totalScores = mDbManager.getAthleteIdInScoreByDate(date,
+			List<ScoreSum> totalScores = mDbManager.getAthleteIdInScoreByDate(date,
 					athIds);
 			List<List<Score>> lists = new ArrayList<List<Score>>();
 			for (int i = 1; i < times; i++) {
@@ -140,7 +140,7 @@ public class ShowScoreActivity extends Activity {
 
 	class TempClass {
 		private List<List<Score>> scoresList = new ArrayList<List<Score>>();
-		List<Temp> temps = new ArrayList<Temp>();
+		List<ScoreSum> temps = new ArrayList<ScoreSum>();
 
 		public List<List<Score>> getScoresList() {
 			return scoresList;
@@ -150,11 +150,11 @@ public class ShowScoreActivity extends Activity {
 			this.scoresList = scoresList;
 		}
 
-		public List<Temp> getTemps() {
+		public List<ScoreSum> getTemps() {
 			return temps;
 		}
 
-		public void setTemps(List<Temp> temps) {
+		public void setTemps(List<ScoreSum> temps) {
 			this.temps = temps;
 		}
 
@@ -163,11 +163,11 @@ public class ShowScoreActivity extends Activity {
 	class ShowScoreListAdapter extends BaseExpandableListAdapter {
 		private Context mContext;
 		private List<List<Score>> mLists = new ArrayList<List<Score>>();
-		private List<Temp> mTemps = new ArrayList<Temp>();
+		private List<ScoreSum> mTemps = new ArrayList<ScoreSum>();
 		private int mSwimTime = 0;
 
 		public ShowScoreListAdapter(Context mContext,
-				List<List<Score>> scoresList, List<Temp> mTemps, int mSwimTime) {
+				List<List<Score>> scoresList, List<ScoreSum> mTemps, int mSwimTime) {
 			this.mContext = mContext;
 			this.mLists = scoresList;
 			this.mTemps = mTemps;
@@ -264,7 +264,7 @@ public class ShowScoreActivity extends Activity {
 			return false;
 		}
 
-		public void setDatas(List<List<Score>> mLists, List<Temp> mTemps,
+		public void setDatas(List<List<Score>> mLists, List<ScoreSum> mTemps,
 				int mSwimTime) {
 			this.mLists.clear();
 			this.mTemps.clear();

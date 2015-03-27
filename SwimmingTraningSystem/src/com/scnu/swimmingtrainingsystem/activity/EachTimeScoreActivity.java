@@ -38,6 +38,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.scnu.swimmingtrainingsystem.R;
 import com.scnu.swimmingtrainingsystem.adapter.ViewPargerAdpt;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
@@ -46,10 +47,12 @@ import com.scnu.swimmingtrainingsystem.http.JsonTools;
 import com.scnu.swimmingtrainingsystem.model.Athlete;
 import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.Score;
+import com.scnu.swimmingtrainingsystem.model.SmallPlan;
+import com.scnu.swimmingtrainingsystem.model.SmallScore;
 import com.scnu.swimmingtrainingsystem.model.User;
+import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.ScreenUtils;
-import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 
 public class EachTimeScoreActivity extends FragmentActivity {
@@ -87,7 +90,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 	private void init() {
 		myApplication = (MyApplication) getApplication();
 		mDbManager = DBManager.getInstance();
-		// mQueue = Volley.newRequestQueue(getApplicationContext());
+		mQueue = Volley.newRequestQueue(this);
 		date = (String) myApplication.getMap().get(Constants.TEST_DATE);
 		userID = (Long) myApplication.getMap().get(Constants.CURRENT_USER_ID);
 		Long planId = (Long) myApplication.getMap().get(Constants.PLAN_ID);
@@ -254,7 +257,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 				CommonUtils.showToast(this, mToast, "匹配完成！");
 
 				boolean isConnect = (Boolean) myApplication.getMap().get(
-						Constants.IS_CONNECT_SERVICE);
+						Constants.IS_CONNECT_SERVER);
 				if (isConnect) {
 					// 如果可以联通服务器则发送添加成绩请求
 					if (loadingDialog == null) {
@@ -283,6 +286,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 	 */
 	@SuppressWarnings("unchecked")
 	private void saveScore(int i, Map<String, Object> result) {
+		User user = mDbManager.getUser(userID);
 		String curDistance = (String) result.get("distance");
 		int distance = Integer.parseInt(curDistance);
 		List<String> scoresList = (List<String>) result.get("scores");
@@ -299,6 +303,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 			Athlete athlete = mDbManager.getAthleteByName(userID,
 					namesList.get(l));
 			score.setAthlete(athlete);
+			score.setUser(user);
 			score.save();
 		}
 	}
@@ -310,12 +315,28 @@ public class EachTimeScoreActivity extends FragmentActivity {
 	 *            本轮所有成绩的json字符串
 	 */
 	private void addScoreRequest() {
+
+		SmallPlan sp = new SmallPlan();
+		sp.setDistance(plan.getDistance());
+		sp.setPool(plan.getPool());
+		sp.setExtra(plan.getExtra());
+
+		List<SmallScore> smallScores = new ArrayList<SmallScore>();
 		List<Score> scoresResult = mDbManager.getScoreByDate(date);
+		for (Score s : scoresResult) {
+			SmallScore smScore = new SmallScore();
+			smScore.setScore(s.getScore());
+			smScore.setDate(s.getDate());
+			smScore.setDistance(s.getDistance());
+			smScore.setType(s.getType());
+			smScore.setTimes(s.getTimes());
+			smallScores.add(smScore);
+		}
 		List<Integer> aidList = mDbManager.getAthlteAidInScoreByDate(date);
 		User user = mDbManager.getUser(userID);
 		Map<String, Object> scoreMap = new HashMap<String, Object>();
-		scoreMap.put("score", scoresResult);
-		scoreMap.put("plan", plan);
+		scoreMap.put("score", smallScores);
+		scoreMap.put("plan", sp);
 		scoreMap.put("uid", user.getUid());
 		scoreMap.put("athlete_id", aidList);
 		final String jsonString = JsonTools.creatJsonString(scoreMap);
@@ -332,11 +353,13 @@ public class EachTimeScoreActivity extends FragmentActivity {
 							obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
 							if (resCode == 1) {
-								CommonUtils.showToast(EachTimeScoreActivity.this,
-										mToast, "成功同步至服务器!");
+								CommonUtils.showToast(
+										EachTimeScoreActivity.this, mToast,
+										"成功同步至服务器!");
 							} else {
-								CommonUtils.showToast(EachTimeScoreActivity.this,
-										mToast, "同步失敗！");
+								CommonUtils.showToast(
+										EachTimeScoreActivity.this, mToast,
+										"同步失敗！");
 							}
 
 						} catch (JSONException e) {
@@ -370,6 +393,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(stringRequest);
+
 	}
 
 	@Override

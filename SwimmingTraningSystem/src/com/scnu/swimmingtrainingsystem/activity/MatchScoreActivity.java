@@ -1,8 +1,12 @@
 package com.scnu.swimmingtrainingsystem.activity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
 import android.app.Activity;
@@ -12,6 +16,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -22,6 +27,15 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.Request.Method;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.mobeta.android.dslv.DragSortListView;
 import com.scnu.swimmingtrainingsystem.R;
 import com.scnu.swimmingtrainingsystem.adapter.ScoreListAdapter;
@@ -30,8 +44,12 @@ import com.scnu.swimmingtrainingsystem.http.JsonTools;
 import com.scnu.swimmingtrainingsystem.model.Athlete;
 import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.Score;
-import com.scnu.swimmingtrainingsystem.util.Constants;
+import com.scnu.swimmingtrainingsystem.model.SmallPlan;
+import com.scnu.swimmingtrainingsystem.model.SmallScore;
+import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.CommonUtils;
+import com.scnu.swimmingtrainingsystem.util.Constants;
+import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 
 public class MatchScoreActivity extends Activity {
 
@@ -46,7 +64,11 @@ public class MatchScoreActivity extends Activity {
 	private AutoCompleteTextView acTextView;
 	private Toast toast;
 	private DBManager mDbManager;
-
+	private boolean isConnected;
+	private Long userId;
+	private Plan plan;
+	private LoadingDialog loadingDialog;
+	private RequestQueue mQueue;
 	private DragSortListView.DropListener onDrop = new DragSortListView.DropListener() {
 		@Override
 		public void drop(int from, int to) {
@@ -105,6 +127,8 @@ public class MatchScoreActivity extends Activity {
 		// TODO Auto-generated method stub
 		app = (MyApplication) getApplication();
 		mDbManager = DBManager.getInstance();
+		isConnected = (Boolean) app.getMap().get(Constants.IS_CONNECT_SERVER);
+		mQueue = Volley.newRequestQueue(this);
 		Intent result = getIntent();
 		scores = result.getStringArrayListExtra("SCORES");
 		scoreListView = (DragSortListView) findViewById(R.id.matchscore_list);
@@ -113,6 +137,9 @@ public class MatchScoreActivity extends Activity {
 		nameListView.setRemoveListener(onRemove);
 		nameListView.setDragScrollProfile(ssProfile);
 		scoreListView.setRemoveListener(onRemove2);
+		userId = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
+		Long planId = (Long) app.getMap().get(Constants.PLAN_ID);
+		plan = DataSupport.find(Plan.class, planId);
 		// 设置数据源
 		String[] autoStrings = new String[] { "25", "55", "75", "100", "125",
 				"150", "175", "200", "225", "250", "275", "300" };
@@ -168,9 +195,8 @@ public class MatchScoreActivity extends Activity {
 	 * @param distance
 	 */
 	private void matchSuccess(String date, int nowCurrent, int distance) {
+		User user = mDbManager.getUser(userId);
 		List<Athlete> athletes = mDbManager.getAthleteByNames(dragDatas);
-		Plan p = DataSupport.find(Plan.class,
-				(Long) app.getMap().get(Constants.PLAN_ID));
 		for (int i = 0; i < scores.size(); i++) {
 			Athlete a = athletes.get(i);
 			Score s = new Score();
@@ -180,8 +206,18 @@ public class MatchScoreActivity extends Activity {
 			s.setType(Constants.NORMALSCORE);
 			s.setAthlete(a);
 			s.setDistance(distance);
-			s.setP(p);
+			s.setP(plan);
+			s.setUser(user);
 			s.save();
+		}
+		if (isConnected) {
+			if (loadingDialog == null) {
+				loadingDialog = LoadingDialog.createDialog(this);
+				loadingDialog.setMessage("正在提交...");
+				loadingDialog.setCanceledOnTouchOutside(false);
+			}
+			loadingDialog.show();
+			addScoreRequest(date);
 		}
 	}
 
@@ -222,8 +258,8 @@ public class MatchScoreActivity extends Activity {
 			// 如果这是第一趟并且成绩数目与运动员数目不相等,则先保存到sp中，统计再做调整
 			String scoresString = JsonTools.creatJsonString(scores);
 			String athleteJson = JsonTools.creatJsonString(dragDatas);
-			CommonUtils.saveCurrentScoreAndAthlete(this, nowCurrent, crrentDistance,
-					scoresString, athleteJson);
+			CommonUtils.saveCurrentScoreAndAthlete(this, nowCurrent,
+					crrentDistance, scoresString, athleteJson);
 		}
 		startActivity(i);
 		finish();
@@ -264,9 +300,9 @@ public class MatchScoreActivity extends Activity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
-				//暂时保存到SharePreferences
-				CommonUtils.saveCurrentScoreAndAthlete(context, i, crrentDistance,
-						scoreString, athleteString);
+				// 暂时保存到SharePreferences
+				CommonUtils.saveCurrentScoreAndAthlete(context, i,
+						crrentDistance, scoreString, athleteString);
 				Intent intent = new Intent(MatchScoreActivity.this,
 						TimerActivity.class);
 				startActivity(intent);
@@ -320,6 +356,84 @@ public class MatchScoreActivity extends Activity {
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+
+	private void addScoreRequest(String date) {
+		SmallPlan sp = new SmallPlan();
+		sp.setDistance(plan.getDistance());
+		sp.setPool(plan.getPool());
+		sp.setExtra(plan.getExtra());
+
+		List<SmallScore> smallScores = new ArrayList<SmallScore>();
+		List<Score> scoresResult = mDbManager.getScoreByDate(date);
+		for (Score s : scoresResult) {
+			SmallScore smScore = new SmallScore();
+			smScore.setScore(s.getScore());
+			smScore.setDate(s.getDate());
+			smScore.setDistance(s.getDistance());
+			smScore.setType(s.getType());
+			smScore.setTimes(s.getTimes());
+			smallScores.add(smScore);
+		}
+		List<Integer> aidList = mDbManager.getAthlteAidInScoreByDate(date);
+		User user = mDbManager.getUser(userId);
+		Map<String, Object> scoreMap = new HashMap<String, Object>();
+		scoreMap.put("score", smallScores);
+		scoreMap.put("plan", sp);
+		scoreMap.put("uid", user.getUid());
+		scoreMap.put("athlete_id", aidList);
+		final String jsonString = JsonTools.creatJsonString(scoreMap);
+		StringRequest stringRequest = new StringRequest(Method.POST,
+				CommonUtils.HOSTURL + "addScores", new Listener<String>() {
+
+					@Override
+					public void onResponse(String response) {
+						// TODO Auto-generated method stub
+						Log.i("addScores", response);
+						loadingDialog.dismiss();
+						JSONObject obj;
+						try {
+							obj = new JSONObject(response);
+							int resCode = (Integer) obj.get("resCode");
+							if (resCode == 1) {
+								CommonUtils.showToast(MatchScoreActivity.this,
+										toast, "成功同步至服务器!");
+							} else {
+								CommonUtils.showToast(MatchScoreActivity.this,
+										toast, "同步失敗！");
+							}
+
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						Intent intent = new Intent(MatchScoreActivity.this,
+								ShowScoreActivity.class);
+						startActivity(intent);
+						finish();
+					}
+				}, new ErrorListener() {
+
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						// TODO Auto-generated method stub
+						// Log.e("addScores", error.getMessage());
+					}
+				}) {
+
+			@Override
+			protected Map<String, String> getParams() throws AuthFailureError {
+				// 设置请求参数
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("scoresJson", jsonString);
+				return map;
+			}
+		};
+		stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+				Constants.SOCKET_TIMEOUT,
+				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+		mQueue.add(stringRequest);
 	}
 
 }

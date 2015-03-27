@@ -23,7 +23,7 @@ public class Plan extends DataSupport {
 	/**
 	 * 该计划预计游泳进行的总距离
 	 */
-	private String distance;
+	private int distance;
 
 	/**
 	 * 该计划的备注，方便查阅并区分成绩
@@ -69,11 +69,11 @@ public class Plan extends DataSupport {
 		this.pool = pool;
 	}
 
-	public String getDistance() {
+	public int getDistance() {
 		return distance;
 	}
 
-	public void setDistance(String distance) {
+	public void setDistance(int distance) {
 		this.distance = distance;
 	}
 
@@ -112,7 +112,6 @@ public class Plan extends DataSupport {
 	@Override
 	public String toString() {
 		return "Plan [id=" + id + ", pid=" + pid + ", pool=" + pool
-				+ ", distance=" + distance + ", extra=" + extra + ", user="
-				+ user + ", athlete=" + athlete + ", scores=" + scores + "]";
+				+ ", distance=" + distance + ", extra=" + extra + "]";
 	}
 }

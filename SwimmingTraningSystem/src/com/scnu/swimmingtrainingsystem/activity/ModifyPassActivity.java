@@ -91,7 +91,7 @@ public class ModifyPassActivity extends Activity {
 			CommonUtils.showToast(this, toast, "修改密码成功！");
 			// 如果处在联网状态，则发送至服务器
 			boolean isConnect = (Boolean) app.getMap().get(
-					Constants.IS_CONNECT_SERVICE);
+					Constants.IS_CONNECT_SERVER);
 			if (isConnect) {
 				// 发送至服务器
 				modifyRequest(oldPassword, newPassword, comfPassword);

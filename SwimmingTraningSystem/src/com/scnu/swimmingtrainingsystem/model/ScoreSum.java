@@ -6,7 +6,7 @@ package com.scnu.swimmingtrainingsystem.model;
  * @author LittleByte
  * 
  */
-public class Temp {
+public class ScoreSum {
 
 	private String score;
 	private String athleteName;

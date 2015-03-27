@@ -6,34 +6,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.litepal.crud.DataSupport;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.TranslateAnimation;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.Button;
 import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,17 +44,14 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.scnu.swimmingtrainingsystem.R;
-import com.scnu.swimmingtrainingsystem.adapter.QueryDatesAdapter;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
 import com.scnu.swimmingtrainingsystem.http.JsonTools;
-import com.scnu.swimmingtrainingsystem.model.Athlete;
 import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.Score;
-import com.scnu.swimmingtrainingsystem.model.Temp;
-import com.scnu.swimmingtrainingsystem.model.TempScore;
+import com.scnu.swimmingtrainingsystem.model.ScoreSum;
 import com.scnu.swimmingtrainingsystem.model.User;
-import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.CommonUtils;
+import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 
 /**
@@ -69,39 +60,22 @@ import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
  * @author LittleByte
  * 
  */
-public class QueryScoreActivity extends Activity implements OnScrollListener {
+public class QueryScoreActivity extends Activity {
+	private final static String GENERATING_RESULT_STRING = "正在生成查询结果...";
+	private final static int RequestCode = 0x01;
 	// Volley请求队列
 	private RequestQueue mQueue;
-	private LinearLayout totalDates, containLayout;
+	private LinearLayout containLayout;
 	private ExpandableListView mExpandableListView;
 	private TextView details;
 	private TextView dateTextView;
 	private DBManager dbManager;
 	private long userid;
-	private int time = 0;
-	private Plan plan;
-	private List<Temp> sumList = new ArrayList<Temp>();
 	private LoadingDialog mLoadingDialog;
-	private List<String> dateList = new ArrayList<String>();
-	private QueryDatesAdapter adapter;
-	private ListView dateListView;
-	private PopupWindow mPopWin;
-	private ProgressBar progressBar;
-	private Button loadmoreButton;
-	private View moreView;
 	private Toast mToast;
 	private User mUser;
-	private int currentPage = 0;
 	private boolean isConnect;
-	// 设置最大的数据条数
-	private int maxDateNum = 0;
-	// 最后可见条目的索引
-	private int lastVisibleIndex;
-	// 当前窗口可见项总数
-	private int visibleItemCount = 5;
-	private final static String NO_SUCH_RECORDS_STRING = "没有关于该查询条件的记录！";
-	private final static String GENERATING_RESULT_STRING = "正在生成查询结果...";
-	private static final String NOT_CORRECT_STRING = "本次计时成绩不完整，无法正确展示！";
+	private float y;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -127,102 +101,170 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 		mQueue = Volley.newRequestQueue(this);
 		userid = (Long) mApplication.getMap().get(Constants.CURRENT_USER_ID);
 		mUser = dbManager.getUser(userid);
-		totalDates = (LinearLayout) findViewById(R.id.total_category);
 		containLayout = (LinearLayout) findViewById(R.id.ll_query_score);
 		details = (TextView) findViewById(R.id.show_details);
 		dateTextView = (TextView) findViewById(R.id.text_category);
-
-		mExpandableListView = (ExpandableListView) findViewById(R.id.query_score_list);
-		isConnect = (Boolean) mApplication.getMap().get(
-				Constants.IS_CONNECT_SERVICE);
-		totalDates.setOnClickListener(new OnClickListener() {
+		dateTextView.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				showPopupWindow(LinearLayout.LayoutParams.WRAP_CONTENT,
-						LinearLayout.LayoutParams.WRAP_CONTENT);
-			}
-		});
-		// 屏蔽收缩
-		mExpandableListView.setOnGroupClickListener(new OnGroupClickListener() {
-
-			@Override
-			public boolean onGroupClick(ExpandableListView parent, View v,
-					int groupPosition, long id) {
 				// TODO Auto-generated method stub
-				return true;
+				y = dateTextView.getY();
+				TranslateAnimation animation = new TranslateAnimation(0, 0, 0,
+						-y);
+				animation.setDuration(500);
+				animation.setFillAfter(true);
+				animation.setAnimationListener(new AnimationListener() {
+					@Override
+					public void onAnimationRepeat(Animation animation) {
+					}
+
+					@Override
+					public void onAnimationStart(Animation animation) {
+					}
+
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						Intent intent = new Intent(QueryScoreActivity.this,
+								SearchboxActivity.class);
+						startActivityForResult(intent, RequestCode);
+						overridePendingTransition(R.anim.animationb,
+								R.anim.animationa);
+					}
+				});
+				containLayout.startAnimation(animation);
 			}
 		});
+		mExpandableListView = (ExpandableListView) findViewById(R.id.query_score_list);
+		isConnect = (Boolean) mApplication.getMap().get(
+				Constants.IS_CONNECT_SERVER);
+
 	}
 
 	/**
-	 * 弹出popupWindow显示可查看的日期列表
+	 * 退出当前Activity
 	 * 
-	 * @param wrapContent
-	 * @param wrapContent2
+	 * @param v
 	 */
-	@SuppressWarnings("deprecation")
-	private void showPopupWindow(int wrapContent, int wrapContent2) {
-		// TODO Auto-generated method stub
-		LinearLayout layout = (LinearLayout) LayoutInflater.from(
-				QueryScoreActivity.this)
-				.inflate(R.layout.query_date_list, null);
-		dateListView = (ListView) layout.findViewById(R.id.date_list);
+	public void back(View v) {
+		finish();
+		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);
+	}
 
-		// 实例化底部布局
-		moreView = getLayoutInflater().inflate(R.layout.listview_footer, null);
-		loadmoreButton = (Button) moreView.findViewById(R.id.more);
-		progressBar = (ProgressBar) moreView.findViewById(R.id.loading);
-		adapter = new QueryDatesAdapter(this, dateList);
-		// 加上底部View，注意要放在setAdapter方法前
-		dateListView.addFooterView(moreView);
-		dateListView.setAdapter(adapter);
-		dateListView.setOnScrollListener(this);
+	/**
+	 * 查询成绩异步任务，防止阻塞主线程导致ANR
+	 * 
+	 * @author LittleByte
+	 * 
+	 */
+	class QueryScoreTask extends AsyncTask<String, Void, Map<String, Object>> {
 
-		mPopWin = new PopupWindow(layout, totalDates.getWidth(),
-				containLayout.getHeight() / 3, true);
-		// 这句是为了防止弹出菜单获取焦点之后，点击activity的其他组件没有响应
-		mPopWin.setBackgroundDrawable(new BitmapDrawable());
-		mPopWin.showAsDropDown(totalDates, 0, 1);
-		mPopWin.update();
-		loadmoreButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				// 将进度条可见
-				progressBar.setVisibility(View.VISIBLE);
-				// 按钮不可见
-				loadmoreButton.setVisibility(View.GONE);
-				loadMoreData();
+		@Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			super.onPreExecute();
+			if (mLoadingDialog == null) {
+				mLoadingDialog = LoadingDialog
+						.createDialog(QueryScoreActivity.this);
+				mLoadingDialog.setMessage(GENERATING_RESULT_STRING);
+				mLoadingDialog.setCanceledOnTouchOutside(false);
 			}
-		});
-		dateListView.setOnItemClickListener(new OnItemClickListener() {
+			mLoadingDialog.show();
+		}
 
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				// TODO Auto-generated method stub
-				details.setVisibility(View.GONE);
-				if (position <= dateList.size()) {
-					details.setVisibility(View.GONE);
-					dateTextView.setText(dateList.get(position));
-					// 服务器联通则进行请求
-					if (isConnect) {
-						getScoresRequest(dateList.get(position));
-					} else {
-						// 本地查询（试用账号所使用的功能）
-						new QueryScoreTask().execute(dateList.get(position));
+		@Override
+		protected Map<String, Object> doInBackground(String... params) {
+			// TODO Auto-generated method stub
+			Map<String, Object> map = new HashMap<String, Object>();
+			// 获取本轮所有成绩
+			List<Score> reScores = DataSupport.where("date=?", params[0]).find(
+					Score.class, true);
+			// 获取该轮成绩的计划
+			Plan plan = reScores.get(0).getP();
+			// 获取本轮成绩的总趟数
+			int maxTime = reScores.get(reScores.size() - 1).getTimes();
+
+			List<Long> athIds = dbManager.getAthleteIdInScoreByDate(params[0]);
+			List<ScoreSum> sumList = dbManager.getAthleteIdInScoreByDate(
+					params[0], athIds);
+
+			List<List<Score>> listss = new ArrayList<List<Score>>();
+			// 根据时间查询成绩
+			for (int t = 1; t <= maxTime; t++) {
+				List<Score> sco = dbManager
+						.getScoreByDateAndTimes(params[0], t);
+				listss.add(sco);
+			}
+
+			map.put("time", maxTime);
+			map.put("plan", plan);
+			map.put("sumList", sumList);
+			map.put("scores", listss);
+			return map;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		protected void onPostExecute(Map<String, Object> result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			if (result != null) {
+				int maxTime = (Integer) result.get("time");
+				final Plan plan = (Plan) result.get("plan");
+				List<ScoreSum> sumList = (List<ScoreSum>) result.get("sumList");
+				List<List<Score>> scores = (List<List<Score>>) result
+						.get("scores");
+
+				details.setVisibility(View.VISIBLE);
+				details.setText(plan.getPool() + "  共" + maxTime + "趟  "
+						+ "  目标总距离：" + plan.getDistance());
+				details.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						String extraString = "无备注";
+						if (!TextUtils.isEmpty(plan.getExtra().trim())) {
+							extraString = plan.getExtra();
+						}
+						showPlanExtra(extraString);
 					}
+
+				});
+				NameScoreListAdapter scoreListAdapter = new NameScoreListAdapter(
+						QueryScoreActivity.this, scores, sumList, maxTime + 1);
+				mExpandableListView.setAdapter(scoreListAdapter);
+				// 默认展开
+				for (int i = 0; i <= maxTime; i++) {
+					mExpandableListView.expandGroup(i);
 				}
-				mPopWin.dismiss();
 			}
-		});
+			mLoadingDialog.dismiss();
+		}
+	}
+
+	/**
+	 * 弹出备注
+	 * 
+	 * @param s
+	 *            备注内容
+	 */
+	private void showPlanExtra(String s) {
+		// TODO Auto-generated method stub
+		View view = getLayoutInflater()
+				.inflate(R.layout.popupwindow_tips, null);
+		TextView tipTextView = (TextView) view.findViewById(R.id.tv_pop_tips);
+		tipTextView.setText(s);
+		PopupWindow popupWindow = new PopupWindow(view,
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT, true);
+		popupWindow.setBackgroundDrawable(getResources().getDrawable(
+				R.drawable.title_function_bg));
+		popupWindow.showAsDropDown(details, containLayout.getWidth() - 50, 0);
 	}
 
 	protected void getScoresRequest(final String string) {
 		// TODO Auto-generated method stub
-
 		Map<String, Object> jsonMap = new HashMap<String, Object>();
 		jsonMap.put("up_time", string);
 		jsonMap.put("uid", mUser.getUid());
@@ -233,71 +275,82 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 
 					@Override
 					public void onResponse(String response) {
-						System.out.println("response>>>>>>>>>>>>>>>>>"
-								+ response);
 						JSONObject obj;
 						try {
 							obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
-							if (resCode == 1) {
-								TempScore[] tempScores = JsonTools.getObject(
-										obj.get("dataList").toString(),
-										TempScore[].class);
-
-								int pid = tempScores[0].getPlan_id();
-								Plan planResult = dbManager.getPlanByPid(pid);
-
-								details.setVisibility(View.VISIBLE);
-//								details.setText("计划名：" + planResult.getName()
-//										+ "--" + planResult.getPool() + " "
-//										+ planResult.getTime() + "趟");
-								for (TempScore tempScore : tempScores) {
-
-									int aid = tempScore.getAthlete_id();
-									Athlete ath = dbManager
-											.getAthletesByAid(aid);
-									Score newScore = new Score();
-									newScore.setP(planResult);
-									newScore.setDate(string);
-									newScore.setType(Constants.NORMALSCORE);
-									newScore.setAthlete(ath);
-									newScore.setTimes(tempScore.getTimes());
-									newScore.setScore(tempScore.getScore());
-									newScore.save();
-								}
-//								time = planResult.getTime();
-
-								List<List<Score>> listscores = new ArrayList<List<Score>>();
-								// 根据时间查询成绩
-								for (int t = 1; t <= time; t++) {
-									List<Score> sco = dbManager
-											.getScoreByDateAndTimes(string, t);
-									if (t == 1) {
-										List<Long> athIds = new ArrayList<Long>();
-										for (Score s : sco) {
-											athIds.add(s.getAthlete().getId());
-										}
-										sumList = dbManager
-												.getAthleteIdInScoreByDate(
-														string, athIds);
-									}
-									// 查询出来要确保该轮成绩是存在的
-									if (sco.size() != 0) {
-										listscores.add(sco);
-									}
-
-								}
-								NameScoreListAdapter scoreListAdapter = new NameScoreListAdapter(
-										QueryScoreActivity.this, listscores,
-										sumList, time + 1);
-								mExpandableListView
-										.setAdapter(scoreListAdapter);
-								// 默认展开
-								for (int i = 0; i <= time; i++) {
-									mExpandableListView.expandGroup(i);
-								}
-							} else {
-
+							if (resCode == 1) {/*
+												 * TempScore[] tempScores =
+												 * JsonTools.getObject(
+												 * obj.get("dataList"
+												 * ).toString(),
+												 * TempScore[].class);
+												 * 
+												 * int pid =
+												 * tempScores[0].getPlan_id();
+												 * Plan planResult =
+												 * dbManager.getPlanByPid(pid);
+												 * 
+												 * details.setVisibility(View.
+												 * VISIBLE); //
+												 * details.setText("计划名：" +
+												 * planResult.getName() // +
+												 * "--" + planResult.getPool() +
+												 * " " // + planResult.getTime()
+												 * + "趟"); for (TempScore
+												 * tempScore : tempScores) {
+												 * 
+												 * int aid =
+												 * tempScore.getAthlete_id();
+												 * Athlete ath = dbManager
+												 * .getAthletesByAid(aid); Score
+												 * newScore = new Score();
+												 * newScore.setP(planResult);
+												 * newScore.setDate(string);
+												 * newScore
+												 * .setType(Constants.NORMALSCORE
+												 * ); newScore.setAthlete(ath);
+												 * newScore
+												 * .setTimes(tempScore.getTimes
+												 * ());
+												 * newScore.setScore(tempScore
+												 * .getScore());
+												 * newScore.save(); } // time =
+												 * planResult.getTime();
+												 * 
+												 * List<List<Score>> listscores
+												 * = new
+												 * ArrayList<List<Score>>(); //
+												 * 根据时间查询成绩 for (int t = 1; t <=
+												 * time; t++) { List<Score> sco
+												 * = dbManager
+												 * .getScoreByDateAndTimes
+												 * (string, t); if (t == 1) {
+												 * List<Long> athIds = new
+												 * ArrayList<Long>(); for (Score
+												 * s : sco) {
+												 * athIds.add(s.getAthlete
+												 * ().getId()); } sumList =
+												 * dbManager
+												 * .getAthleteIdInScoreByDate(
+												 * string, athIds); } //
+												 * 查询出来要确保该轮成绩是存在的 if
+												 * (sco.size() != 0) {
+												 * listscores.add(sco); }
+												 * 
+												 * } NameScoreListAdapter
+												 * scoreListAdapter = new
+												 * NameScoreListAdapter(
+												 * QueryScoreActivity.this,
+												 * listscores, sumList, time +
+												 * 1); mExpandableListView
+												 * .setAdapter
+												 * (scoreListAdapter); // 默认展开
+												 * for (int i = 0; i <= time;
+												 * i++) {
+												 * mExpandableListView.expandGroup
+												 * (i); }
+												 */
 							}
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block
@@ -343,107 +396,14 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 
 	}
 
-	/**
-	 * 退出当前Activity
-	 * 
-	 * @param v
-	 */
-	public void back(View v) {
-		finish();
-		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);
-	}
-
-	/**
-	 * 查询成绩异步任务，防止阻塞主线程导致ANR
-	 * 
-	 * @author LittleByte
-	 * 
-	 */
-	class QueryScoreTask extends AsyncTask<String, Void, List<List<Score>>> {
-
-		@Override
-		protected void onPreExecute() {
-			// TODO Auto-generated method stub
-			super.onPreExecute();
-			if (mLoadingDialog == null) {
-				mLoadingDialog = LoadingDialog
-						.createDialog(QueryScoreActivity.this);
-				mLoadingDialog.setMessage(GENERATING_RESULT_STRING);
-				mLoadingDialog.setCanceledOnTouchOutside(false);
-			}
-			mLoadingDialog.show();
-		}
-
-		@Override
-		protected List<List<Score>> doInBackground(String... params) {
-			// TODO Auto-generated method stub
-			plan = dbManager.getPlanInScoreByDate(params[0]);
-			// 输入的条件查询确保能查询出对应的成绩
-			if (plan != null) {
-//				time = plan.getTime();
-				List<List<Score>> listss = new ArrayList<List<Score>>();
-				// 根据时间查询成绩
-				for (int t = 1; t <= time; t++) {
-					List<Score> sco = dbManager.getScoreByDateAndTimes(
-							params[0], t);
-					if (t == 1) {
-						List<Long> athIds = new ArrayList<Long>();
-						for (Score s : sco) {
-							athIds.add(s.getAthlete().getId());
-						}
-						sumList = dbManager.getAthleteIdInScoreByDate(
-								params[0], athIds);
-					}
-					// 查询出来要确保该轮成绩是存在的
-					if (sco.size() != 0) {
-						listss.add(sco);
-					}
-
-				}
-				return listss;
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(List<List<Score>> result) {
-			// TODO Auto-generated method stub
-			super.onPostExecute(result);
-			// 成绩是否完整，中途退出计时会导致计时成绩不完整
-			boolean isComplete = true;
-			if (result.size() != time) {
-				isComplete = false;
-			}
-			if (result != null && isComplete) {
-				details.setVisibility(View.VISIBLE);
-//				details.setText("计划名：" + plan.getName() + "--" + plan.getPool()
-//						+ " " + time + "趟");
-				NameScoreListAdapter scoreListAdapter = new NameScoreListAdapter(
-						QueryScoreActivity.this, result, sumList, time + 1);
-				mExpandableListView.setAdapter(scoreListAdapter);
-				// 默认展开
-				for (int i = 0; i <= time; i++) {
-					mExpandableListView.expandGroup(i);
-				}
-			} else if (!isComplete) {
-				CommonUtils.showToast(QueryScoreActivity.this, mToast,
-						NOT_CORRECT_STRING);
-			} else {
-				CommonUtils.showToast(QueryScoreActivity.this, mToast,
-						NO_SUCH_RECORDS_STRING);
-			}
-			mLoadingDialog.dismiss();
-		}
-	}
-
 	class NameScoreListAdapter extends BaseExpandableListAdapter {
 		private Context mContext;
 		private List<List<Score>> mLists = new ArrayList<List<Score>>();
-		private List<Temp> mTemps = new ArrayList<Temp>();
+		private List<ScoreSum> mTemps = new ArrayList<ScoreSum>();
 		private int mSwimTime = 0;
 
 		public NameScoreListAdapter(Context mContext, List<List<Score>> mLists,
-				List<Temp> mTemps, int mSwimTime) {
+				List<ScoreSum> mTemps, int mSwimTime) {
 			this.mContext = mContext;
 			this.mLists = mLists;
 			this.mTemps = mTemps;
@@ -470,12 +430,12 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 				childHolder = new ChildHolder();
 				convertView = View.inflate(mContext,
 						R.layout.show_score_list_item_sub, null);
-//				childHolder.rank = (TextView) convertView
-//						.findViewById(R.id.show_rank);
-//				childHolder.score = (TextView) convertView
-//						.findViewById(R.id.show_score);
-//				childHolder.name = (TextView) convertView
-//						.findViewById(R.id.show_name);
+				childHolder.rank = (TextView) convertView
+						.findViewById(R.id.show_rank);
+				childHolder.score = (TextView) convertView
+						.findViewById(R.id.show_score);
+				childHolder.name = (TextView) convertView
+						.findViewById(R.id.show_name);
 				convertView.setTag(childHolder);
 			} else {
 				childHolder = (ChildHolder) convertView.getTag();
@@ -532,17 +492,22 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 				groupHolder = new GroupHolder();
 				convertView = View.inflate(mContext,
 						R.layout.query_score_list_item_head, null);
-				groupHolder.date = (TextView) convertView
+				groupHolder.timeTextView = (TextView) convertView
 						.findViewById(R.id.test_date);
+				groupHolder.curDistance = (TextView) convertView
+						.findViewById(R.id.test_plan);
 				convertView.setTag(groupHolder);
 			} else {
 				groupHolder = (GroupHolder) convertView.getTag();
 			}
 
 			if (groupPosition < getGroupCount() - 1) {
-				groupHolder.date.setText("第" + (groupPosition + 1) + "趟");
+				groupHolder.timeTextView.setText("第" + (groupPosition + 1)
+						+ "趟");
+				groupHolder.curDistance.setText("当前距离 "
+						+ mLists.get(groupPosition).get(0).getDistance() + "米");
 			} else {
-				groupHolder.date.setText("本轮总计");
+				groupHolder.timeTextView.setText("本轮总计");
 			}
 			return convertView;
 		}
@@ -560,7 +525,8 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 		}
 
 		final class GroupHolder {
-			private TextView date;
+			private TextView timeTextView;
+			private TextView curDistance;
 		}
 
 		final class ChildHolder {
@@ -569,37 +535,6 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 			private TextView name;
 		}
 
-	}
-
-	/**
-	 * 获取本地的日期数据集的异步任务，离线状态使用
-	 * 
-	 * @author LiitleByte
-	 * 
-	 */
-	class QueryDatesTask extends AsyncTask<Void, Void, List<String>> {
-
-		@Override
-		protected List<String> doInBackground(Void... params) {
-			// TODO Auto-generated method stub
-			List<Athlete> aths = dbManager.getAthletes(userid);
-			List<Long> aids = new ArrayList<Long>();
-			for (Athlete a : aths) {
-				aids.add(a.getId());
-			}
-			dateList = dbManager.getScoresByAthleteId(aids);
-			return dateList;
-		}
-
-		@Override
-		protected void onPostExecute(List<String> result) {
-			// TODO Auto-generated method stub
-			super.onPostExecute(result);
-			dateList = result;
-			maxDateNum = adapter.getCount();
-			adapter.setDatas(result);
-			adapter.notifyDataSetChanged();
-		}
 	}
 
 	@Override
@@ -613,127 +548,27 @@ public class QueryScoreActivity extends Activity implements OnScrollListener {
 		return false;
 	}
 
-	public void loadMoreData() {
-		// TODO Auto-generated method stub
-		if (isConnect) {
-			// 如果与服务器联通
-			currentPage++;
-			getScoreDateListReqeust(currentPage);
-		} else {
-			// 当前为离线状态
-			new QueryDatesTask().execute();
-		}
-	}
-
-	/**
-	 * 获取指定页数的日期数据集
-	 * 
-	 * @param curPage
-	 *            当前页
-	 */
-	protected void getScoreDateListReqeust(final int curPage) {
-		Map<String, Object> jsonMap = new HashMap<String, Object>();
-		jsonMap.put("curPage", curPage);
-		jsonMap.put("uid", mUser.getUid());
-		final String jsonString = JsonTools.creatJsonString(jsonMap);
-
-		StringRequest getScoreDateList = new StringRequest(Method.POST,
-				CommonUtils.HOSTURL + "getScoreDateList", new Listener<String>() {
-
-					@Override
-					public void onResponse(String response) {
-						System.out.println("dateresponse>>>>" + response);
-						JSONObject obj;
-						try {
-							obj = new JSONObject(response);
-							int resCode = (Integer) obj.get("resCode");
-							if (resCode == 1) {
-								maxDateNum = obj.getInt("totalRecords");
-
-								List<String> dateResult = new ArrayList<String>();
-								JSONArray dates = new JSONArray(obj.get(
-										"dataList").toString());
-								int length = dates.length();
-								for (int i = 0; i < length; i++) {
-									JSONObject jsonObject = new JSONObject(
-											dates.get(i).toString());
-									dateResult.add(jsonObject
-											.getString("up_time"));
-								}
-								dateList.addAll(dateResult);
-								System.out.println("dateList>>>" + dateList);
-								// 进度条不可见
-								progressBar.setVisibility(View.GONE);
-								// 按钮可见
-								loadmoreButton.setVisibility(View.VISIBLE);
-								dateListView.setAdapter(new QueryDatesAdapter(
-										QueryScoreActivity.this, dateList));
-							} else {
-								// 进度条不可见
-								progressBar.setVisibility(View.GONE);
-								// 按钮可见
-								loadmoreButton.setVisibility(View.GONE);
-								CommonUtils.showToast(QueryScoreActivity.this,
-										mToast, "数据已全部加载完成！");
-							}
-						} catch (JSONException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-
-					}
-				}, new ErrorListener() {
-
-					@Override
-					public void onErrorResponse(VolleyError error) {
-
-					}
-				}) {
-
-			@Override
-			protected Response<String> parseNetworkResponse(
-					NetworkResponse response) {
-				String str = null;
-				try {
-					str = new String(response.data, "utf-8");
-				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		TranslateAnimation animation = new TranslateAnimation(0, 0, -y, 0);
+		animation.setDuration(500);
+		animation.setFillAfter(true);
+		containLayout.startAnimation(animation);
+		if (resultCode != 0x11) {
+			String dateString = data.getStringExtra("date");
+			dateTextView.setText(dateString);
+			if (resultCode == 1) {
+				if (isConnect) {
+					getScoresRequest(dateString);
+				} else {
+					CommonUtils.showToast(this, mToast, "无法连接服务器！");
 				}
-				return Response.success(str,
-						HttpHeaderParser.parseCacheHeaders(response));
+			} else {
+				new QueryScoreTask().execute(dateString);
 			}
-
-			@Override
-			protected Map<String, String> getParams() throws AuthFailureError {
-				// 设置请求参数
-				Map<String, String> map = new HashMap<String, String>();
-				map.put("getScoreDate", jsonString);
-				return map;
-			}
-		};
-		getScoreDateList.setRetryPolicy(new DefaultRetryPolicy(
-				Constants.SOCKET_TIMEOUT,
-				DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-		mQueue.add(getScoreDateList);
-	}
-
-	@Override
-	public void onScroll(AbsListView view, int firstVisibleItem,
-			int visibleItemCount, int totalItemCount) {
-		this.visibleItemCount = visibleItemCount;
-		lastVisibleIndex = firstVisibleItem + visibleItemCount - 1;
-	}
-
-	@Override
-	public void onScrollStateChanged(AbsListView view, int scrollState) {
-		int itemsLastIndex = adapter.getCount() - 1; // 数据集最后一项的索引
-		int lastIndex = itemsLastIndex + 1;
-		if (scrollState == OnScrollListener.SCROLL_STATE_IDLE
-				&& lastVisibleIndex == lastIndex) {
-			// 如果是自动加载,可以在这里放置异步加载数据的代码
-			// loadMoreData();
 		}
+
 	}
+
 }

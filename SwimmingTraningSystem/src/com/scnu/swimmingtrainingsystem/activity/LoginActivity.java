@@ -55,10 +55,11 @@ public class LoginActivity extends Activity {
 	private static final String DEFAULT_PASSWORD = "123456asdjkl";
 	private MyApplication app;
 	private DBManager dbManager;
+	
 	private EditText etLogin;
 	private EditText etPassword;
-	// private TextView forget;
 	private TextView sethost;
+	private TextView forgot;
 	private Toast toast;
 	private RequestQueue mQueue;
 	private LoadingDialog loadingDialog;
@@ -118,12 +119,23 @@ public class LoginActivity extends Activity {
 		etLogin = (EditText) findViewById(R.id.tv_user);
 		etPassword = (EditText) findViewById(R.id.tv_password);
 		sethost = (TextView) findViewById(R.id.setting_host);
+		forgot = (TextView) findViewById(R.id.forget_password);
 		sethost.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				showSettingDialog(LoginActivity.this);
+			}
+		});
+		forgot.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				LoginActivity.this.startActivity(new Intent(LoginActivity.this,
+						RetrievePasswordActivity.class));
+				overridePendingTransition(R.anim.push_right_in, R.anim.push_left_out);
 			}
 		});
 	}
@@ -157,7 +169,7 @@ public class LoginActivity extends Activity {
 				// 保存登录信息
 				CommonUtils.SaveLoginInfo(this, loginString, passwordString);
 				boolean tryConnect = (Boolean) app.getMap().get(
-						Constants.IS_CONNECT_SERVICE);
+						Constants.IS_CONNECT_SERVER);
 				if (tryConnect) {
 					if (loadingDialog == null) {
 						loadingDialog = LoadingDialog.createDialog(this);
@@ -195,8 +207,8 @@ public class LoginActivity extends Activity {
 							JSONObject obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
 							if (resCode == 1) {
-								CommonUtils.showToast(LoginActivity.this, toast,
-										"登录成功");
+								CommonUtils.showToast(LoginActivity.this,
+										toast, "登录成功");
 								String userJson = obj.get("user").toString();
 								User user = JsonTools.getObject(userJson,
 										User.class);
@@ -207,8 +219,9 @@ public class LoginActivity extends Activity {
 									user.save();
 									app.getMap().put(Constants.CURRENT_USER_ID,
 											user.getId());
-									//用户第一次登陆
-									CommonUtils.saveIsThisUserFirstLogin(LoginActivity.this, true);
+									// 用户第一次登陆
+									CommonUtils.saveIsThisUserFirstLogin(
+											LoginActivity.this, true);
 								} else {
 									// 如果该用户信息已存在本地数据库，则取出当前id作为全局变量
 									long currentId = dbManager.getUserByName(
@@ -217,14 +230,14 @@ public class LoginActivity extends Activity {
 											currentId);
 								}
 							} else if (resCode == 2) {
-								CommonUtils.showToast(LoginActivity.this, toast,
-										"用户名不存在！");
+								CommonUtils.showToast(LoginActivity.this,
+										toast, "用户名不存在！");
 							} else if (resCode == 3) {
-								CommonUtils.showToast(LoginActivity.this, toast,
-										"密码错误！");
+								CommonUtils.showToast(LoginActivity.this,
+										toast, "密码错误！");
 							} else {
-								CommonUtils.showToast(LoginActivity.this, toast,
-										"服务器错误！");
+								CommonUtils.showToast(LoginActivity.this,
+										toast, "服务器错误！");
 							}
 
 						} catch (JSONException e) {
@@ -232,8 +245,9 @@ public class LoginActivity extends Activity {
 							e.printStackTrace();
 						}
 
-						CommonUtils.showToast(LoginActivity.this, toast, "登陆成功");
-					
+						CommonUtils
+								.showToast(LoginActivity.this, toast, "登陆成功");
+
 						Handler handler = new Handler();
 						Runnable updateThread = new Runnable() {
 							public void run() {
@@ -253,7 +267,7 @@ public class LoginActivity extends Activity {
 						// TODO Auto-generated method stub
 						// Log.e(TAG, error.getMessage());
 						loadingDialog.dismiss();
-						app.getMap().put(Constants.IS_CONNECT_SERVICE, false);
+						app.getMap().put(Constants.IS_CONNECT_SERVER, false);
 						showUserSelectDialog();
 					}
 				}) {
@@ -275,14 +289,6 @@ public class LoginActivity extends Activity {
 		mQueue.add(loginRequest);
 	}
 
-	/**
-	 * 找回密码
-	 * 
-	 * @param v
-	 */
-	public void onForget(View v) {
-
-	}
 
 	/**
 	 * 设置服务器IP地址和端口地址对话框
@@ -322,14 +328,15 @@ public class LoginActivity extends Activity {
 				String hostIp = tv_ip.getText().toString().trim();
 				String hostPort = tv_port.getText().toString().trim();
 				if (TextUtils.isEmpty(hostIp) || TextUtils.isEmpty(hostPort)) {
-					CommonUtils.showToast(LoginActivity.this, toast, "ip与端口地址均不可为空！");
+					CommonUtils.showToast(LoginActivity.this, toast,
+							"ip与端口地址均不可为空！");
 				} else {
 					String hostUrl = "http://" + hostIp + ":" + hostPort
 							+ "/SWIMYUE33/httpPost.action?action_flag=";
 					// 保存服务器ip和端口地址到sp
 					CommonUtils.HOSTURL = hostUrl;
-					CommonUtils.SaveLoginInfo(LoginActivity.this, hostUrl, hostIp,
-							hostPort);
+					CommonUtils.SaveLoginInfo(LoginActivity.this, hostUrl,
+							hostIp, hostPort);
 					CommonUtils.showToast(LoginActivity.this, toast, "设置成功!");
 					settingDialog.dismiss();
 				}
@@ -362,8 +369,8 @@ public class LoginActivity extends Activity {
 						etLogin.setText("defaultUser");
 						etPassword.setText("123456asdjkl");
 						// 保存登录信息
-						CommonUtils.SaveLoginInfo(LoginActivity.this, "defaultUser",
-								"123456asdjkl");
+						CommonUtils.SaveLoginInfo(LoginActivity.this,
+								"defaultUser", "123456asdjkl");
 						userDialog.dismiss();
 						offlineLogin();
 					}
@@ -372,7 +379,7 @@ public class LoginActivity extends Activity {
 					@Override
 					public void onClick(View v) {
 						// TODO Auto-generated method stub
-						app.getMap().put(Constants.IS_CONNECT_SERVICE, true);
+						app.getMap().put(Constants.IS_CONNECT_SERVER, true);
 						userDialog.dismiss();
 					}
 				}).show();

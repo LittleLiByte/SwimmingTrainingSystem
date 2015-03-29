@@ -40,9 +40,9 @@ public class SexangleImageViews extends ImageView {
 	private int home;
 	private String texts;
 	private Bitmap home_flight;
-	private int state = 1; // °´ÏÂ
 
 	private OnSexangleImageClickListener listener;
+	@SuppressWarnings("unused")
 	private Context mContext;
 
 	public SexangleImageViews(Context context) {

@@ -34,7 +34,7 @@
         android:id="@+id/show_the_plan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/aliceblue"
+           android:background="@color/color_train"
         android:gravity="center"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"

@@ -69,6 +69,7 @@ public class MatchScoreActivity extends Activity {
 	private Plan plan;
 	private LoadingDialog loadingDialog;
 	private RequestQueue mQueue;
+	private Toast mToast;
 	private DragSortListView.DropListener onDrop = new DragSortListView.DropListener() {
 		@Override
 		public void drop(int from, int to) {
@@ -83,7 +84,13 @@ public class MatchScoreActivity extends Activity {
 	private DragSortListView.RemoveListener onRemove = new DragSortListView.RemoveListener() {
 		@Override
 		public void remove(int which) {
-			dragAdapter.remove(dragAdapter.getItem(which));
+			if (dragDatas.size() > 1) {
+				dragAdapter.remove(dragAdapter.getItem(which));
+			} else {
+				CommonUtils.showToast(MatchScoreActivity.this, mToast,
+						"至少要保留一个运动员");
+			}
+			dragAdapter.notifyDataSetChanged();
 		}
 	};
 
@@ -102,7 +109,12 @@ public class MatchScoreActivity extends Activity {
 	private DragSortListView.RemoveListener onRemove2 = new DragSortListView.RemoveListener() {
 		@Override
 		public void remove(int which) {
-			scores.remove(which);
+			if (scores.size() > 1) {
+				scores.remove(which);
+			} else {
+				CommonUtils.showToast(MatchScoreActivity.this, mToast,
+						"至少要保留一个成绩");
+			}
 			adapter.notifyDataSetChanged();
 		}
 	};
@@ -131,6 +143,7 @@ public class MatchScoreActivity extends Activity {
 		mQueue = Volley.newRequestQueue(this);
 		Intent result = getIntent();
 		scores = result.getStringArrayListExtra("SCORES");
+
 		scoreListView = (DragSortListView) findViewById(R.id.matchscore_list);
 		nameListView = (DragSortListView) findViewById(R.id.matchName_list);
 		nameListView.setDropListener(onDrop);
@@ -273,6 +286,7 @@ public class MatchScoreActivity extends Activity {
 	public void matchBack(View v) {
 		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
 		finish();
+		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);
 	}
 
 	/**
@@ -353,6 +367,8 @@ public class MatchScoreActivity extends Activity {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
 			finish();
+			overridePendingTransition(R.anim.slide_bottom_in,
+					R.anim.slide_top_out);
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);

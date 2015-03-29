@@ -19,11 +19,13 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.mobeta.android.dslv.DragSortListView;
 import com.scnu.swimmingtrainingsystem.R;
 import com.scnu.swimmingtrainingsystem.activity.MyApplication;
 import com.scnu.swimmingtrainingsystem.adapter.ScoreListAdapter;
+import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 
 @SuppressLint("ValidFragment")
@@ -43,6 +45,8 @@ public class EachTimeScoreFragment extends Fragment {
 	private String scoreString;
 	private String nameString;
 	private boolean firstMatch = true;
+	private Toast mToast;
+
 	private DragSortListView.DropListener onDrop = new DragSortListView.DropListener() {
 		@Override
 		public void drop(int from, int to) {
@@ -56,7 +60,12 @@ public class EachTimeScoreFragment extends Fragment {
 	private DragSortListView.RemoveListener onRemove = new DragSortListView.RemoveListener() {
 		@Override
 		public void remove(int which) {
-			dragAdapter.remove(dragAdapter.getItem(which));
+			if (dragDatas.size() > 1) {
+				dragAdapter.remove(dragAdapter.getItem(which));
+			} else {
+				CommonUtils.showToast(getActivity(), mToast, "至少要保留一个运动员");
+			}
+			dragAdapter.notifyDataSetChanged();
 		}
 	};
 
@@ -74,7 +83,11 @@ public class EachTimeScoreFragment extends Fragment {
 	private DragSortListView.RemoveListener onRemove2 = new DragSortListView.RemoveListener() {
 		@Override
 		public void remove(int which) {
-			scores.remove(which);
+			if (scores.size() > 1) {
+				scores.remove(which);
+			} else {
+				CommonUtils.showToast(getActivity(), mToast, "至少要保留一个成绩");
+			}
 			scoreListAdapter.notifyDataSetChanged();
 		}
 	};
@@ -104,7 +117,7 @@ public class EachTimeScoreFragment extends Fragment {
 			acTextView.setAdapter(tipsAdapter);
 			acTextView.setDropDownHeight(350);
 			acTextView.setThreshold(1);
-			
+
 			scListView = (DragSortListView) view
 					.findViewById(R.id.matchscore_list);
 			scListView.setRemoveListener(onRemove2);

@@ -99,6 +99,7 @@ public class TimerActivity extends Activity {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void setupView() {
 		// TODO Auto-generated method stub
 		app = (MyApplication) getApplication();

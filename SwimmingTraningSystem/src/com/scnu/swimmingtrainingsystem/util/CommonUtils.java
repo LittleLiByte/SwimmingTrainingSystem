@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.R.integer;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -19,6 +21,7 @@ import com.scnu.swimmingtrainingsystem.R;
  * @author Littleyte
  * 
  */
+@SuppressLint("DefaultLocale")
 public class CommonUtils {
 
 	public static String HOSTURL = "";
@@ -48,7 +51,7 @@ public class CommonUtils {
 	public static void SaveLoginInfo(Context context, String username,
 			String password) {
 		SharedPreferences sp = context.getSharedPreferences(
-				Constants.LOGININFO, context.MODE_PRIVATE);
+				Constants.LOGININFO, Context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putString("username", username);
 		editor.putString("password", password);
@@ -58,7 +61,7 @@ public class CommonUtils {
 	public static void SaveLoginInfo(Context context, String host, String ip,
 			String port) {
 		SharedPreferences sp = context.getSharedPreferences(
-				Constants.LOGININFO, context.MODE_PRIVATE);
+				Constants.LOGININFO, Context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putString("hostInfo", host);
 		editor.putString("ip", ip);
@@ -68,7 +71,7 @@ public class CommonUtils {
 
 	public static void saveIsThisUserFirstLogin(Context context, boolean first) {
 		SharedPreferences sp = context.getSharedPreferences(
-				Constants.LOGININFO, context.MODE_PRIVATE);
+				Constants.LOGININFO, Context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putBoolean(Constants.IS_THIS_USER_FIRST_LOGIN, first);
 		editor.commit();
@@ -82,7 +85,7 @@ public class CommonUtils {
 	 */
 	public static void saveSelectedPool(Context context, int position) {
 		SharedPreferences sp = context.getSharedPreferences(
-				Constants.LOGININFO, context.MODE_PRIVATE);
+				Constants.LOGININFO, Context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putInt(Constants.SELECTED_POOL, position);
 		editor.commit();
@@ -96,7 +99,7 @@ public class CommonUtils {
 	 */
 	public static void saveDistance(Context context, String distance) {
 		SharedPreferences sp = context.getSharedPreferences(
-				Constants.LOGININFO, context.MODE_PRIVATE);
+				Constants.LOGININFO, Context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putString(Constants.SWIM_DISTANCE, distance);
 		editor.commit();
@@ -115,11 +118,19 @@ public class CommonUtils {
 	public static void saveCurrentScoreAndAthlete(Context context, int i,
 			int crrentDistance, String scoreString, String athleteString) {
 		SharedPreferences sp = context.getSharedPreferences(
-				Constants.LOGININFO, context.MODE_PRIVATE);
+				Constants.LOGININFO, Context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putInt(Constants.CURRENT_DISTANCE + i, crrentDistance);
 		editor.putString(Constants.SCORESJSON + i, scoreString);
 		editor.putString(Constants.ATHLETEJSON + i, athleteString);
+		editor.commit();
+	}
+
+	public static void saveSelectedAthlete(Context context, String mapJson) {
+		SharedPreferences sp = context.getSharedPreferences(
+				Constants.LOGININFO, Context.MODE_PRIVATE);
+		Editor editor = sp.edit();
+		editor.putString("mapConfig", mapJson);
 		editor.commit();
 	}
 
@@ -131,7 +142,7 @@ public class CommonUtils {
 	 */
 	public static void initAthletes(Context context, boolean isFirst) {
 		SharedPreferences sp = context.getSharedPreferences(
-				Constants.LOGININFO, context.MODE_PRIVATE);
+				Constants.LOGININFO, Context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putBoolean(Constants.FISRTOPENATHLETE, isFirst);
 		editor.commit();
@@ -145,7 +156,7 @@ public class CommonUtils {
 	 */
 	public static void initPlans(Context context, boolean isFirst) {
 		SharedPreferences sp = context.getSharedPreferences(
-				Constants.LOGININFO, context.MODE_PRIVATE);
+				Constants.LOGININFO, Context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putBoolean(Constants.FISRTOPENPLAN, isFirst);
 		editor.commit();
@@ -207,6 +218,7 @@ public class CommonUtils {
 
 	}
 
+	@SuppressLint("DefaultLocale")
 	public static String timeInt2TimeString(int totalMsec) {
 		// ÃëÊý
 		long time_count_s = totalMsec / 1000;

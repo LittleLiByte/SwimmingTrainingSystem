@@ -63,8 +63,7 @@
         </activity>
         <activity
             android:name="com.scnu.swimmingtrainingsystem.activity.QueryScoreActivity"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Light.NoTitleBar" >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.scnu.swimmingtrainingsystem.activity.SettingActivity"

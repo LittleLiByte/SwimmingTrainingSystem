@@ -449,7 +449,7 @@ public class DBManager {
 				sum.add(s.getScore());
 			}
 			ScoreSum p = new ScoreSum();
-			p.setAthleteName(DataSupport.find(Athlete.class, id).getName());
+			p.setAthleteName(Athlete.find(Athlete.class, id).getName());
 			p.setScore(CommonUtils.scoreSum(sum));
 			temps.add(p);
 		}

@@ -30,6 +30,7 @@ public class SettingActivity extends Activity {
 		try {
 			app = (MyApplication) getApplication();
 			//这里是为了应对可能出现的application里面的全局变量被系统回收导致的错误
+			@SuppressWarnings("unused")
 			Long mUserId = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		} catch (Exception e) {
 			// TODO: handle exception

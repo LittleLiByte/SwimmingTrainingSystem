@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
@@ -74,6 +75,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_modify_each_score);
 		try {
@@ -237,6 +239,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 					.get(i)).check();
 			int number = (Integer) myApplication.getMap().get(
 					Constants.COMPLETE_NUMBER);
+			System.out.println("number--->" + number);
 			int resCode = (Integer) result.get("resCode");
 			int position = (Integer) result.get("position");
 			if (resCode == 1 && number != length) {
@@ -403,5 +406,12 @@ public class EachTimeScoreActivity extends FragmentActivity {
 			createDialog();
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		myApplication.getMap().put(Constants.COMPLETE_NUMBER, 0);
 	}
 }

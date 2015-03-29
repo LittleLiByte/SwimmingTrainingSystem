@@ -43,6 +43,7 @@ public class ShowScoreActivity extends Activity {
 	private Integer times = 0;
 	private List<ScoreSum> mScoreSum = new ArrayList<ScoreSum>();
 	private List<List<Score>> list = new ArrayList<List<Score>>();
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -72,8 +73,8 @@ public class ShowScoreActivity extends Activity {
 		Long planid = (Long) mApplication.getMap().get(Constants.PLAN_ID);
 		Plan plan = DataSupport.find(Plan.class, planid);
 		mPlanName.setText(plan.getPool() + "  总距离：" + plan.getDistance()
-				+ "  共" + (times - 1) + "趟");
-		
+				+ "米    共" + (times - 1) + "趟");
+
 		adapter = new ShowScoreListAdapter(this, list, mScoreSum, 0);
 		mExpandableListView.setAdapter(adapter);
 		// 启动查询异步任务
@@ -81,7 +82,9 @@ public class ShowScoreActivity extends Activity {
 	}
 
 	public void showBack(View v) {
+
 		finish();
+		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);
 	}
 
 	/**
@@ -111,8 +114,8 @@ public class ShowScoreActivity extends Activity {
 			TempClass tempScore = new TempClass();
 			List<Long> athIds = mDbManager
 					.getAthleteNumberInScoreByDate(params[0]);
-			List<ScoreSum> totalScores = mDbManager.getAthleteIdInScoreByDate(date,
-					athIds);
+			List<ScoreSum> totalScores = mDbManager.getAthleteIdInScoreByDate(
+					date, athIds);
 			List<List<Score>> lists = new ArrayList<List<Score>>();
 			for (int i = 1; i < times; i++) {
 				List<Score> ls = mDbManager.getScoreByDateAndTimes(date, i);
@@ -167,7 +170,8 @@ public class ShowScoreActivity extends Activity {
 		private int mSwimTime = 0;
 
 		public ShowScoreListAdapter(Context mContext,
-				List<List<Score>> scoresList, List<ScoreSum> mTemps, int mSwimTime) {
+				List<List<Score>> scoresList, List<ScoreSum> mTemps,
+				int mSwimTime) {
 			this.mContext = mContext;
 			this.mLists = scoresList;
 			this.mTemps = mTemps;

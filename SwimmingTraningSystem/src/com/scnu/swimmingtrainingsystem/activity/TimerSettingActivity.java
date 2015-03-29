@@ -30,12 +30,13 @@ import com.scnu.swimmingtrainingsystem.adapter.ShowChosenAthleteAdapter;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
 import com.scnu.swimmingtrainingsystem.effect.Effectstype;
 import com.scnu.swimmingtrainingsystem.effect.NiftyDialogBuilder;
+import com.scnu.swimmingtrainingsystem.http.JsonTools;
+import com.scnu.swimmingtrainingsystem.model.AdapterHolder;
 import com.scnu.swimmingtrainingsystem.model.Athlete;
 import com.scnu.swimmingtrainingsystem.model.Plan;
-import com.scnu.swimmingtrainingsystem.model.AdapterHolder;
 import com.scnu.swimmingtrainingsystem.model.User;
-import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.CommonUtils;
+import com.scnu.swimmingtrainingsystem.util.Constants;
 
 /**
  * 开始计时前设定的Activity，即选择运动员以及其他添加其他信息并开始计时
@@ -110,23 +111,36 @@ public class TimerSettingActivity extends Activity {
 	}
 
 	private void initData() {
-
 		SharedPreferences sp = getSharedPreferences(Constants.LOGININFO,
 				Context.MODE_PRIVATE);
 		int selectedPositoin = sp.getInt(Constants.SELECTED_POOL, 1);
 		String swimDistance = sp.getString(Constants.SWIM_DISTANCE, "");
-
+		String mapConfigString = sp.getString("mapConfig", "");
+		SparseBooleanArray configArray = JsonTools.getObject(mapConfigString,
+				SparseBooleanArray.class);
 		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
 		userid = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		athletes = dbManager.getAthletes(userid);
 		for (Athlete ath : athletes) {
 			athleteNames.add(ath.getName());
 		}
-
 		// 初始化map数据，即将全部运动员设为不选中状态
 		for (int i = 0; i < athletes.size(); i++) {
-			map.put(i, false);
+			if (configArray.size() != 0) {
+				if (i < configArray.size()) {
+					map.put(i, configArray.get(i));
+					if (configArray.get(i)) {
+						chosenAthletes.add(athleteNames.get(i));
+					}
+				} else {
+					map.put(i, false);
+				}
+			} else {
+				map.put(i, false);
+			}
+
 		}
+
 		distanceEditText.setText(swimDistance);
 		List<String> poolLength = new ArrayList<String>();
 		poolLength.add("25米池");
@@ -138,6 +152,7 @@ public class TimerSettingActivity extends Activity {
 		poolSpinner.setSelection(selectedPositoin);
 		showChosenAthleteAdapter = new ShowChosenAthleteAdapter(
 				TimerSettingActivity.this, chosenAthletes);
+		chosenListView.setAdapter(showChosenAthleteAdapter);
 	}
 
 	/**
@@ -213,11 +228,13 @@ public class TimerSettingActivity extends Activity {
 	public void startTiming(View v) {
 
 		if (chosenAthletes.size() != 0) {
-			// 保存上一次的配置
+			// 保存这一次的配置到sp
 			CommonUtils.saveSelectedPool(this,
 					poolSpinner.getSelectedItemPosition());
 			CommonUtils.saveDistance(this, distanceEditText.getText()
 					.toString());
+			CommonUtils.saveSelectedAthlete(this,
+					JsonTools.creatJsonString(map));
 
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String date = sdf.format(new Date());

@@ -197,7 +197,11 @@ public class AthleteActivity extends Activity {
 							CommonUtils.showToast(AthleteActivity.this, mToast,
 									NAME_CANNOT_BE_REPEATE_STRING);
 						} else {
-							int age = Integer.parseInt(ageString);
+							int age = 0;
+							if (!TextUtils.isEmpty(ageString)) {
+								age = Integer.parseInt(ageString);
+							}
+
 							addAthlete(name, age, gender, phone, other);
 							addDialog.dismiss();
 						}
@@ -260,43 +264,43 @@ public class AthleteActivity extends Activity {
 		jsonMap.put("athlete", a);
 		jsonMap.put("uid", mUser.getUid());
 		final String athleteJson = JsonTools.creatJsonString(jsonMap);
-		StringRequest request = new StringRequest(Method.POST, CommonUtils.HOSTURL
-				+ ADDATHLETE, new Listener<String>() {
+		StringRequest request = new StringRequest(Method.POST,
+				CommonUtils.HOSTURL + ADDATHLETE, new Listener<String>() {
 
-			@Override
-			public void onResponse(String response) {
-				// TODO Auto-generated method stub
-				Log.i(Constants.TAG, response);
-				try {
-					JSONObject obj = new JSONObject(response);
-					int resCode = (Integer) obj.get("resCode");
-					if (resCode == 1) {
-						CommonUtils.showToast(AthleteActivity.this, mToast,
-								Constants.ADD_SUCCESS_STRING);
-						int aid = (Integer) obj.get("athlete_id");
-						a.setAid(aid);
-						a.setUser(mUser);
-						a.save();
-						mAthletes = mDbManager.getAthletes(mUserId);
-						mAthleteListAdapter.setDatas(mAthletes);
-						mAthleteListAdapter.notifyDataSetChanged();
+					@Override
+					public void onResponse(String response) {
+						// TODO Auto-generated method stub
+						Log.i(Constants.TAG, response);
+						try {
+							JSONObject obj = new JSONObject(response);
+							int resCode = (Integer) obj.get("resCode");
+							if (resCode == 1) {
+								CommonUtils.showToast(AthleteActivity.this,
+										mToast, Constants.ADD_SUCCESS_STRING);
+								int aid = (Integer) obj.get("athlete_id");
+								a.setAid(aid);
+								a.setUser(mUser);
+								a.save();
+								mAthletes = mDbManager.getAthletes(mUserId);
+								mAthleteListAdapter.setDatas(mAthletes);
+								mAthleteListAdapter.notifyDataSetChanged();
+							}
+
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
 					}
+				}, new ErrorListener() {
 
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						// TODO Auto-generated method stub
+						Log.e(Constants.TAG, error.getMessage());
 
-			}
-		}, new ErrorListener() {
-
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				// TODO Auto-generated method stub
-				Log.e(Constants.TAG, error.getMessage());
-
-			}
-		}) {
+					}
+				}) {
 
 			@Override
 			protected Map<String, String> getParams() throws AuthFailureError {
@@ -349,11 +353,11 @@ public class AthleteActivity extends Activity {
 								mAthletes = mDbManager.getAthletes(mUserId);
 								mAthleteListAdapter.setDatas(mAthletes);
 								mAthleteListAdapter.notifyDataSetChanged();
-								CommonUtils.showToast(AthleteActivity.this, mToast,
-										"同步成功！");
+								CommonUtils.showToast(AthleteActivity.this,
+										mToast, "同步成功！");
 							} else {
-								CommonUtils.showToast(AthleteActivity.this, mToast,
-										UNKNOW_ERROR);
+								CommonUtils.showToast(AthleteActivity.this,
+										mToast, UNKNOW_ERROR);
 							}
 
 						} catch (JSONException e) {

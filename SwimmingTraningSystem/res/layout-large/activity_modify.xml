@@ -103,7 +103,7 @@
     </LinearLayout>
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/modify_ll3"
         android:layout_centerHorizontal="true"
@@ -113,12 +113,12 @@
         android:background="@drawable/bg_login"
         android:gravity="center"
         android:onClick="modify"
-        android:paddingBottom="10dp"
+        android:paddingBottom="20dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
-        android:paddingTop="10dp"
+        android:paddingTop="20dp"
         android:text="确认修改 "
         android:textColor="#fff"
-        android:textSize="25sp" />
+        android:textSize="30sp" />
 
 </RelativeLayout>

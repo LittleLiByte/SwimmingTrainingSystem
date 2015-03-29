@@ -115,7 +115,7 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:paddingTop="10dp"
-        android:text="       确认修改       "
+        android:text="确认修改 "
         android:textColor="#fff" />
 
 </RelativeLayout>

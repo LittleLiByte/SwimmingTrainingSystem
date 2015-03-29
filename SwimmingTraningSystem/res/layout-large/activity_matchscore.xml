@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="本次成绩在"
-            android:textSize="22sp" />
+            android:textSize="24sp" />
 
         <AutoCompleteTextView
             android:id="@+id/act_current_distance"
@@ -50,14 +50,14 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:inputType="number"
-            android:textSize="22sp" />
+            android:textSize="24sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:text="米处记录"
-            android:textSize="22sp" />
+            android:textSize="24sp" />
     </LinearLayout>
 
     <include
@@ -82,8 +82,9 @@
             android:layout_weight="1.0"
             android:background="@drawable/startback"
             android:onClick="matchDone"
+            android:padding="5dp"
             android:text="保存并开始下一趟计时"
-            android:textSize="23sp" />
+            android:textSize="28sp" />
 
         <Button
             android:layout_width="match_parent"
@@ -91,8 +92,9 @@
             android:layout_weight="1.0"
             android:background="@drawable/startback"
             android:onClick="finishTiming"
+            android:padding="5dp"
             android:text="结束并查看本轮计时"
-            android:textSize="23sp" />
+            android:textSize="28sp" />
     </LinearLayout>
 
 </LinearLayout>

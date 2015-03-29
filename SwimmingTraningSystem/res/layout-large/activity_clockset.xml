@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:text="选择训练计划"
+            android:text="计时准备"
             android:textColor="#fff"
             android:textSize="30sp" />
 

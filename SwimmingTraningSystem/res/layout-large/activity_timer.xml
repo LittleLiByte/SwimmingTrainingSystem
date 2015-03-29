@@ -211,7 +211,7 @@
             android:background="@drawable/startback"
             android:onClick="matchAthlete"
             android:text="运动员成绩匹配"
-            android:textSize="20sp" />
+            android:textSize="25sp" />
     </LinearLayout>
 
 </RelativeLayout>

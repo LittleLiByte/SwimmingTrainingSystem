@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:text="第一趟"
-        android:textColor="@color/brown"
+        android:textColor="@color/white"
         android:textSize="18sp" />
 
     <TextView
@@ -24,7 +24,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="20dp"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="18sp" />
 
 </RelativeLayout>

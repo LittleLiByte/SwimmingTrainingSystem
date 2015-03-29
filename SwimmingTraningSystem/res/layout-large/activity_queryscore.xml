@@ -53,7 +53,8 @@
         android:id="@+id/query_score_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="@drawable/base_list_divider_drawable" >
+        android:divider="@drawable/base_list_divider_drawable"
+        android:groupIndicator="@null" >
     </ExpandableListView>
 
 </LinearLayout>

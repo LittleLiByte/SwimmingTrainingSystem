@@ -3,7 +3,7 @@
     android:id="@+id/item1"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#3D3D3D"
+  android:background="@color/orange"
     android:paddingBottom="16dp"
     android:paddingLeft="15dp"
     android:paddingTop="16dp" >
@@ -24,7 +24,6 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="20dp"
-        android:text="计划1"
         android:textColor="@color/white"
         android:textSize="28sp" />
 

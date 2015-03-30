@@ -55,7 +55,7 @@ public class LoginActivity extends Activity {
 	private static final String DEFAULT_PASSWORD = "123456asdjkl";
 	private MyApplication app;
 	private DBManager dbManager;
-	
+
 	private EditText etLogin;
 	private EditText etPassword;
 	private TextView sethost;
@@ -129,13 +129,14 @@ public class LoginActivity extends Activity {
 			}
 		});
 		forgot.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				LoginActivity.this.startActivity(new Intent(LoginActivity.this,
 						RetrievePasswordActivity.class));
-				overridePendingTransition(R.anim.push_right_in, R.anim.push_left_out);
+				overridePendingTransition(R.anim.push_right_in,
+						R.anim.push_left_out);
 			}
 		});
 	}
@@ -222,6 +223,10 @@ public class LoginActivity extends Activity {
 									// 用户第一次登陆
 									CommonUtils.saveIsThisUserFirstLogin(
 											LoginActivity.this, true);
+									
+									//覆盖前一个用户选择的运动员
+									CommonUtils.saveSelectedAthlete(
+											LoginActivity.this, "");
 								} else {
 									// 如果该用户信息已存在本地数据库，则取出当前id作为全局变量
 									long currentId = dbManager.getUserByName(
@@ -288,7 +293,6 @@ public class LoginActivity extends Activity {
 				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 		mQueue.add(loginRequest);
 	}
-
 
 	/**
 	 * 设置服务器IP地址和端口地址对话框

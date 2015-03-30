@@ -11,6 +11,7 @@ import org.litepal.crud.DataSupport;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -231,7 +232,13 @@ public class MatchScoreActivity extends Activity {
 			}
 			loadingDialog.show();
 			addScoreRequest(date);
+		} else {
+			Intent intent = new Intent(MatchScoreActivity.this,
+					ShowScoreActivity.class);
+			startActivity(intent);
+			finish();
 		}
+
 	}
 
 	/**
@@ -240,7 +247,7 @@ public class MatchScoreActivity extends Activity {
 	 * @param v
 	 */
 	public void finishTiming(View v) {
-		Intent i = null;
+
 		String date = (String) app.getMap().get(Constants.TEST_DATE);
 		String actv = acTextView.getText().toString().trim();
 		int crrentDistance = 0;
@@ -262,20 +269,20 @@ public class MatchScoreActivity extends Activity {
 				CommonUtils.showToast(this, toast, "成绩数目与运动员数目不相等！");
 				return;
 			} else {
-				i = new Intent(this, ShowScoreActivity.class);
 				// 如果这是第一趟并且成绩数目与运动员数目相等，则直接保存到数据库
 				matchSuccess(date, nowCurrent, crrentDistance);
 			}
 		} else {
-			i = new Intent(this, EachTimeScoreActivity.class);
+			Intent i = new Intent(this, EachTimeScoreActivity.class);
 			// 如果这是第一趟并且成绩数目与运动员数目不相等,则先保存到sp中，统计再做调整
 			String scoresString = JsonTools.creatJsonString(scores);
 			String athleteJson = JsonTools.creatJsonString(dragDatas);
 			CommonUtils.saveCurrentScoreAndAthlete(this, nowCurrent,
 					crrentDistance, scoresString, athleteJson);
+			startActivity(i);
+			finish();
 		}
-		startActivity(i);
-		finish();
+
 	}
 
 	/**
@@ -398,6 +405,7 @@ public class MatchScoreActivity extends Activity {
 		scoreMap.put("plan", sp);
 		scoreMap.put("uid", user.getUid());
 		scoreMap.put("athlete_id", aidList);
+		scoreMap.put("type", 1);
 		final String jsonString = JsonTools.creatJsonString(scoreMap);
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				CommonUtils.HOSTURL + "addScores", new Listener<String>() {
@@ -411,9 +419,14 @@ public class MatchScoreActivity extends Activity {
 						try {
 							obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
+							int planId = (Integer) obj.get("plan_id");
 							if (resCode == 1) {
 								CommonUtils.showToast(MatchScoreActivity.this,
 										toast, "成功同步至服务器!");
+								ContentValues values = new ContentValues();
+								values.put("pid", planId);
+								Plan.updateAll(Plan.class, values,
+										String.valueOf(plan.getId()));
 							} else {
 								CommonUtils.showToast(MatchScoreActivity.this,
 										toast, "同步失敗！");

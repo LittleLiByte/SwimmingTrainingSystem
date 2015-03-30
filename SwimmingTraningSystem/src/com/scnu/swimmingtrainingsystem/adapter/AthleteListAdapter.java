@@ -39,6 +39,8 @@ import com.scnu.swimmingtrainingsystem.effect.Effectstype;
 import com.scnu.swimmingtrainingsystem.effect.NiftyDialogBuilder;
 import com.scnu.swimmingtrainingsystem.http.JsonTools;
 import com.scnu.swimmingtrainingsystem.model.Athlete;
+import com.scnu.swimmingtrainingsystem.model.SmallPlan;
+import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 import com.scnu.swimmingtrainingsystem.view.Switch;
@@ -215,15 +217,18 @@ public class AthleteListAdapter extends BaseAdapter {
 			}
 			dbManager.updateAthlete(athletes, position, ath_name, ath_age,
 					ath_gender, ath_phone, ath_extras);
-			setDatas(dbManager.getAthletes(userID));
-			notifyDataSetChanged();
-			CommonUtils.showToast(context, toast, "修改成功");
+			
 			// 如果处在联网状态，则发送至服务器
 			boolean isConnect = (Boolean) app.getMap().get(
 					Constants.IS_CONNECT_SERVER);
 			if (isConnect) {
 				// 同步服务器
-				modifyAthRequest(athletes, position);
+				modifyAthRequest(athletes, position, ath_name, ath_age,
+						ath_gender, ath_phone, ath_extras);
+			}else {
+				setDatas(dbManager.getAthletes(userID));
+				notifyDataSetChanged();
+				CommonUtils.showToast(context, toast, "修改成功");
 			}
 		}
 		viewDialog.dismiss();
@@ -278,10 +283,13 @@ public class AthleteListAdapter extends BaseAdapter {
 								if (isConnect) {
 									// 同步服务器
 									deleteAthRequest(athletes.get(position));
+								} else {
+									setDatas(dbManager.getAthletes(userID));
+									notifyDataSetChanged();
+									CommonUtils.showToast(context, toast,
+											"删除成功");
 								}
-								setDatas(dbManager.getAthletes(userID));
-								notifyDataSetChanged();
-								CommonUtils.showToast(context, toast, "删除成功");
+
 							}
 						}
 					});
@@ -305,11 +313,20 @@ public class AthleteListAdapter extends BaseAdapter {
 	 * 
 	 * @param obj
 	 */
-	public void modifyAthRequest(List<Athlete> athletes, int position) {
-
+	public void modifyAthRequest(List<Athlete> athletes, int position,
+			String ath_name, String ath_age, String ath_gender,
+			String ath_phone, String ath_extras) {
+		User user = dbManager.getUser(userID);
 		Athlete obj = athletes.get(position);
-		obj = DataSupport.find(Athlete.class, obj.getId(), true);
-		final String athleteJson = JsonTools.creatJsonString(obj);
+		Map<String, Object> jsonMap = new HashMap<String, Object>();
+		jsonMap.put("uid", user.getUid());
+		jsonMap.put("athlete_id", obj.getAid());
+		jsonMap.put("athlete_name", ath_name);
+		jsonMap.put("athlete_age", ath_age);
+		jsonMap.put("athlete_gender", ath_gender);
+		jsonMap.put("athlete_phone", ath_phone);
+		jsonMap.put("athlete_extra", ath_extras);
+		final String athleteJson = JsonTools.creatJsonString(jsonMap);
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				CommonUtils.HOSTURL + "modifyAthlete", new Listener<String>() {
 
@@ -322,6 +339,8 @@ public class AthleteListAdapter extends BaseAdapter {
 							obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
 							if (resCode == 1) {
+								setDatas(dbManager.getAthletes(userID));
+								notifyDataSetChanged();
 								CommonUtils.showToast(context, toast, "修改成功");
 							} else {
 								CommonUtils.showToast(context, toast, "修改失败");
@@ -362,9 +381,8 @@ public class AthleteListAdapter extends BaseAdapter {
 	 * @param a
 	 *            运动员对象
 	 */
-	public void deleteAthRequest(Athlete a) {
-
-		final String jsonString = JsonTools.creatJsonString(a);
+	public void deleteAthRequest(final Athlete a) {
+		final User us = dbManager.getUser(userID);
 		StringRequest stringRequest2 = new StringRequest(Method.POST,
 				CommonUtils.HOSTURL + "deleteAthlete", new Listener<String>() {
 
@@ -377,6 +395,8 @@ public class AthleteListAdapter extends BaseAdapter {
 							obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
 							if (resCode == 1) {
+								setDatas(dbManager.getAthletes(userID));
+								notifyDataSetChanged();
 								CommonUtils.showToast(context, toast, "删除成功");
 							} else {
 								CommonUtils.showToast(context, toast, "删除失败");
@@ -399,7 +419,7 @@ public class AthleteListAdapter extends BaseAdapter {
 			protected Map<String, String> getParams() throws AuthFailureError {
 				// 设置请求参数
 				Map<String, String> map = new HashMap<String, String>();
-				map.put("deleteAthlete", jsonString);
+				map.put("athlete_id", a.getAid() + "");
 				return map;
 			}
 		};

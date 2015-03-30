@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -342,6 +343,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 		scoreMap.put("plan", sp);
 		scoreMap.put("uid", user.getUid());
 		scoreMap.put("athlete_id", aidList);
+		scoreMap.put("type", 1);
 		final String jsonString = JsonTools.creatJsonString(scoreMap);
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				CommonUtils.HOSTURL + "addScores", new Listener<String>() {
@@ -355,10 +357,15 @@ public class EachTimeScoreActivity extends FragmentActivity {
 						try {
 							obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
+							int planId = (Integer) obj.get("plan_id");
 							if (resCode == 1) {
 								CommonUtils.showToast(
 										EachTimeScoreActivity.this, mToast,
 										"成功同步至服务器!");
+								ContentValues values = new ContentValues();
+								values.put("pid", planId);
+								Plan.updateAll(Plan.class, values,
+										String.valueOf(plan.getId()));
 							} else {
 								CommonUtils.showToast(
 										EachTimeScoreActivity.this, mToast,

@@ -489,7 +489,7 @@ public class DBManager {
 	 */
 	public List<Long> getAthleteIdInScoreByDate(String date) {
 		List<Long> athleteIds = new ArrayList<Long>();
-		String sql = "select distinct athlete_id from score where date='"
+		String sql = "select distinct athlete_id from score where  date='"
 				+ date + "'";
 		Cursor cursor = DataSupport.findBySQL(sql);
 		while (cursor.moveToNext()) {
@@ -498,6 +498,34 @@ public class DBManager {
 			athleteIds.add(athlete_id);
 		}
 		return athleteIds;
+	}
+
+	/**
+	 * 获取该用户普通成绩的最新日期
+	 * 
+	 * @param user_id
+	 *            用戶id
+	 * @return
+	 */
+	public int getScoreDateNumberbyUid(long user_id) {
+		String userString = String.valueOf(user_id);
+		List<String> dates = new ArrayList<String>();
+		String sql = "select distinct date from score where user_id='"
+				+ userString + "' and type='1'";
+		Cursor cursor = DataSupport.findBySQL(sql);
+		while (cursor.moveToNext()) {
+			String date = cursor.getString(cursor.getColumnIndex("date"));
+			dates.add(date);
+		}
+		return dates.size();
+	}
+
+	public void deleteScores(String date) {
+		List<Score> scores = DataSupport.select("id").where("date=?", date)
+				.find(Score.class);
+		for (Score s : scores) {
+			DataSupport.delete(Score.class, s.getId());
+		}
 	}
 
 	/**

@@ -126,7 +126,7 @@ public class TimerSettingActivity extends Activity {
 		}
 		// 初始化map数据，即将全部运动员设为不选中状态
 		for (int i = 0; i < athletes.size(); i++) {
-			if (configArray.size() != 0) {
+			if (configArray != null && configArray.size() != 0) {
 				if (i < configArray.size()) {
 					map.put(i, configArray.get(i));
 					if (configArray.get(i)) {

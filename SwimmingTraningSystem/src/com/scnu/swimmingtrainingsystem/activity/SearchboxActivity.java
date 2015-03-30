@@ -70,7 +70,9 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 	private boolean searchType = false;
 	private int resultCode = 0x11;
 	private List<String> dateList = new ArrayList<String>();
-	private int offset;
+	private int localOffset;
+	private int serverOffset;
+	private int currentDateCount;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +99,7 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 
 		isConnected = (Boolean) myApplication.getMap().get(
 				Constants.IS_CONNECT_SERVER);
-
+		currentDateCount = mDbManager.getScoreDateNumberbyUid(userid);
 		radioGroup = (RadioGroup) findViewById(R.id.radiogroup1);
 		mListView = (XListView) findViewById(R.id.search_date_list);
 		mAdapter = new ArrayAdapter<String>(this, R.layout.xlist_item, dateList);
@@ -132,7 +134,8 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 			}
 		});
 
-		new QueryDatesTask().execute(offset);
+		new QueryDatesTask().execute(localOffset);
+		localOffset+=20;
 	}
 
 	/**
@@ -142,21 +145,19 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 	 */
 	protected void excuteSearching(int checkedId) {
 		// TODO Auto-generated method stub
-		dateList.clear();
-		mAdapter.notifyDataSetChanged();
 		switch (checkedId) {
 		case R.id.btn_0:
+			localOffset += 20;
 			searchType = false;
-			offset = 0;
 			break;
 		case R.id.btn_1:
+			serverOffset += 20;
 			searchType = true;
-			offset = 0;
 			break;
 		default:
 			break;
 		}
-		onLoad(offset);
+		onLoad();
 	}
 
 	public void back(View v) {
@@ -189,6 +190,7 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 				mAdapter.notifyDataSetChanged();
 			} else {
 				mListView.stopLoadMore();
+//				mListView.hideFooter();
 				Toast.makeText(SearchboxActivity.this, "没有可加载的数据了！",
 						Toast.LENGTH_SHORT).show();
 			}
@@ -205,22 +207,23 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 	@Override
 	public void onLoadMore() {
 		// TODO Auto-generated method stub
-		offset += 20;
-		onLoad(offset);
+		onLoad();
 	}
 
-	private void onLoad(int off) {
+	private void onLoad() {
 		// TODO Auto-generated method stub
 		if (searchType) {
 			if (isConnected) {
-				getScoreDateListReqeust(off);
+				getScoreDateListReqeust(serverOffset);
+				serverOffset += 20;
 			} else {
 				CommonUtils.showToast(SearchboxActivity.this, mToast,
 						"没有连接服务器！");
 				mListView.stopLoadMore();
 			}
 		} else {
-			new QueryDatesTask().execute(off);
+			new QueryDatesTask().execute(localOffset);
+			localOffset += 20;
 		}
 
 	}
@@ -232,16 +235,11 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 	 *            当前页
 	 */
 	protected void getScoreDateListReqeust(int curPage) {
-		if (mLoadingDialog == null) {
-			mLoadingDialog = LoadingDialog.createDialog(SearchboxActivity.this);
-			mLoadingDialog.setMessage("正在努力查询...");
-			mLoadingDialog.setCanceledOnTouchOutside(false);
-		}
-		mLoadingDialog.show();
 		User user = mDbManager.getUser(userid);
 		Map<String, Object> jsonMap = new HashMap<String, Object>();
-		jsonMap.put("curPage", curPage);
+		jsonMap.put("curOffset", curPage / 20);
 		jsonMap.put("uid", user.getUid());
+		jsonMap.put("localNumber", currentDateCount);
 		final String jsonString = JsonTools.creatJsonString(jsonMap);
 
 		StringRequest getScoreDateList = new StringRequest(Method.POST,
@@ -269,9 +267,11 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 								}
 								dateList.addAll(dateResult);
 								mAdapter.notifyDataSetChanged();
-								System.out.println("dateList>>>" + dateList);
 							} else {
-
+								mListView.stopLoadMore();
+								Toast.makeText(SearchboxActivity.this,
+										"没有可加载的数据了！", Toast.LENGTH_SHORT)
+										.show();
 							}
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block

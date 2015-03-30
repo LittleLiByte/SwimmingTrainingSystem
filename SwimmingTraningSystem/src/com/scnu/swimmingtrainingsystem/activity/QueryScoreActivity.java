@@ -46,7 +46,9 @@ import com.android.volley.toolbox.Volley;
 import com.scnu.swimmingtrainingsystem.R;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
 import com.scnu.swimmingtrainingsystem.http.JsonTools;
+import com.scnu.swimmingtrainingsystem.model.Athlete;
 import com.scnu.swimmingtrainingsystem.model.Plan;
+import com.scnu.swimmingtrainingsystem.model.ResponseScore;
 import com.scnu.swimmingtrainingsystem.model.Score;
 import com.scnu.swimmingtrainingsystem.model.ScoreSum;
 import com.scnu.swimmingtrainingsystem.model.User;
@@ -215,22 +217,7 @@ public class QueryScoreActivity extends Activity {
 				List<List<Score>> scores = (List<List<Score>>) result
 						.get("scores");
 
-				details.setVisibility(View.VISIBLE);
-				details.setText(plan.getPool() + "  共" + maxTime + "趟  "
-						+ "  目标总距离：" + plan.getDistance() + "米");
-				details.setOnClickListener(new OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						// TODO Auto-generated method stub
-						String extraString = "无备注";
-						if (!TextUtils.isEmpty(plan.getExtra().trim())) {
-							extraString = plan.getExtra();
-						}
-						showPlanExtra(extraString);
-					}
-
-				});
+				setDetailTextView(maxTime, plan);
 				NameScoreListAdapter scoreListAdapter = new NameScoreListAdapter(
 						QueryScoreActivity.this, scores, sumList, maxTime + 1);
 				mExpandableListView.setAdapter(scoreListAdapter);
@@ -241,6 +228,26 @@ public class QueryScoreActivity extends Activity {
 			}
 			mLoadingDialog.dismiss();
 		}
+
+	}
+
+	private void setDetailTextView(int maxTime, final Plan plan) {
+		details.setVisibility(View.VISIBLE);
+		details.setText(plan.getPool() + "  共" + maxTime + "趟  " + "  目标总距离："
+				+ plan.getDistance() + "米");
+		details.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				String extraString = "无备注";
+				if (!TextUtils.isEmpty(plan.getExtra().trim())) {
+					extraString = plan.getExtra();
+				}
+				showPlanExtra(extraString);
+			}
+
+		});
 	}
 
 	/**
@@ -279,79 +286,52 @@ public class QueryScoreActivity extends Activity {
 						try {
 							obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
-							if (resCode == 1) {/*
-												 * TempScore[] tempScores =
-												 * JsonTools.getObject(
-												 * obj.get("dataList"
-												 * ).toString(),
-												 * TempScore[].class);
-												 * 
-												 * int pid =
-												 * tempScores[0].getPlan_id();
-												 * Plan planResult =
-												 * dbManager.getPlanByPid(pid);
-												 * 
-												 * details.setVisibility(View.
-												 * VISIBLE); //
-												 * details.setText("计划名：" +
-												 * planResult.getName() // +
-												 * "--" + planResult.getPool() +
-												 * " " // + planResult.getTime()
-												 * + "趟"); for (TempScore
-												 * tempScore : tempScores) {
-												 * 
-												 * int aid =
-												 * tempScore.getAthlete_id();
-												 * Athlete ath = dbManager
-												 * .getAthletesByAid(aid); Score
-												 * newScore = new Score();
-												 * newScore.setP(planResult);
-												 * newScore.setDate(string);
-												 * newScore
-												 * .setType(Constants.NORMALSCORE
-												 * ); newScore.setAthlete(ath);
-												 * newScore
-												 * .setTimes(tempScore.getTimes
-												 * ());
-												 * newScore.setScore(tempScore
-												 * .getScore());
-												 * newScore.save(); } // time =
-												 * planResult.getTime();
-												 * 
-												 * List<List<Score>> listscores
-												 * = new
-												 * ArrayList<List<Score>>(); //
-												 * 根据时间查询成绩 for (int t = 1; t <=
-												 * time; t++) { List<Score> sco
-												 * = dbManager
-												 * .getScoreByDateAndTimes
-												 * (string, t); if (t == 1) {
-												 * List<Long> athIds = new
-												 * ArrayList<Long>(); for (Score
-												 * s : sco) {
-												 * athIds.add(s.getAthlete
-												 * ().getId()); } sumList =
-												 * dbManager
-												 * .getAthleteIdInScoreByDate(
-												 * string, athIds); } //
-												 * 查询出来要确保该轮成绩是存在的 if
-												 * (sco.size() != 0) {
-												 * listscores.add(sco); }
-												 * 
-												 * } NameScoreListAdapter
-												 * scoreListAdapter = new
-												 * NameScoreListAdapter(
-												 * QueryScoreActivity.this,
-												 * listscores, sumList, time +
-												 * 1); mExpandableListView
-												 * .setAdapter
-												 * (scoreListAdapter); // 默认展开
-												 * for (int i = 0; i <= time;
-												 * i++) {
-												 * mExpandableListView.expandGroup
-												 * (i); }
-												 */
+							if (resCode == 1) {
+								int maxTime = 0;
+								ResponseScore[] tempScores = JsonTools
+										.getObject(obj.get("dataList")
+												.toString(),
+												ResponseScore[].class);
+								int plan_id = tempScores[0].getPlan_id();
+								Plan plan = DataSupport.find(Plan.class,
+										plan_id);
+								for (ResponseScore responseScore : tempScores) {
+									int curTime = responseScore.getTimes();
+									maxTime = curTime > maxTime ? curTime
+											: maxTime;
+									Score score = new Score();
+									score.setDate(responseScore.getUp_time());
+									score.setDistance(responseScore
+											.getDistance());
+									score.setScore(responseScore.getScore());
+									score.setTimes(responseScore.getTimes());
+									score.setType(1);
+									score.setUser(mUser);
+									score.save();
+								}
+								String resDate = tempScores[0].getUp_time();
+								List<Long> athIds = dbManager
+										.getAthleteIdInScoreByDate(resDate);
+								List<ScoreSum> sumList = dbManager
+										.getAthleteIdInScoreByDate(resDate,
+												athIds);
+								List<List<Score>> listss = new ArrayList<List<Score>>();
+								// 根据时间查询成绩
+								for (int t = 1; t <= maxTime; t++) {
+									List<Score> sco = dbManager
+											.getScoreByDateAndTimes(resDate, t);
+									listss.add(sco);
+								}
+								setDetailTextView(maxTime, plan);
+
+								NameScoreListAdapter scoreListAdapter = new NameScoreListAdapter(
+										QueryScoreActivity.this, listss,
+										sumList, maxTime + 1);
+								mExpandableListView
+										.setAdapter(scoreListAdapter);
+								dbManager.deleteScores(resDate);
 							}
+
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();

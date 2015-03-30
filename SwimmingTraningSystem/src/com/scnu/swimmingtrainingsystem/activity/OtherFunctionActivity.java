@@ -359,13 +359,16 @@ public class OtherFunctionActivity extends Activity implements OnClickListener {
 
 	private void addScoreRequest(final int aid) {
 		List<Score> scoresResult = new ArrayList<Score>();
+		List<Integer> athList = new ArrayList<Integer>();
 		scoresResult.add(DataSupport.findLast(Score.class));
+		athList.add(aid);
 		User user = mDbManager.getUser(userID);
 		Map<String, Object> scoreMap = new HashMap<String, Object>();
 		scoreMap.put("score", scoresResult);
 		scoreMap.put("plan", null);
 		scoreMap.put("uid", user.getUid());
-		scoreMap.put("athlete_id", aid);
+		scoreMap.put("athlete_id", athList);
+		scoreMap.put("type", fuctionSpinner.getSelectedItemPosition() + 2);
 		final String jsonString = JsonTools.creatJsonString(scoreMap);
 		StringRequest stringRequest = new StringRequest(Method.POST,
 				CommonUtils.HOSTURL + "addScores", new Listener<String>() {
@@ -393,7 +396,6 @@ public class OtherFunctionActivity extends Activity implements OnClickListener {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						finish();
 					}
 				}, new ErrorListener() {
 

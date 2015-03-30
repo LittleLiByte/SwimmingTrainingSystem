@@ -130,9 +130,9 @@ public class AthleteActivity extends Activity {
 				Context.MODE_PRIVATE);
 		boolean isFirst = sp.getBoolean(Constants.FISRTOPENATHLETE, true);
 		boolean userFirstLogin = sp.getBoolean(
-				Constants.IS_THIS_USER_FIRST_LOGIN, true);
+				Constants.IS_THIS_USER_FIRST_LOGIN, false);
 
-		// 如果第一次打开应用并且可以连接服务器，就会尝试从服务器获取运动员信息
+		// 如果新用户第一次打开应用并且可以连接服务器，就会尝试从服务器获取运动员信息
 		if (isConnect && isFirst && userFirstLogin) {
 			CommonUtils.initAthletes(this, false);
 			CommonUtils.saveIsThisUserFirstLogin(this, false);

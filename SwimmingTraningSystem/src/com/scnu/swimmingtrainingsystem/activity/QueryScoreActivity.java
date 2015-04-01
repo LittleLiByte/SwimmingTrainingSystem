@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -282,19 +283,19 @@ public class QueryScoreActivity extends Activity {
 
 					@Override
 					public void onResponse(String response) {
+						Log.i(Constants.TAG, response);
 						JSONObject obj;
 						try {
 							obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
+							int distance = (Integer) obj.get("distance");
+							String poolString = (String) obj.get("pool");
 							if (resCode == 1) {
 								int maxTime = 0;
 								ResponseScore[] tempScores = JsonTools
 										.getObject(obj.get("dataList")
 												.toString(),
 												ResponseScore[].class);
-								int plan_id = tempScores[0].getPlan_id();
-								Plan plan = DataSupport.find(Plan.class,
-										plan_id);
 								for (ResponseScore responseScore : tempScores) {
 									int curTime = responseScore.getTimes();
 									maxTime = curTime > maxTime ? curTime
@@ -307,6 +308,10 @@ public class QueryScoreActivity extends Activity {
 									score.setTimes(responseScore.getTimes());
 									score.setType(1);
 									score.setUser(mUser);
+									Athlete athlete = dbManager
+											.getAthletesByAid(responseScore
+													.getAthlete_id());
+									score.setAthlete(athlete);
 									score.save();
 								}
 								String resDate = tempScores[0].getUp_time();
@@ -322,7 +327,9 @@ public class QueryScoreActivity extends Activity {
 											.getScoreByDateAndTimes(resDate, t);
 									listss.add(sco);
 								}
-								setDetailTextView(maxTime, plan);
+								details.setVisibility(View.VISIBLE);
+								details.setText(poolString + "  目标总距离："
+										+ distance + "米");
 
 								NameScoreListAdapter scoreListAdapter = new NameScoreListAdapter(
 										QueryScoreActivity.this, listss,
@@ -330,6 +337,9 @@ public class QueryScoreActivity extends Activity {
 								mExpandableListView
 										.setAdapter(scoreListAdapter);
 								dbManager.deleteScores(resDate);
+								for (int i = 0; i <= maxTime; i++) {
+									mExpandableListView.expandGroup(i);
+								}
 							}
 
 						} catch (JSONException e) {

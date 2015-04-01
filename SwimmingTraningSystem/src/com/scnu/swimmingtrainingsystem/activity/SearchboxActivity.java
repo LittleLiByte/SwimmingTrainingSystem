@@ -42,7 +42,6 @@ import com.scnu.swimmingtrainingsystem.http.JsonTools;
 import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 import com.scnu.swimmingtrainingsystem.util.Constants;
-import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 import com.scnu.swimmingtrainingsystem.view.XListView;
 import com.scnu.swimmingtrainingsystem.view.XListView.IXListViewListener;
 
@@ -60,7 +59,6 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 
 	private RadioGroup radioGroup;
 	private XListView mListView;
-	private LoadingDialog mLoadingDialog;
 	private Toast mToast;
 
 	private ArrayAdapter<String> mAdapter;
@@ -70,8 +68,8 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 	private boolean searchType = false;
 	private int resultCode = 0x11;
 	private List<String> dateList = new ArrayList<String>();
+	private List<String> localList = new ArrayList<String>();
 	private int localOffset;
-	private int serverOffset;
 	private int currentDateCount;
 
 	@Override
@@ -124,10 +122,10 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 				// TODO Auto-generated method stub
 				Intent data = new Intent();
 				data.putExtra("date", dateList.get(position - 1));
-				if (searchType) {
-					resultCode = 1;
-				} else {
+				if (localList.contains(dateList.get(position - 1))) {
 					resultCode = 0;
+				} else {
+					resultCode = 1;
 				}
 				setResult(resultCode, data);
 				finish();
@@ -135,7 +133,7 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 		});
 
 		new QueryDatesTask().execute(localOffset);
-		localOffset+=20;
+		localOffset += 20;
 	}
 
 	/**
@@ -151,7 +149,6 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 			searchType = false;
 			break;
 		case R.id.btn_1:
-			serverOffset += 20;
 			searchType = true;
 			break;
 		default:
@@ -187,10 +184,11 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 			super.onPostExecute(result);
 			if (result.size() != 0) {
 				dateList.addAll(result);
+				localList.addAll(result);
 				mAdapter.notifyDataSetChanged();
 			} else {
 				mListView.stopLoadMore();
-//				mListView.hideFooter();
+				// mListView.hideFooter();
 				Toast.makeText(SearchboxActivity.this, "没有可加载的数据了！",
 						Toast.LENGTH_SHORT).show();
 			}
@@ -214,8 +212,7 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 		// TODO Auto-generated method stub
 		if (searchType) {
 			if (isConnected) {
-				getScoreDateListReqeust(serverOffset);
-				serverOffset += 20;
+				getScoreDateListReqeust();
 			} else {
 				CommonUtils.showToast(SearchboxActivity.this, mToast,
 						"没有连接服务器！");
@@ -234,10 +231,11 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 	 * @param curPage
 	 *            当前页
 	 */
-	protected void getScoreDateListReqeust(int curPage) {
+	protected void getScoreDateListReqeust() {
+
 		User user = mDbManager.getUser(userid);
 		Map<String, Object> jsonMap = new HashMap<String, Object>();
-		jsonMap.put("curOffset", curPage / 20);
+		jsonMap.put("curPage", currentDateCount / 20 + 1);
 		jsonMap.put("uid", user.getUid());
 		jsonMap.put("localNumber", currentDateCount);
 		final String jsonString = JsonTools.creatJsonString(jsonMap);
@@ -248,13 +246,12 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 
 					@Override
 					public void onResponse(String response) {
-						System.out.println("dateresponse>>>>" + response);
 						JSONObject obj;
 						try {
 							obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
 							if (resCode == 1) {
-
+								currentDateCount += 20;
 								List<String> dateResult = new ArrayList<String>();
 								JSONArray dates = new JSONArray(obj.get(
 										"dataList").toString());
@@ -283,7 +280,6 @@ public class SearchboxActivity extends Activity implements IXListViewListener {
 
 					@Override
 					public void onErrorResponse(VolleyError error) {
-						mLoadingDialog.dismiss();
 					}
 				}) {
 

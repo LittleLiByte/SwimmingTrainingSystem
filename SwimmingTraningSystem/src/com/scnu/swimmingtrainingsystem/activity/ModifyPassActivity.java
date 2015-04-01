@@ -3,6 +3,9 @@ package com.scnu.swimmingtrainingsystem.activity;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.scnu.swimmingtrainingsystem.R;
 import android.app.Activity;
 import android.content.Intent;
@@ -24,8 +27,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
+import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.CommonUtils;
+import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 
 public class ModifyPassActivity extends Activity {
 	private MyApplication app;
@@ -36,6 +41,7 @@ public class ModifyPassActivity extends Activity {
 	private RequestQueue mQueue;
 	private Toast toast;
 	private Long userId;
+	private LoadingDialog loadingDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,15 +94,24 @@ public class ModifyPassActivity extends Activity {
 			CommonUtils.showToast(this, toast, "当前为系统默认帐号，不能修改密码！");
 		} else {
 			dbManager.modifyUserPassword(userId, comfPassword);
-			CommonUtils.showToast(this, toast, "修改密码成功！");
+		
 			// 如果处在联网状态，则发送至服务器
 			boolean isConnect = (Boolean) app.getMap().get(
 					Constants.IS_CONNECT_SERVER);
 			if (isConnect) {
+				if (loadingDialog == null) {
+					loadingDialog = LoadingDialog.createDialog(this);
+					loadingDialog.setMessage("正在同步...");
+					loadingDialog.setCanceledOnTouchOutside(false);
+				}
+				loadingDialog.show();
 				// 发送至服务器
 				modifyRequest(oldPassword, newPassword, comfPassword);
+			}else {
+				CommonUtils.showToast(this, toast, "修改密码成功！");
+				finish();
 			}
-			finish();
+			
 		}
 	}
 
@@ -119,7 +134,20 @@ public class ModifyPassActivity extends Activity {
 					public void onResponse(String response) {
 						// TODO Auto-generated method stub
 						Log.i("modifyPass", response);
-						finish();
+						loadingDialog.dismiss();
+						JSONObject obj;
+						try {
+							obj = new JSONObject(response);
+							int resCode = (Integer) obj.get("resCode");
+							if (resCode == 1) {
+								CommonUtils.showToast(ModifyPassActivity.this,
+										toast, "修改成功！");
+							}
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
 					}
 				}, new ErrorListener() {
 
@@ -134,9 +162,9 @@ public class ModifyPassActivity extends Activity {
 			protected Map<String, String> getParams() throws AuthFailureError {
 				// 设置请求参数
 				Map<String, String> map = new HashMap<String, String>();
-				map.put("oldPass", oldPassword);
+				User user = dbManager.getUser(userId);
+				map.put("uid", user.getUid() + "");
 				map.put("newPass", newPassword);
-				map.put("comfrim", comfPassword);
 				return map;
 			}
 

@@ -48,6 +48,7 @@
             android:layout_weight="1.0"
             android:background="@drawable/startback"
             android:onClick="finishModify"
+            android:textSize="18sp"
             android:text="调整完毕,进行统计" />
     </LinearLayout>
 

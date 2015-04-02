@@ -25,16 +25,17 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
 import com.android.volley.Request.Method;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.mobeta.android.dslv.DragSortListView;
@@ -55,6 +56,7 @@ import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 public class MatchScoreActivity extends Activity {
 
 	private MyApplication app;
+	private Button btNextTiming, btStatistics;
 	private DragSortListView scoreListView;
 	private DragSortListView nameListView;
 	private ScoreListAdapter adapter;
@@ -70,6 +72,9 @@ public class MatchScoreActivity extends Activity {
 	private LoadingDialog loadingDialog;
 	private RequestQueue mQueue;
 	private Toast mToast;
+
+	private ArrayList<String> originScores = new ArrayList<String>();
+	private ArrayList<String> originNames = new ArrayList<String>();
 	private DragSortListView.DropListener onDrop = new DragSortListView.DropListener() {
 		@Override
 		public void drop(int from, int to) {
@@ -143,6 +148,10 @@ public class MatchScoreActivity extends Activity {
 		mQueue = Volley.newRequestQueue(this);
 		Intent result = getIntent();
 		scores = result.getStringArrayListExtra("SCORES");
+		originScores.addAll(scores);
+
+		btNextTiming = (Button) findViewById(R.id.match_done);
+		btStatistics = (Button) findViewById(R.id.match_statistic);
 
 		scoreListView = (DragSortListView) findViewById(R.id.matchscore_list);
 		nameListView = (DragSortListView) findViewById(R.id.matchName_list);
@@ -163,8 +172,19 @@ public class MatchScoreActivity extends Activity {
 		acTextView.setAdapter(tipsAdapter);
 		acTextView.setDropDownHeight(350);
 		acTextView.setThreshold(1);
+		int numberth = (Integer) app.getMap().get(Constants.CURRENT_SWIM_TIME);
+		String intervalString = (String) app.getMap().get(Constants.INTERVAL);
+		int intervalDistance = Integer
+				.parseInt(intervalString.replace("米", ""));
+		acTextView.setText(intervalDistance * numberth + "");
+		int totalDistance = plan.getDistance();
+		if (totalDistance <= intervalDistance * numberth) {
+			btNextTiming.setVisibility(View.GONE);
+			btStatistics.setText("调整完毕，进入统计页面");
+		}
 
 		dragDatas = (List<String>) app.getMap().get(Constants.DRAG_NAME_LIST);
+		originNames.addAll(dragDatas);
 		viewList = new ArrayList<ListView>();
 		viewList.add(scoreListView);
 		viewList.add(nameListView);
@@ -191,7 +211,7 @@ public class MatchScoreActivity extends Activity {
 		int crrentDistance = 0;
 		if (!TextUtils.isEmpty(actv)) {
 			crrentDistance = Integer.parseInt(acTextView.getText().toString()
-					.trim());
+					.trim().replace("米", ""));
 		}
 		// 暂时保存到SharePreferences
 		String scoresString = JsonTools.creatJsonString(scores);
@@ -251,8 +271,7 @@ public class MatchScoreActivity extends Activity {
 		String actv = acTextView.getText().toString().trim();
 		int crrentDistance = 0;
 		if (!TextUtils.isEmpty(actv)) {
-			crrentDistance = Integer.parseInt(acTextView.getText().toString()
-					.trim());
+			crrentDistance = Integer.parseInt(actv.replace("米", ""));
 		}
 		int nowCurrent = (Integer) app.getMap()
 				.get(Constants.CURRENT_SWIM_TIME);
@@ -293,6 +312,16 @@ public class MatchScoreActivity extends Activity {
 		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
 		finish();
 		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void reLoad(View v) {
+		scores.clear();
+		scores.addAll(originScores);
+		adapter.notifyDataSetChanged();
+		dragDatas.clear();
+		dragDatas.addAll(originNames);
+		dragAdapter.notifyDataSetChanged();
 	}
 
 	/**

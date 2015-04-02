@@ -24,8 +24,14 @@ import android.widget.TextView;
 
 import com.scnu.swimmingtrainingsystem.R;
 
+/**
+ * 三次计频fragment
+ * 
+ * @author LittleByte
+ * 
+ */
 @SuppressLint("HandlerLeak")
-public class DashFragment extends Fragment implements OnClickListener {
+public class FrequenceFragment extends Fragment implements OnClickListener {
 	private Button btReset;
 	private TextView tvResult;
 	private Activity activity;
@@ -63,7 +69,7 @@ public class DashFragment extends Fragment implements OnClickListener {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-		View view = inflater.inflate(R.layout.fragment_dash, null);
+		View view = inflater.inflate(R.layout.fragment_frequence, null);
 		return view;
 	}
 
@@ -148,8 +154,8 @@ public class DashFragment extends Fragment implements OnClickListener {
 						tvTime.setText(strTime_count);
 						// 设置指针转动动画
 						setAnimation();
-						predegree = (float) (0.006 * mlCount);
-						secondpredegree = (float) (0.36 * mlCount);
+						predegree = (float) (0.0058 * mlCount);
+						secondpredegree = (float) (0.358 * mlCount);
 						hourpredegree = (float) (mlCount / 10000);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -249,7 +255,6 @@ public class DashFragment extends Fragment implements OnClickListener {
 			break;
 		}
 	}
-
 
 	@Override
 	public void onStop() {

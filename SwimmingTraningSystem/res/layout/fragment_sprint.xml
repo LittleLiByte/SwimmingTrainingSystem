@@ -139,6 +139,7 @@
             android:layout_weight="1.0"
             android:background="@drawable/bg_register"
             android:padding="10dp"
+            android:textSize="18sp"
             android:text="重置计时" />
 
         <Button
@@ -149,6 +150,7 @@
             android:layout_weight="1.0"
             android:background="@drawable/bg_login"
             android:padding="10dp"
+            android:textSize="18sp"
             android:text="匹配调整" />
     </LinearLayout>
 

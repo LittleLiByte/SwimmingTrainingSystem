@@ -100,7 +100,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.scnu.swimmingtrainingsystem.activity.MatchDashScoreActivity"
+            android:name="com.scnu.swimmingtrainingsystem.activity.MatchSprintScoreActivity"
             android:screenOrientation="portrait" >
         </activity>
     </application>

@@ -25,7 +25,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.scnu.swimmingtrainingsystem.R;
-import com.scnu.swimmingtrainingsystem.fragment.DashFragment;
+import com.scnu.swimmingtrainingsystem.fragment.FrequenceFragment;
 import com.scnu.swimmingtrainingsystem.fragment.SprintFragment;
 
 /**
@@ -55,7 +55,7 @@ public class OtherFunctionActivity extends FragmentActivity implements
 	 * Fragment（页面）
 	 */
 	SprintFragment sprintFragment;
-	DashFragment dashFragment;
+	FrequenceFragment dashFragment;
 	/**
 	 * 当前选中的项
 	 */
@@ -91,7 +91,7 @@ public class OtherFunctionActivity extends FragmentActivity implements
 	private void initData() {
 		initCursor(2);
 		sprintFragment = new SprintFragment();
-		dashFragment = new DashFragment();
+		dashFragment = new FrequenceFragment();
 		fragmentList.add(dashFragment);
 		fragmentList.add(sprintFragment);
 		adapter = new MyFrageStatePagerAdapter(getSupportFragmentManager());

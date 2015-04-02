@@ -133,4 +133,6 @@ public class Constants {
 
 	public static final String CORRECT = "correct";
 	
+	public static final String INTERVAL ="interval";
+	
 }

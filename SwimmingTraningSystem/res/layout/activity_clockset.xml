@@ -30,7 +30,6 @@
             android:background="@color/transparent"
             android:onClick="clcokset_back"
             android:src="@drawable/btn_back" />
-
     </RelativeLayout>
 
     <RelativeLayout
@@ -53,8 +52,7 @@
                 android:layout_height="wrap_content"
                 android:baselineAligned="false"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
-               >
+                android:orientation="horizontal" >
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -81,25 +79,21 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_weight="1"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal" >
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <AutoCompleteTextView
+                        android:id="@+id/tv_distance"
+                        android:layout_width="100dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
-                        android:text="总距离"
-                        android:textColor="@color/aliceblue"
-                        android:textSize="13sp" />
-
-                    <EditText
-                        android:id="@+id/tv_distance"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:hint="0"
                         android:ems="5"
+                        android:hint="游泳总距离"
                         android:inputType="number"
+                        android:nextFocusLeft="@+id/bt_choose_athlete"
+                        android:nextFocusUp="@+id/pool_length"
                         android:singleLine="true"
                         android:textColor="@color/dark_orange"
                         android:textSize="15sp" />
@@ -117,13 +111,29 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
+
+                <AutoCompleteTextView
+                    android:id="@+id/act_interval"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:ems="5"
+                    android:hint="计时间隔"
+                    android:inputType="number"
+                    android:nextFocusLeft="@+id/bt_choose_athlete"
+                    android:nextFocusUp="@+id/pool_length"
+                    android:singleLine="true"
+                    android:textColor="@color/dark_orange"
+                    android:textSize="14sp" />
 
                 <com.scnu.swimmingtrainingsystem.view.EditTextWithDel
                     android:id="@+id/et_remarks"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
                     android:hint="输入备注，方便查阅区分成绩"
                     android:singleLine="true" />
             </LinearLayout>

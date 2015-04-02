@@ -97,11 +97,13 @@ public class CommonUtils {
 	 * @param context
 	 * @param distance
 	 */
-	public static void saveDistance(Context context, String distance) {
+	public static void saveDistance(Context context, String distance,
+			String interval) {
 		SharedPreferences sp = context.getSharedPreferences(
 				Constants.LOGININFO, Context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putString(Constants.SWIM_DISTANCE, distance);
+		editor.putString(Constants.INTERVAL, interval);
 		editor.commit();
 	}
 

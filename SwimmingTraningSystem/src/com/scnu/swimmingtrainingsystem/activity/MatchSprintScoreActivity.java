@@ -58,7 +58,7 @@ import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 
 @SuppressLint("SimpleDateFormat")
-public class MatchDashScoreActivity extends Activity {
+public class MatchSprintScoreActivity extends Activity {
 
 	private MyApplication app;
 	private DBManager mDbManager;
@@ -81,7 +81,7 @@ public class MatchDashScoreActivity extends Activity {
 	private boolean isSave = false;
 	private ImageButton chooseButton;
 	private Spinner distanceSpinner;
-
+	private ArrayList<String> originScores = new ArrayList<String>();
 	private DragSortListView.DropListener onDrop = new DragSortListView.DropListener() {
 		@Override
 		public void drop(int from, int to) {
@@ -99,7 +99,7 @@ public class MatchDashScoreActivity extends Activity {
 			if (dragDatas.size() > 1) {
 				dragAdapter.remove(dragAdapter.getItem(which));
 			} else {
-				CommonUtils.showToast(MatchDashScoreActivity.this, mToast,
+				CommonUtils.showToast(MatchSprintScoreActivity.this, mToast,
 						"至少要保留一个运动员");
 			}
 			dragAdapter.notifyDataSetChanged();
@@ -124,7 +124,7 @@ public class MatchDashScoreActivity extends Activity {
 			if (scores.size() > 1) {
 				scores.remove(which);
 			} else {
-				CommonUtils.showToast(MatchDashScoreActivity.this, mToast,
+				CommonUtils.showToast(MatchSprintScoreActivity.this, mToast,
 						"至少要保留一个成绩");
 			}
 			adapter.notifyDataSetChanged();
@@ -163,8 +163,8 @@ public class MatchDashScoreActivity extends Activity {
 		distanceSpinner.setAdapter(spinerAdapter);
 		distanceSpinner.setSelection(2);
 		userId = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
-		Intent result = getIntent();
-		scores = result.getStringArrayListExtra("SCORES");
+		scores = getIntent().getStringArrayListExtra("SCORES");
+		originScores.addAll(scores);
 		List<Athlete> athletes = mDbManager.getAthletes(userId);
 		for (int i = 0; i < athletes.size(); i++) {
 			map.put(i, false);
@@ -327,11 +327,11 @@ public class MatchDashScoreActivity extends Activity {
 							int resCode = (Integer) obj.get("resCode");
 							if (resCode == 1) {
 								CommonUtils.showToast(
-										MatchDashScoreActivity.this, mToast,
+										MatchSprintScoreActivity.this, mToast,
 										"提交成功！");
 							} else {
 								CommonUtils.showToast(
-										MatchDashScoreActivity.this, mToast,
+										MatchSprintScoreActivity.this, mToast,
 										"提交失敗！");
 							}
 
@@ -394,6 +394,12 @@ public class MatchDashScoreActivity extends Activity {
 					R.anim.slide_top_out);
 		}
 
+	}
+
+	public void reLoad(View v) {
+		scores.clear();
+		scores.addAll(originScores);
+		adapter.notifyDataSetChanged();
 	}
 
 	@Override

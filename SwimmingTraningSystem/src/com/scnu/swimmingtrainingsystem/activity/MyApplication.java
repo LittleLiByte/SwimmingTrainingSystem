@@ -38,6 +38,9 @@ public class MyApplication extends LitePalApplication {
 		mMap.put(Constants.IS_CONNECT_SERVER, true);
 		//保存匹配完成的成绩（趟数）
 		mMap.put(Constants.COMPLETE_NUMBER, 0);
+		//保存每次计时时的间隔距离
+		mMap.put(Constants.INTERVAL, "");
+		
 	}
 
 	/**

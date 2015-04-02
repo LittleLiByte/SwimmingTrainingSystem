@@ -26,10 +26,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.scnu.swimmingtrainingsystem.R;
-import com.scnu.swimmingtrainingsystem.activity.MatchDashScoreActivity;
+import com.scnu.swimmingtrainingsystem.activity.MatchSprintScoreActivity;
 import com.scnu.swimmingtrainingsystem.adapter.TimeLineListAdapter;
 import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 
+/**
+ * 冲刺计时fragment
+ * @author LittleByte
+ *
+ */
 @SuppressLint("HandlerLeak")
 public class SprintFragment extends Fragment implements OnClickListener {
 
@@ -86,6 +91,9 @@ public class SprintFragment extends Fragment implements OnClickListener {
 		resetData();
 	}
 
+	/**
+	 * 初始化控件及数据
+	 */
 	private void init() {
 		activity = getActivity();
 		tvTime = (TextView) activity.findViewById(R.id.tvTime);
@@ -139,6 +147,9 @@ public class SprintFragment extends Fragment implements OnClickListener {
 		});
 	}
 
+	/**
+	 * 生成成绩列表
+	 */
 	private void setlistview() {
 		// TODO Auto-generated method stub
 		time.add(tvTime.getText().toString());
@@ -169,6 +180,9 @@ public class SprintFragment extends Fragment implements OnClickListener {
 		listView.setSelection(time.size() - 1);
 	}
 
+	/**
+	 * 重置数据
+	 */
 	private void resetData() {
 		listView.setAdapter(null);
 		tvTime.setText("点击表盘开始计时，再次点击记录成绩");
@@ -265,6 +279,9 @@ public class SprintFragment extends Fragment implements OnClickListener {
 		}
 	}
 
+	/**
+	 * 重置计时器
+	 */
 	private void resetTimer() {
 		clickCount = 0;
 		predegree = 0;
@@ -287,7 +304,7 @@ public class SprintFragment extends Fragment implements OnClickListener {
 			resetTimer();
 			break;
 		case R.id.bt_dash_modify:
-			Intent intent = new Intent(activity, MatchDashScoreActivity.class);
+			Intent intent = new Intent(activity, MatchSprintScoreActivity.class);
 			intent.putStringArrayListExtra("SCORES", time);
 			activity.startActivity(intent);
 			activity.finish();

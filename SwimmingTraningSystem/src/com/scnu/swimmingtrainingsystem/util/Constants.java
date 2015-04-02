@@ -10,7 +10,7 @@ public class Constants {
 	/**
 	 * 超时时间设置
 	 */
-	public static final int SOCKET_TIMEOUT = 1500;
+	public static final int SOCKET_TIMEOUT = 100;
 
 	/**
 	 * 成绩类型 1:普通成绩

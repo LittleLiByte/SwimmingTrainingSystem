@@ -63,7 +63,6 @@ public class MatchScoreActivity extends Activity {
 	private List<ListView> viewList;
 	private List<String> dragDatas;
 	private AutoCompleteTextView acTextView;
-	private Toast toast;
 	private DBManager mDbManager;
 	private boolean isConnected;
 	private Long userId;
@@ -263,10 +262,10 @@ public class MatchScoreActivity extends Activity {
 
 		if (nowCurrent == 1) {
 			if (crrentDistance == 0 && TextUtils.isEmpty(actv)) {
-				CommonUtils.showToast(this, toast, "请填写记录当前成绩的距离！");
+				CommonUtils.showToast(this, mToast, "请填写记录当前成绩的距离！");
 				return;
 			} else if (scoresNumber != athleteNumber) {
-				CommonUtils.showToast(this, toast, "成绩数目与运动员数目不相等！");
+				CommonUtils.showToast(this, mToast, "成绩数目与运动员数目不相等！");
 				return;
 			} else {
 				// 如果这是第一趟并且成绩数目与运动员数目相等，则直接保存到数据库
@@ -422,14 +421,14 @@ public class MatchScoreActivity extends Activity {
 							int planId = (Integer) obj.get("plan_id");
 							if (resCode == 1) {
 								CommonUtils.showToast(MatchScoreActivity.this,
-										toast, "成功同步至服务器!");
+										mToast, "成功同步至服务器!");
 								ContentValues values = new ContentValues();
 								values.put("pid", planId);
 								Plan.updateAll(Plan.class, values,
 										String.valueOf(plan.getId()));
 							} else {
 								CommonUtils.showToast(MatchScoreActivity.this,
-										toast, "同步失敗！");
+										mToast, "同步失敗！");
 							}
 
 						} catch (JSONException e) {

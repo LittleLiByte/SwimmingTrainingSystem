@@ -210,7 +210,6 @@ public class TimerActivity extends Activity {
 	private void setlistview() {
 		// TODO Auto-generated method stub
 		okclear = true;
-		// 如果超过60分钟
 		time.add(athletes - 1, tvTime.getText().toString());
 		if (athletes > 1) {
 			// 两个成绩之差

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:id="@+id/frequence_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/layout_timer" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#a2a2a2" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="本次的三次计频结果为："
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tv_frequen_result"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="0.00次/分钟"
+        android:textColor="@color/red"
+        android:textSize="25sp" />
+
+    <Button
+        android:id="@+id/bt_frequen_reset"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:padding="10dp"
+        android:textSize="20sp"
+        android:text="重置"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/startback"
+        android:textColor="@color/brown" />
+
+</LinearLayout>

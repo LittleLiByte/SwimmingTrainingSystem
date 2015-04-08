@@ -101,7 +101,7 @@ public class ModifyPassActivity extends Activity {
 			if (isConnect) {
 				if (loadingDialog == null) {
 					loadingDialog = LoadingDialog.createDialog(this);
-					loadingDialog.setMessage("正在同步...");
+					loadingDialog.setMessage("正在提交请求...");
 					loadingDialog.setCanceledOnTouchOutside(false);
 				}
 				loadingDialog.show();
@@ -155,6 +155,7 @@ public class ModifyPassActivity extends Activity {
 					public void onErrorResponse(VolleyError error) {
 						// TODO Auto-generated method stub
 						Log.e("modifyPass", error.getMessage());
+						loadingDialog.dismiss();
 					}
 				}) {
 

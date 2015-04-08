@@ -6,9 +6,7 @@ import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.litepal.crud.DataSupport;
 
-import com.scnu.swimmingtrainingsystem.R;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -33,16 +31,17 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.scnu.swimmingtrainingsystem.R;
 import com.scnu.swimmingtrainingsystem.activity.MyApplication;
 import com.scnu.swimmingtrainingsystem.db.DBManager;
 import com.scnu.swimmingtrainingsystem.effect.Effectstype;
 import com.scnu.swimmingtrainingsystem.effect.NiftyDialogBuilder;
 import com.scnu.swimmingtrainingsystem.http.JsonTools;
 import com.scnu.swimmingtrainingsystem.model.Athlete;
-import com.scnu.swimmingtrainingsystem.model.SmallPlan;
 import com.scnu.swimmingtrainingsystem.model.User;
-import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.util.CommonUtils;
+import com.scnu.swimmingtrainingsystem.util.Constants;
+import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 import com.scnu.swimmingtrainingsystem.view.Switch;
 
 /**
@@ -66,7 +65,8 @@ public class AthleteListAdapter extends BaseAdapter {
 	private long userID;
 	protected Toast toast;
 	protected MyApplication app;
-
+	private LoadingDialog loadingDialog;
+	
 	public AthleteListAdapter(Context context, MyApplication app,
 			List<Athlete> athletes, long userID) {
 		this.context = context;
@@ -222,6 +222,12 @@ public class AthleteListAdapter extends BaseAdapter {
 			boolean isConnect = (Boolean) app.getMap().get(
 					Constants.IS_CONNECT_SERVER);
 			if (isConnect) {
+				if (loadingDialog == null) {
+					loadingDialog = LoadingDialog.createDialog(context);
+					loadingDialog.setMessage("正在同步至服务器...");
+					loadingDialog.setCanceledOnTouchOutside(false);
+				}
+				loadingDialog.show();
 				// 同步服务器
 				modifyAthRequest(athletes, position, ath_name, ath_age,
 						ath_gender, ath_phone, ath_extras);
@@ -281,6 +287,12 @@ public class AthleteListAdapter extends BaseAdapter {
 								boolean isConnect = (Boolean) app.getMap().get(
 										Constants.IS_CONNECT_SERVER);
 								if (isConnect) {
+									if (loadingDialog == null) {
+										loadingDialog = LoadingDialog.createDialog(context);
+										loadingDialog.setMessage("正在同步至服务器...");
+										loadingDialog.setCanceledOnTouchOutside(false);
+									}
+									loadingDialog.show();
 									// 同步服务器
 									deleteAthRequest(athletes.get(position));
 								} else {
@@ -334,6 +346,7 @@ public class AthleteListAdapter extends BaseAdapter {
 					public void onResponse(String response) {
 						// TODO Auto-generated method stub
 						Log.i("ModifyAthlete", response);
+						loadingDialog.dismiss();
 						JSONObject obj;
 						try {
 							obj = new JSONObject(response);
@@ -357,6 +370,7 @@ public class AthleteListAdapter extends BaseAdapter {
 					public void onErrorResponse(VolleyError error) {
 						// TODO Auto-generated method stub
 						Log.e("ModifyAthlete", error.getMessage());
+						loadingDialog.dismiss();
 					}
 				}) {
 
@@ -382,7 +396,6 @@ public class AthleteListAdapter extends BaseAdapter {
 	 *            运动员对象
 	 */
 	public void deleteAthRequest(final Athlete a) {
-		final User us = dbManager.getUser(userID);
 		StringRequest stringRequest2 = new StringRequest(Method.POST,
 				CommonUtils.HOSTURL + "deleteAthlete", new Listener<String>() {
 
@@ -390,6 +403,7 @@ public class AthleteListAdapter extends BaseAdapter {
 					public void onResponse(String response) {
 						// TODO Auto-generated method stub
 						Log.i("AthleteListAdapter", response);
+						loadingDialog.dismiss();
 						JSONObject obj;
 						try {
 							obj = new JSONObject(response);
@@ -412,6 +426,7 @@ public class AthleteListAdapter extends BaseAdapter {
 					public void onErrorResponse(VolleyError error) {
 						// TODO Auto-generated method stub
 						Log.e("AthleteListAdapter", error.getMessage());
+						loadingDialog.dismiss();
 					}
 				}) {
 

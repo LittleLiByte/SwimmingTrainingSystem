@@ -314,7 +314,6 @@ public class MatchScoreActivity extends Activity {
 		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void reLoad(View v) {
 		scores.clear();
 		scores.addAll(originScores);

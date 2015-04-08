@@ -241,6 +241,12 @@ public class AthleteActivity extends Activity {
 		a.setExtras(others);
 
 		if (isConnect) {
+			if (loadingDialog == null) {
+				loadingDialog = LoadingDialog.createDialog(this);
+				loadingDialog.setMessage("正在同步...");
+				loadingDialog.setCanceledOnTouchOutside(false);
+			}
+			loadingDialog.show();
 			addAthleteequest(a);
 		} else {
 			a.setUser(mUser);
@@ -270,7 +276,7 @@ public class AthleteActivity extends Activity {
 					@Override
 					public void onResponse(String response) {
 						// TODO Auto-generated method stub
-						Log.i(Constants.TAG, response);
+						loadingDialog.dismiss();
 						try {
 							JSONObject obj = new JSONObject(response);
 							int resCode = (Integer) obj.get("resCode");
@@ -298,6 +304,7 @@ public class AthleteActivity extends Activity {
 					public void onErrorResponse(VolleyError error) {
 						// TODO Auto-generated method stub
 						Log.e(Constants.TAG, error.getMessage());
+						loadingDialog.dismiss();
 
 					}
 				}) {

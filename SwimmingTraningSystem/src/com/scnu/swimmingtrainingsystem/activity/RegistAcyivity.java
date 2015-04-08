@@ -7,12 +7,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -49,6 +52,7 @@ public class RegistAcyivity extends Activity {
 	private RequestQueue mQueue;
 	private Toast toast;
 	private LoadingDialog loadingDialog;
+	private Button regButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +62,19 @@ public class RegistAcyivity extends Activity {
 		setContentView(R.layout.activity_regist);
 
 		app = (MyApplication) getApplication();
+		regButton = (Button) findViewById(R.id.bt_regist);
 		username = (EditText) findViewById(R.id.et_userID);
 		password = (EditText) findViewById(R.id.et_password);
 		password1 = (EditText) findViewById(R.id.et_password1);
 		email = (EditText) findViewById(R.id.et_email);
 		phone = (EditText) findViewById(R.id.et_phone);
 		mQueue = Volley.newRequestQueue(this);
+
+		SharedPreferences hostSp = getSharedPreferences(Constants.LOGININFO,
+				Context.MODE_PRIVATE);
+		// 保存服务器ip和端口地址到sp
+		CommonUtils.HOSTURL = hostSp.getString("hostInfo", "");
+
 	}
 
 	public void getback(View v) {
@@ -76,37 +87,36 @@ public class RegistAcyivity extends Activity {
 	 * @param v
 	 */
 	public void quick_regist(View v) {
-		if (CommonUtils.isFastDoubleClick()) {
-			return;
+		regButton.setClickable(false);
+		final String user = username.getText().toString().trim();
+		final String pass = password.getText().toString().trim();
+		final String pass1 = password1.getText().toString().trim();
+		final String Email = email.getText().toString().trim();
+		final String cellphone = phone.getText().toString().trim();
+		if (TextUtils.isEmpty(user)) {
+			CommonUtils.showToast(this, toast, "用户名不能为空");
+		} else if (TextUtils.isEmpty(pass)) {
+			CommonUtils.showToast(this, toast, "密码不能为空");
+		} else if (TextUtils.isEmpty(pass1) || !pass.equals(pass1)) {
+			CommonUtils.showToast(this, toast, "两次输入密码不一致");
+		} else if (!TextUtils.isEmpty(Email)
+				&& !CommonUtils.isEmail(email.getText().toString().trim())) {
+			CommonUtils.showToast(this, toast, "邮箱格式错误");
+		} else if (!TextUtils.isEmpty(cellphone)
+				&& !CommonUtils.isMobileNO(phone.getText().toString().trim())) {
+			CommonUtils.showToast(this, toast, "手机号码格式错误");
 		} else {
-			final String user = username.getText().toString().trim();
-			final String pass = password.getText().toString().trim();
-			final String pass1 = password1.getText().toString().trim();
-			final String Email = email.getText().toString().trim();
-			final String cellphone = phone.getText().toString().trim();
-			if (TextUtils.isEmpty(user)) {
-				CommonUtils.showToast(this, toast, "用户名不能为空");
-			} else if (TextUtils.isEmpty(pass)) {
-				CommonUtils.showToast(this, toast, "密码不能为空");
-			} else if (TextUtils.isEmpty(pass1) || !pass.equals(pass1)) {
-				CommonUtils.showToast(this, toast, "两次输入密码不一致");
-			} else if (!CommonUtils.isEmail(email.getText().toString().trim())) {
-				CommonUtils.showToast(this, toast, "邮箱格式错误");
-			}else if (!CommonUtils.isMobileNO(phone.getText().toString().trim())) {
-				CommonUtils.showToast(this, toast, "手机号码格式错误");
-			}else {
-				// 如果处在联网状态，则发送至服务器
-				boolean isConnect = (Boolean) app.getMap().get(
-						Constants.IS_CONNECT_SERVER);
-				if (isConnect) {
-					User newUser = new User();
-					newUser.setUsername(user);
-					newUser.setPassword(pass);
-					newUser.setEmail(Email);
-					newUser.setPhone(cellphone);
-					// 发送至服务器
-					registRequest(newUser);
-				}
+			// 如果处在联网状态，则发送至服务器
+			boolean isConnect = (Boolean) app.getMap().get(
+					Constants.IS_CONNECT_SERVER);
+			if (isConnect) {
+				User newUser = new User();
+				newUser.setUsername(user);
+				newUser.setPassword(pass);
+				newUser.setEmail(Email);
+				newUser.setPhone(cellphone);
+				// 发送至服务器
+				registRequest(newUser);
 			}
 		}
 
@@ -120,6 +130,8 @@ public class RegistAcyivity extends Activity {
 	private void registRequest(final User user) {
 		if (loadingDialog == null) {
 			loadingDialog = LoadingDialog.createDialog(this);
+			loadingDialog.setMessage("正在注册...");
+			loadingDialog.setCanceledOnTouchOutside(false);
 		}
 		loadingDialog.show();
 

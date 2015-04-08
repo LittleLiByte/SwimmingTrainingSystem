@@ -39,6 +39,7 @@ public class DBManager {
 		return dbManager;
 	}
 
+	
 	/**
 	 * 根据id获取用户
 	 * 

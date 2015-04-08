@@ -61,7 +61,7 @@ public class RetrievePasswordActivity extends Activity {
 		} else {
 			if (loadingDialog == null) {
 				loadingDialog = LoadingDialog.createDialog(this);
-				loadingDialog.setMessage("正在登录...");
+				loadingDialog.setMessage("正在发送请求...");
 				loadingDialog.setCanceledOnTouchOutside(false);
 			}
 			loadingDialog.show();

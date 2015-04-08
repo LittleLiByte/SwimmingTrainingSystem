@@ -273,6 +273,13 @@ public class QueryScoreActivity extends Activity {
 
 	protected void getScoresRequest(final String string) {
 		// TODO Auto-generated method stub
+		if (mLoadingDialog == null) {
+			mLoadingDialog = LoadingDialog
+					.createDialog(QueryScoreActivity.this);
+			mLoadingDialog.setMessage(GENERATING_RESULT_STRING);
+			mLoadingDialog.setCanceledOnTouchOutside(false);
+		}
+		mLoadingDialog.show();
 		Map<String, Object> jsonMap = new HashMap<String, Object>();
 		jsonMap.put("up_time", string);
 		jsonMap.put("uid", mUser.getUid());
@@ -283,6 +290,7 @@ public class QueryScoreActivity extends Activity {
 
 					@Override
 					public void onResponse(String response) {
+						mLoadingDialog.dismiss();
 						Log.i(Constants.TAG, response);
 						JSONObject obj;
 						try {
@@ -352,7 +360,7 @@ public class QueryScoreActivity extends Activity {
 
 					@Override
 					public void onErrorResponse(VolleyError error) {
-
+						mLoadingDialog.dismiss();
 					}
 				}) {
 

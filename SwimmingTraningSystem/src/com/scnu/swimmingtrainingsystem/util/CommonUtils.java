@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;

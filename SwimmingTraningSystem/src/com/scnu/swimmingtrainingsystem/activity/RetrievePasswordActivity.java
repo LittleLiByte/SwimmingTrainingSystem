@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -54,19 +53,13 @@ public class RetrievePasswordActivity extends Activity {
 
 	public void sendEmail(View v) {
 		String emailAdress = emailEditText.getText().toString().trim();
-		if (TextUtils.isEmpty(emailAdress)) {
-			CommonUtils.showToast(this, mToast, "请填写邮箱地址");
-		} else if (!CommonUtils.isEmail(emailAdress)) {
-			CommonUtils.showToast(this, mToast, "请填写正确的邮箱地址");
-		} else {
-			if (loadingDialog == null) {
-				loadingDialog = LoadingDialog.createDialog(this);
-				loadingDialog.setMessage("正在发送请求...");
-				loadingDialog.setCanceledOnTouchOutside(false);
-			}
-			loadingDialog.show();
-			sendEmailRequest(emailAdress);
+		if (loadingDialog == null) {
+			loadingDialog = LoadingDialog.createDialog(this);
+			loadingDialog.setMessage("正在发送请求...");
+			loadingDialog.setCanceledOnTouchOutside(false);
 		}
+		loadingDialog.show();
+		sendEmailRequest(emailAdress);
 	}
 
 	/**
@@ -78,7 +71,7 @@ public class RetrievePasswordActivity extends Activity {
 	public void sendEmailRequest(final String s1) {
 
 		StringRequest sendEmailRequest = new StringRequest(Method.POST,
-				CommonUtils.HOSTURL + "login", new Listener<String>() {
+				CommonUtils.HOSTURL + "getPassword", new Listener<String>() {
 
 					@Override
 					public void onResponse(String response) {
@@ -92,6 +85,10 @@ public class RetrievePasswordActivity extends Activity {
 								CommonUtils.showToast(
 										RetrievePasswordActivity.this, mToast,
 										"发送成功，请稍后查看邮箱");
+							} else if (resCode == 0) {
+								CommonUtils.showToast(
+										RetrievePasswordActivity.this, mToast,
+										"该用户还未注册");
 							} else {
 								CommonUtils.showToast(
 										RetrievePasswordActivity.this, mToast,
@@ -129,7 +126,7 @@ public class RetrievePasswordActivity extends Activity {
 			protected Map<String, String> getParams() throws AuthFailureError {
 				// 设置请求参数
 				Map<String, String> map = new HashMap<String, String>();
-				map.put("userName", s1);
+				map.put("email", s1);
 				return map;
 			}
 

@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.litepal.crud.DataSupport;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -288,7 +287,7 @@ public class MatchSprintScoreActivity extends Activity {
 						loadingDialog.setCanceledOnTouchOutside(false);
 					}
 					loadingDialog.show();
-					addScoreRequest(athIds);
+					addScoreRequest(date, athIds);
 				} else {
 					CommonUtils.showToast(this, mToast, "±£´æ³É¹¦£¡");
 				}
@@ -300,10 +299,10 @@ public class MatchSprintScoreActivity extends Activity {
 
 	}
 
-	private void addScoreRequest(List<Integer> athIds) {
+	private void addScoreRequest(String date, List<Integer> athIds) {
 		List<Score> scoresResult = new ArrayList<Score>();
 		List<Integer> athList = new ArrayList<Integer>();
-		scoresResult.add(DataSupport.findLast(Score.class));
+		scoresResult.addAll(mDbManager.getScoreByDate(date));
 		athList.addAll(athIds);
 		User user = mDbManager.getUser(userId);
 		Map<String, Object> scoreMap = new HashMap<String, Object>();

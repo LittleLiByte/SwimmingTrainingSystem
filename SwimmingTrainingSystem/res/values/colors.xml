@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <drawable name="blank">#00000000</drawable>
+
+    <color name="dialog_bg">#FFB13D</color>
+    <color name="btn_press_color">#FF6600</color>
+    <color name="btn_unpress_color">#FF8533</color>
+    <color name="lightgray">#e2e2e2</color>
+    <color name="unwhite">#ffffff</color>
+    <color name="FlightCXListInfoActivityBg">#DCDCDC</color>
+    <color name="popup_char_color">#99ff00ff</color>
+    <color name="yellow">#ffffff00</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#ff000000</color>
+    <color name="dark_gray">#ff585858</color>
+    <color name="light_gray2">#ffbdbdbd</color>
+    <color name="gray">#ff333333</color>
+    <color name="gray_2">#ffd3d3d3</color>
+    <color name="lighter_gray">#ff666666</color>
+    <color name="transparent">#00000000</color>
+    <color name="blue">#3399FF</color>
+    <color name="light_blue">#ffacd7ff</color>
+    <color name="dark_orange">#fff85d00</color>
+    <color name="orange">#FBB327</color>
+    <color name="red">#FF0000</color>
+    <color name="dark_red">#cc0000</color>
+    <color name="brown">#ff654019</color>
+    <color name="light_gray">#ff9b9b9b</color>
+    <color name="light_gray1">#99999999</color>
+    <color name="list_dark">#ff001023</color>
+    <color name="list_light">#ff203249</color>
+    <color name="list_arrive">#ff00ff8a</color>
+    <color name="list_late">#ffff2a00</color>
+    <color name="list_cancel">#ffff9600</color>
+    <color name="promotion_bg">#ffd5e6f8</color>
+    <color name="transparent_background">#50000000</color>
+    <color name="bule_bule">#FFCCFFFF</color>
+    <color name="black_black">#FF999999</color>
+    <color name="royalblue">#A2C7EC</color>
+    <color name="dimgray">#696969</color>
+    <color name="keworddefault">#fff5f5f5</color>
+    <color name="blacks">#000000</color>
+    <color name="aliceblue">#696969</color>
+    <color name="color_flight">#0cb1f5</color>
+    <color name="color_user">#ab67ce</color>
+    <color name="color_hotel">#ed3d3d</color>
+    <color name="color_train">#99cc01</color>
+    <color name="color_sales">#fbc436</color>
+    <color name="color_remind">#3dce70</color>
+    <color name="color_setting">#40e0d0</color>
+    <color name="color_mgray">#E0E0E0</color>
+    <color name="color_toast">#33CCFF</color>
+    <color name="huise">#7b747c</color>
+    <color name="gray_1">#A6A6A6</color>
+    <color name="gray_3">#EEEEEE</color>
+
+</resources>

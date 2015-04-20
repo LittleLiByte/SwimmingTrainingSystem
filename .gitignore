@@ -2,3 +2,11 @@
 /SwimmingTraningSystem/bin/classes
 /SwimmingTraningSystem/bin/dexedLibs
 /SwimmingTraningSystem/bin/res
+/SwimmingTrainingSystem/gen
+/SwimmingTrainingSystem/*.classpath
+/SwimmingTrainingSystem/bin/*
+/SwimmingTrainingSystem/bin/*.xml
+/SwimmingTrainingSystem/bin/*.dex
+/SwimmingTrainingSystem/bin/*.cache
+/SwimmingTrainingSystem/bin/*.txt
+/SwimmingTrainingSystem/bin/*.ap_

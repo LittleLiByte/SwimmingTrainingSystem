@@ -1,0 +1,112 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/clock_main_bg" >
+
+    <RelativeLayout
+        android:id="@+id/timer_headbar"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_alignParentTop="true"
+        android:background="#3D8BFF" >
+
+        <TextView
+            android:id="@+id/time_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="第一次计时"
+            android:textColor="#fff"
+            android:textSize="28sp" />
+
+        <ImageButton
+            android:id="@+id/timer_back"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@color/transparent"
+            android:onClick="back"
+            android:src="@drawable/btn_back" />
+
+        <Button
+            android:id="@+id/resetbutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/bg_reset"
+            android:onClick="reset"
+            android:paddingBottom="8dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:paddingTop="8dp"
+            android:text="重  置"
+            android:textSize="20sp" />
+    </RelativeLayout>
+
+    <include
+        android:id="@+id/clcokview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/timer_headbar"
+        layout="@layout/layout_timer" />
+
+    <RelativeLayout
+        android:id="@+id/listjishi"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:layout_above="@+id/rl_buttom"
+        android:layout_below="@id/clcokview"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/v5_bottom_bar_bg_light" >
+
+        <TextView
+            android:id="@+id/textwujici"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@drawable/v5_bottom_bar_bg_light"
+            android:gravity="center"
+            android:text="点击上方表盘开始计时!再次点击即可记录成绩"
+            android:textColor="#777777"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ListView
+            android:id="@+id/duocijishilist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#00000000"
+            android:divider="#00000000" >
+        </ListView>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/rl_buttom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/v5_bottom_bar_bg_light"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp" >
+
+
+        <Button
+            android:id="@+id/match_people"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:layout_weight="1.0"
+            android:background="@drawable/startback"
+            android:onClick="matchAthlete"
+            android:text="运动员成绩匹配"
+            android:textSize="25sp" />
+    </LinearLayout>
+
+</RelativeLayout>

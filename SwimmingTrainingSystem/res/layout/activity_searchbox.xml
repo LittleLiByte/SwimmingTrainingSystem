@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/search_scroe_headbar"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="#3D8BFF"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="5dp" >
+
+        <ImageButton
+            android:id="@+id/search_scroe_back"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            android:onClick="back"
+            android:src="@drawable/btn_back" />
+
+        <TextView
+            android:id="@+id/search_text_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1.0"
+            android:background="@drawable/bg_query_score_pressed"
+            android:padding="7dp"
+            android:text="请选择日期进行查询"
+            android:textColor="@color/huise"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <RadioGroup
+        android:id="@+id/radiogroup1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="3dp" >
+
+        <RadioButton
+            android:id="@+id/btn_0"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/radio"
+            android:button="@null"
+            android:checked="true"
+            android:gravity="center"
+            android:padding="3dp"
+            android:text="本地查询"
+            android:textColor="@color/aliceblue"
+            android:textSize="17.0sp" />
+
+        <RadioButton
+            android:id="@+id/btn_1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/radio"
+            android:button="@null"
+            android:gravity="center"
+            android:padding="3dp"
+            android:text="联网查询"
+            android:textColor="@color/aliceblue"
+            android:textSize="17.0sp" />
+    </RadioGroup>
+
+    <com.scnu.swimmingtrainingsystem.view.XListView
+        android:id="@+id/search_date_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:cacheColorHint="#00000000"
+        android:divider="#fff"
+        android:dividerHeight="1px" />
+
+</LinearLayout>

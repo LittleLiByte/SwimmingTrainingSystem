@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <!-- <RelativeLayout
+        android:id="@+id/customviewlayTitle"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#1A94F9" >
+
+        <TextView
+            android:id="@+id/customviewtvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
+            android:text="服务器IP与端口设置"
+            android:textColor="#fff"
+            android:textSize="15sp" />
+    </RelativeLayout> -->
+
+    <LinearLayout
+        android:id="@+id/customviewlayMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp" >
+
+        <EditText
+            android:id="@+id/tv_ip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_edit"
+            android:drawablePadding="20dp"
+            android:hint="请输入服务器IP地址"
+            android:inputType="number|text"
+            android:padding="8dp"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/tv_port"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_edit"
+            android:drawablePadding="20dp"
+            android:hint="请输入服务器端口地址"
+            android:inputType="number|text"
+            android:padding="8dp"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <!-- <LinearLayout
+        android:id="@+id/customviewlayLink"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/customviewlayMessage"
+        android:orientation="horizontal"
+        android:paddingBottom="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp" >
+
+        <Button
+            android:id="@+id/close"
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_register"
+            android:linksClickable="true"
+            android:text="取消" />
+
+        <Button
+            android:id="@+id/host_done"
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_login"
+            android:linksClickable="true"
+            android:text="完成" />
+    </LinearLayout> -->
+
+</RelativeLayout>

@@ -1,0 +1,99 @@
+<resources>
+
+    <!--
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    -->
+    <style name="AppBaseTheme" parent="android:Theme.Light">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+    </style>
+
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+
+    <style name="CustomCheckboxTheme" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/checkbox_style</item>
+    </style>
+
+    <style name="transparentFrameWindowStyle" parent="android:style/Theme.Dialog">
+        <item name="android:windowBackground">@drawable/photo_choose_bg</item>
+    </style>
+
+    <style name="main_menu_animstyle">
+        <item name="android:windowEnterAnimation">@anim/photo_dialog_in_anim</item>
+        <item name="android:windowExitAnimation">@anim/photo_dialog_out_anim</item>
+    </style>
+
+    <style name="MyDialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/color_mgray</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.6</item>
+    </style>
+
+    <style name="CustomDialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+    </style>
+
+    <style name="CustomProgressDialog" parent="@style/CustomDialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="DialogWindowTitle">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="dialog_btn">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">36dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:background">@drawable/dialogbtn_selector</item>
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="dialog_tran" parent="android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:backgroundDimAmount">0.4</item>
+    </style>
+
+    <style name="dialog_untran" parent="dialog_tran">
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
+    <style name="AppThemeLight" parent="@android:style/Theme.DeviceDefault.Light">
+        <item name="com.scnu.swimmingtrainingsystem:switchStyle">@style/switch_light</item>
+    </style>
+
+    <style name="switch_light">
+        <item name="@attr/colorChecked">#FFFFFF</item>
+        <item name="@attr/colorUnChecked">#181818</item>
+        <item name="@attr/backgroundDrawable">@drawable/switch_bg_holo_light</item>
+        <item name="@attr/switchDrawable">@drawable/switch_thumb_activated_holo_light</item>
+    </style>
+
+</resources>

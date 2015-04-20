@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:background="#EDEDED"
+    android:gravity="center_vertical"
+    android:padding="5dp" >
+
+    <View
+        android:layout_width="0.5dp"
+        android:layout_height="match_parent"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/tick"
+        android:background="#44000000" />
+
+    <TextView
+        android:id="@+id/ath_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="40dp"
+        android:text="张三"
+        android:textColor="@color/black_black"
+        android:textSize="26sp" />
+
+    <CheckBox
+        android:id="@+id/tick"
+        style="@style/CustomCheckboxTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/ath_name"
+        android:layout_alignParentRight="true"
+        android:clickable="false"
+        android:focusable="false" />
+
+</RelativeLayout>

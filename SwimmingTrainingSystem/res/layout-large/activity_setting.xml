@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/setting_headbar"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:background="#3D8BFF" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="系统设置"
+            android:textColor="#fff"
+            android:textSize="28sp" />
+
+        <ImageButton
+            android:id="@+id/setting_back"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@color/transparent"
+            android:onClick="setting_back"
+            android:src="@drawable/btn_back" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#E0E0E0"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/setting_illustration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:background="@drawable/bg_setting_selector"
+            android:clickable="true"
+            android:gravity="center_vertical"
+            android:onClick="setting"
+            android:orientation="horizontal"
+            android:paddingBottom="15dp"
+            android:paddingTop="15dp" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:src="@drawable/tips" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1.0"
+                android:text="使用说明"
+                android:textSize="24sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/togo" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#c2c2c2" />
+
+        <LinearLayout
+            android:id="@+id/setting_change_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_setting_selector"
+            android:clickable="true"
+            android:gravity="center_vertical"
+            android:onClick="setting"
+            android:orientation="horizontal"
+            android:paddingBottom="15dp"
+            android:paddingTop="15dp" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:clickable="true"
+                android:src="@drawable/password_change" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1.0"
+                android:text="修改密码"
+                android:textSize="24sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/togo" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#c2c2c2" />
+
+        <LinearLayout
+            android:id="@+id/setting_exit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_setting_selector"
+            android:clickable="true"
+            android:gravity="center_vertical"
+            android:onClick="setting"
+            android:orientation="horizontal"
+            android:paddingBottom="15dp"
+            android:paddingTop="15dp" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:src="@drawable/cancellation" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1.0"
+                android:text="注销登录"
+                android:textSize="24sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/togo" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

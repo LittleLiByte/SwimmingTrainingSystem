@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <LinearLayout
+        android:id="@+id/ll_title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/tb_AthID"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
+            android:text="运动员ID"
+            android:textColor="#9C9C9C"
+            android:textSize="25sp" />
+
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="match_parent"
+            android:background="#A8A8A8" />
+
+        <TextView
+            android:id="@+id/tb_AthName"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp"
+            android:singleLine="true"
+            android:text="姓名"
+            android:textColor="#77000000"
+            android:textSize="25sp" />
+
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="match_parent"
+            android:background="#A8A8A8" />
+
+        <LinearLayout
+            android:id="@+id/tb_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp" >
+
+            <ImageButton
+                android:id="@+id/details"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/details" />
+
+            <ImageButton
+                android:id="@+id/delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:background="@drawable/delete" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_alignParentBottom="true"
+        android:background="#B8B8B8" />
+
+</RelativeLayout>

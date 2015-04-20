@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <ImageView
+        android:id="@+id/duocimin_dial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/min_dial" />
+
+    <ImageView
+        android:id="@+id/duocimin_progress_hand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:src="@drawable/min_progress_hand" />
+
+    <TextView
+        android:id="@+id/duocitvTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="0:00&apos;00&apos;&apos;00"
+        android:textSize="40sp"
+        android:textColor="@color/black" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/duocimin_dial"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal" >
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="100sp" >
+
+            <ImageView
+                android:id="@+id/duocihour_dial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/hour_dial" />
+
+            <ImageView
+                android:id="@+id/duocihour_progress_hand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/hour_progress_hand" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <ImageView
+                android:id="@+id/duocisecond_dial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/hour_dial" />
+
+            <ImageView
+                android:id="@+id/duocisecond_progress_hand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/second_progress_hand" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</RelativeLayout>

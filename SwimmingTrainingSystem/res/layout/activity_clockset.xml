@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/clockset_headbar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#3D8BFF"
+        android:gravity="center_vertical" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="计时准备"
+            android:textColor="#fff"
+            android:textSize="20sp" />
+
+        <ImageButton
+            android:id="@+id/plan_back"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@color/transparent"
+            android:onClick="clcokset_back"
+            android:src="@drawable/btn_back" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/clcokset_rl"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="visible" >
+
+        <LinearLayout
+            android:id="@+id/choose_plan_ll1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="泳池大小"
+                        android:textColor="@color/aliceblue" />
+
+                    <Spinner
+                        android:id="@+id/pool_length"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
+
+                    <AutoCompleteTextView
+                        android:id="@+id/tv_distance"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:ems="5"
+                        android:hint="游泳总距离"
+                        android:inputType="number"
+                        android:nextFocusLeft="@+id/bt_choose_athlete"
+                        android:nextFocusUp="@+id/pool_length"
+                        android:singleLine="true"
+                        android:textColor="@color/dark_orange"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:text="米"
+                        android:textColor="@color/aliceblue"
+                        android:textSize="15sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <AutoCompleteTextView
+                    android:id="@+id/act_interval"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:ems="5"
+                    android:hint="计时间隔"
+                    android:inputType="number"
+                    android:nextFocusLeft="@+id/bt_choose_athlete"
+                    android:nextFocusUp="@+id/pool_length"
+                    android:singleLine="true"
+                    android:textColor="@color/dark_orange"
+                    android:textSize="14sp" />
+
+                <com.scnu.swimmingtrainingsystem.view.EditTextWithDel
+                    android:id="@+id/et_remarks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:hint="输入备注，方便查阅区分成绩"
+                    android:singleLine="true" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/bt_choose_athlete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/choose_plan_ll1"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/startback"
+            android:onClick="chooseAthlete"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="选择运动员" />
+
+        <ListView
+            android:id="@+id/list_choosed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/bt_choose_athlete"
+            android:cacheColorHint="#fff" >
+        </ListView>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#33000000"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="8dp" >
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_reset"
+            android:onClick="startTiming"
+            android:padding="6dp"
+            android:text="开始计时"
+            android:textColor="@color/aliceblue" />
+    </LinearLayout>
+
+</LinearLayout>

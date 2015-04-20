@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#e0e0e0"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="#EEEEEE" >
+
+        <TextView
+            android:id="@+id/tvTag1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="三次计频"
+            android:textColor="@drawable/pager_title_selector"
+            android:textSize="25sp" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/white" />
+
+        <TextView
+            android:id="@+id/tvTag2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="冲刺计时"
+            android:textColor="@drawable/pager_title_selector"
+            android:textSize="25sp" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ivCursor"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="matrix"
+        android:src="@drawable/cursor" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp_fuction"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10" >
+    </android.support.v4.view.ViewPager>
+
+</LinearLayout>

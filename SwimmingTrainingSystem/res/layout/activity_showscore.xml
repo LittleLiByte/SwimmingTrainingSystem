@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/show_headbar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#3D8BFF" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="成绩展示"
+            android:textColor="#fff"
+            android:textSize="20sp" />
+
+        <ImageButton
+            android:id="@+id/show_back"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@color/transparent"
+            android:onClick="showBack"
+            android:src="@drawable/btn_back" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/show_the_plan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+           android:background="@color/color_train"
+        android:gravity="center"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:singleLine="true"
+        android:text="计划1"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+
+    <ExpandableListView
+        android:id="@+id/show_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:groupIndicator="@null" >
+    </ExpandableListView>
+
+</LinearLayout>

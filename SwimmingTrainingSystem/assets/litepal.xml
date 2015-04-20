@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<litepal>
+
+    <dbname value="SwimmingTranning" >
+    </dbname>
+
+    <version value="2" >
+    </version>
+
+    <list>
+
+        <mapping class="com.scnu.swimmingtrainingsystem.model.User" >
+        </mapping>
+
+        <mapping class="com.scnu.swimmingtrainingsystem.model.Plan" >
+        </mapping>
+
+        <mapping class="com.scnu.swimmingtrainingsystem.model.Athlete" >
+        </mapping>
+
+        <mapping class="com.scnu.swimmingtrainingsystem.model.Score" >
+        </mapping>
+    </list>
+
+</litepal>

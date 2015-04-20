@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.scnu.swimmingtrainingsystem"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="19" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:name="com.scnu.swimmingtrainingsystem.activity.MyApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppBaseTheme" >
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.WlecomeActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.MainActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.LoginActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.RegistAcyivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.TimerSettingActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.OtherFunctionActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.AthleteActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.TimerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.QueryScoreActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.SettingActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.MatchScoreActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.ShowScoreActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.ModifyPassActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.UseTipsActiviy"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.EachTimeScoreActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.SearchboxActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.RetrievePasswordActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.MatchSprintScoreActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+    </application>
+
+</manifest>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/athlete_headbar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.0"
+        android:background="#3D8BFF" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="运动员管理"
+            android:textColor="#fff"
+            android:textSize="24sp" />
+
+        <ImageButton
+            android:id="@+id/athlete_back"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@color/transparent"
+            android:onClick="back"
+            android:src="@drawable/btn_back" />
+
+        <ImageButton
+            android:id="@+id/add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/add"
+            android:onClick="addAthlete" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_title"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="3dp"
+        android:background="#e0e0e0"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/AthID"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:background="@drawable/bg_ll_title"
+            android:text="运动员ID"
+            android:textColor="#A8A8A8"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/AthName"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:background="@drawable/bg_ll_title"
+            android:gravity="center"
+            android:text="姓名"
+            android:textColor="#A8A8A8"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/operation"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:background="@drawable/bg_ll_title"
+            android:gravity="center"
+            android:text="操作"
+            android:textColor="#A8A8A8"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/lv"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10.0"
+        android:cacheColorHint="#00000000"
+        android:scrollbars="none" >
+    </ListView>
+
+</LinearLayout>

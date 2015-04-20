@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_query_score"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/scroe_headbar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="#3D8BFF"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="5dp" >
+
+        <ImageButton
+            android:id="@+id/scroe_back"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            android:onClick="back"
+            android:src="@drawable/btn_back" />
+
+        <TextView
+            android:id="@+id/text_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/bg_query_score_pressed"
+            android:padding="7dp"
+            android:text="请选择日期进行查询"
+            android:textColor="@color/huise"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/show_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_train"
+        android:paddingBottom="5dp"
+        android:paddingLeft="15dp"
+        android:paddingTop="5dp"
+        android:singleLine="true"
+        android:text="时间---计划详细"
+        android:textColor="@color/aliceblue"
+        android:textSize="18sp"
+        android:visibility="gone" />
+
+    <ExpandableListView
+        android:id="@+id/query_score_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@drawable/base_list_divider_drawable"
+        android:groupIndicator="@null" >
+    </ExpandableListView>
+
+</LinearLayout>

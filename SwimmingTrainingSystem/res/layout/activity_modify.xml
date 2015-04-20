@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E0E0E0" >
+
+    <RelativeLayout
+        android:id="@+id/modify_headbar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:background="#3D8BFF" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="修改密码"
+            android:textColor="#fff"
+            android:textSize="20sp" />
+
+        <ImageButton
+            android:id="@+id/modify_back"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@color/transparent"
+            android:onClick="getback"
+            android:src="@drawable/btn_back" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/modify_ll1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/modify_headbar"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal"
+        android:padding="10dp" >
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="原密码  "
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/modify_oldpass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_edit"
+            android:padding="8dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/modify_ll2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/modify_ll1"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:padding="10dp" >
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="新密码"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/modify_newpass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_edit"
+            android:inputType="textPassword"
+            android:padding="8dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/modify_ll3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/modify_ll2"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:padding="10dp" >
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="确认新密码"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/modify_comfirmpass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_edit"
+            android:inputType="textPassword"
+            android:padding="8dp" />
+    </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/modify_ll3"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/bg_login"
+        android:gravity="center"
+        android:onClick="modify"
+        android:paddingBottom="10dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="10dp"
+        android:text="确认修改 "
+        android:textColor="#fff" />
+
+</RelativeLayout>

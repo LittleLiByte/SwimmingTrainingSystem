@@ -44,8 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/match_dash_headbar"
         android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="5dp" >
+        android:orientation="horizontal" >
 
         <TextView
             android:layout_width="wrap_content"
@@ -73,8 +72,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:padding="5dp"
-        android:gravity="center_vertical" >
+        android:gravity="center_vertical"
+        android:padding="5dp" >
 
         <Button
             android:id="@+id/bt_dash_reload"

@@ -7,18 +7,18 @@
     <LinearLayout
         android:id="@+id/ll_fragment_disatance"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="65dp"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:orientation="horizontal"
-        android:padding="5dp" >
+        android:padding="10dp" >
 
         <TextView
             android:id="@+id/ttvv1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="本次成绩在"
-            android:textSize="18sp" />
+            android:textSize="28sp" />
 
         <AutoCompleteTextView
             android:id="@+id/modify_act_current_distance"
@@ -28,7 +28,7 @@
             android:inputType="number"
             android:nextFocusLeft="@+id/ttvv2"
             android:nextFocusUp="@+id/ttvv1"
-            android:textSize="18sp" />
+            android:textSize="28sp" />
 
         <TextView
             android:id="@+id/ttvv2"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:text="米处记录"
-            android:textSize="18sp" />
+            android:textSize="28sp" />
     </LinearLayout>
 
     <include

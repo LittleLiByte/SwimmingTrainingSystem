@@ -39,8 +39,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:orientation="vertical"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp" >
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp" >
 
         <Button
             android:layout_width="match_parent"
@@ -48,8 +48,10 @@
             android:layout_weight="1.0"
             android:background="@drawable/startback"
             android:onClick="finishModify"
+            android:paddingBottom="15dp"
+            android:paddingTop="15dp"
             android:text="调整完毕,进行统计"
-            android:textSize="18sp" />
+            android:textSize="28sp" />
     </LinearLayout>
 
 </LinearLayout>

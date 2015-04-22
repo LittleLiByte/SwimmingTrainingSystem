@@ -21,14 +21,19 @@ import android.util.SparseBooleanArray;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.View.OnClickListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -64,6 +69,7 @@ public class MatchSprintScoreActivity extends Activity {
 	private boolean isConnected;
 	private Long userId;
 	private Toast mToast;
+	private View mLayout, mLayout2;
 	private RequestQueue mQueue;
 	private LoadingDialog loadingDialog;
 	private DragSortListView scoreListView;
@@ -171,6 +177,9 @@ public class MatchSprintScoreActivity extends Activity {
 		for (Athlete ath : athletes) {
 			athleteNames.add(ath.getName());
 		}
+
+		mLayout = findViewById(R.id.match_dash_headbar);
+		mLayout2 = findViewById(R.id.ll_match_dash2);
 		scoreListView = (DragSortListView) findViewById(R.id.matchscore_list);
 		nameListView = (DragSortListView) findViewById(R.id.matchName_list);
 		nameListView.setDropListener(onDrop);
@@ -183,13 +192,25 @@ public class MatchSprintScoreActivity extends Activity {
 		MyScrollListener mListener = new MyScrollListener();
 		scoreListView.setOnScrollListener(mListener);
 		nameListView.setOnScrollListener(mListener);
-		adapter = new ScoreListAdapter(this, scores);
+		adapter = new ScoreListAdapter(scoreListView, this, scores);
 
 		dragAdapter = new ArrayAdapter<String>(this, R.layout.drag_list_item,
 				R.id.drag_list_item_text, dragDatas);
 		scoreListView.setAdapter(adapter);
 		nameListView.setAdapter(dragAdapter);
+		scoreListView.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				// TODO Auto-generated method stub
+				showPopWindow(position);
+				return true;
+			}
+		});
+
 		chooseAthlete(chooseButton);
+
 	}
 
 	public void chooseAthlete(View v) {
@@ -253,7 +274,6 @@ public class MatchSprintScoreActivity extends Activity {
 	public void saveScores(View v) {
 		if (!isSave) {
 			isSave = true;
-
 			int scoreNumber = scores.size();
 			int athleteNumber = dragDatas.size();
 			if (scoreNumber != athleteNumber) {
@@ -289,12 +309,13 @@ public class MatchSprintScoreActivity extends Activity {
 					loadingDialog.show();
 					addScoreRequest(date, athIds);
 				} else {
-					CommonUtils.showToast(this, mToast, "保存成功！");
+					ShowTipDialog();
 				}
 			}
 
 		} else {
 			CommonUtils.showToast(this, mToast, "成绩已经保存，无需再次保存");
+			ShowTipDialog();
 		}
 
 	}
@@ -328,6 +349,7 @@ public class MatchSprintScoreActivity extends Activity {
 								CommonUtils.showToast(
 										MatchSprintScoreActivity.this, mToast,
 										"提交成功！");
+								ShowTipDialog();
 							} else {
 								CommonUtils.showToast(
 										MatchSprintScoreActivity.this, mToast,
@@ -452,4 +474,53 @@ public class MatchSprintScoreActivity extends Activity {
 		}
 	}
 
+	public void ShowTipDialog() {
+		AlertDialog.Builder build = new AlertDialog.Builder(this);
+		build.setTitle("系统提示").setMessage("成绩已保存成功，是否返回主界面？");
+		build.setPositiveButton(Constants.OK_STRING,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+						MatchSprintScoreActivity.this.finish();
+						overridePendingTransition(R.anim.slide_bottom_in,
+								R.anim.slide_top_out);
+					}
+				});
+		build.setNegativeButton(Constants.CANCLE_STRING,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				}).show();
+	}
+
+	private void showPopWindow(final int position) {
+		// TODO Auto-generated method stub
+		TextView copyView = (TextView) getLayoutInflater().inflate(
+				android.R.layout.simple_list_item_1, null);
+		copyView.setText("复制添加该项");
+		copyView.setTextColor(getResources().getColor(R.color.white));
+		final PopupWindow pop = new PopupWindow(copyView,
+				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		pop.setBackgroundDrawable(getResources().getDrawable(
+				R.drawable.title_function_bg));
+		pop.setOutsideTouchable(true);
+		int yoff = mLayout.getHeight()
+				* (position - scoreListView.getFirstVisiblePosition() + 1);
+		pop.showAsDropDown(mLayout2, scoreListView.getRight() / 2, yoff);
+		copyView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				scores.add(position, scores.get(position));
+				adapter.notifyDataSetChanged();
+				dragDatas.add(position, "");
+				dragAdapter.notifyDataSetChanged();
+				pop.dismiss();
+			}
+		});
+
+	}
 }

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.scnu.swimmingtrainingsystem.R;
@@ -19,10 +20,12 @@ import com.scnu.swimmingtrainingsystem.R;
  * 
  */
 public class ScoreListAdapter extends BaseAdapter {
+	private ListView mListView;
 	private Context context;
 	private List<String> scores = new ArrayList<String>();
 
-	public ScoreListAdapter(Context context, List<String> scores) {
+	public ScoreListAdapter( ListView mListView,Context context, List<String> scores) {
+		this.mListView=mListView;
 		this.context = context;
 		this.scores = scores;
 	}
@@ -36,7 +39,7 @@ public class ScoreListAdapter extends BaseAdapter {
 	@Override
 	public Object getItem(int position) {
 		// TODO Auto-generated method stub
-		return null;
+		return this.getView(position, null, mListView);
 	}
 
 	@Override

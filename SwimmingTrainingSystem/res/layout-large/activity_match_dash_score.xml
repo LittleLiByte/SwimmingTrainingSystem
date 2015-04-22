@@ -6,7 +6,7 @@
     <RelativeLayout
         android:id="@+id/match_dash_headbar"
         android:layout_width="match_parent"
-        android:layout_height="66dp"
+        android:layout_height="65dp"
         android:background="#3D8BFF" >
 
         <TextView
@@ -32,9 +32,9 @@
             android:id="@+id/add_match_athlete"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginRight="10dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
             android:background="@drawable/add"
             android:onClick="chooseAthlete" />
     </RelativeLayout>
@@ -45,8 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/match_dash_headbar"
         android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="5dp" >
+        android:orientation="horizontal" >
 
         <TextView
             android:layout_width="wrap_content"

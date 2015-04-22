@@ -20,13 +20,21 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -53,7 +61,8 @@ import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
 
-public class MatchScoreActivity extends Activity {
+public class MatchScoreActivity extends Activity implements
+		OnItemLongClickListener {
 
 	private MyApplication app;
 	private Button btNextTiming, btStatistics;
@@ -72,7 +81,8 @@ public class MatchScoreActivity extends Activity {
 	private LoadingDialog loadingDialog;
 	private RequestQueue mQueue;
 	private Toast mToast;
-
+	private LinearLayout mLayout;
+	private RelativeLayout mLayout2;
 	private ArrayList<String> originScores = new ArrayList<String>();
 	private ArrayList<String> originNames = new ArrayList<String>();
 	private DragSortListView.DropListener onDrop = new DragSortListView.DropListener() {
@@ -149,15 +159,16 @@ public class MatchScoreActivity extends Activity {
 		Intent result = getIntent();
 		scores = result.getStringArrayListExtra("SCORES");
 		originScores.addAll(scores);
-
+		mLayout = (LinearLayout) findViewById(R.id.ll_pop);
+		mLayout2 = (RelativeLayout) findViewById(R.id.match_score_headbar);
 		btNextTiming = (Button) findViewById(R.id.match_done);
 		btStatistics = (Button) findViewById(R.id.match_statistic);
-
 		scoreListView = (DragSortListView) findViewById(R.id.matchscore_list);
 		nameListView = (DragSortListView) findViewById(R.id.matchName_list);
 		nameListView.setDropListener(onDrop);
 		nameListView.setRemoveListener(onRemove);
 		nameListView.setDragScrollProfile(ssProfile);
+
 		scoreListView.setRemoveListener(onRemove2);
 		userId = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		Long planId = (Long) app.getMap().get(Constants.PLAN_ID);
@@ -191,12 +202,13 @@ public class MatchScoreActivity extends Activity {
 		MyScrollListener mListener = new MyScrollListener();
 		scoreListView.setOnScrollListener(mListener);
 		nameListView.setOnScrollListener(mListener);
-		adapter = new ScoreListAdapter(this, scores);
+		adapter = new ScoreListAdapter(scoreListView, this, scores);
 
 		dragAdapter = new ArrayAdapter<String>(this, R.layout.drag_list_item,
 				R.id.drag_list_item_text, dragDatas);
 		scoreListView.setAdapter(adapter);
 		nameListView.setAdapter(dragAdapter);
+		scoreListView.setOnItemLongClickListener(this);
 	}
 
 	/**
@@ -492,4 +504,39 @@ public class MatchScoreActivity extends Activity {
 		mQueue.add(stringRequest);
 	}
 
+	@Override
+	public boolean onItemLongClick(AdapterView<?> parent, View view,
+			int position, long id) {
+		// TODO Auto-generated method stub
+		showPopWindow(position);
+		return true;
+	}
+
+	private void showPopWindow(final int position) {
+		// TODO Auto-generated method stub
+		TextView copyView = (TextView) getLayoutInflater().inflate(
+				android.R.layout.simple_list_item_1, null);
+		copyView.setText("复制添加该项");
+		copyView.setTextColor(getResources().getColor(R.color.white));
+		final PopupWindow pop = new PopupWindow(copyView,
+				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		pop.setBackgroundDrawable(getResources().getDrawable(
+				R.drawable.title_function_bg));
+		pop.setOutsideTouchable(true);
+		int yoff = mLayout2.getHeight()
+				* (position - scoreListView.getFirstVisiblePosition() + 1);
+		pop.showAsDropDown(mLayout, scoreListView.getRight() / 2, yoff);
+		copyView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				scores.add(position, scores.get(position));
+				adapter.notifyDataSetChanged();
+				dragDatas.add(position, "");
+				dragAdapter.notifyDataSetChanged();
+				pop.dismiss();
+			}
+		});
+
+	}
 }

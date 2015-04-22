@@ -8,8 +8,8 @@
         android:id="@+id/ranking"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:gravity="center_vertical"
         android:layout_marginLeft="8dp"
+        android:gravity="center_vertical"
         android:text="第1名"
         android:textSize="20sp"
         android:textStyle="italic" />
@@ -18,9 +18,10 @@
         android:id="@+id/match_score"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:gravity="center_vertical"
         android:layout_marginLeft="70dp"
+        android:gravity="center_vertical"
         android:text="00分00秒000"
         android:textSize="20sp" />
+
 
 </RelativeLayout>

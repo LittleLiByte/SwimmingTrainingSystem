@@ -14,11 +14,17 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mobeta.android.dslv.DragSortListView;
@@ -31,7 +37,7 @@ import com.scnu.swimmingtrainingsystem.util.Constants;
 @SuppressLint("ValidFragment")
 public class EachTimeScoreFragment extends Fragment {
 	private MyApplication mApplication;
-	private View view;
+	private View headView,view;
 	private List<ListView> viewList;
 	private AutoCompleteTextView acTextView;
 	private DragSortListView scListView;
@@ -117,7 +123,7 @@ public class EachTimeScoreFragment extends Fragment {
 			acTextView.setAdapter(tipsAdapter);
 			acTextView.setDropDownHeight(350);
 			acTextView.setThreshold(1);
-
+			headView=view.findViewById(R.id.ll_fragment_disatance);
 			scListView = (DragSortListView) view
 					.findViewById(R.id.matchscore_list);
 			scListView.setRemoveListener(onRemove2);
@@ -137,7 +143,8 @@ public class EachTimeScoreFragment extends Fragment {
 				for (int j = 0; j < jsonArray2.length(); j++) {
 					dragDatas.add(jsonArray2.get(j).toString());
 				}
-				scoreListAdapter = new ScoreListAdapter(getActivity(), scores);
+				scoreListAdapter = new ScoreListAdapter(scListView,
+						getActivity(), scores);
 				dragAdapter = new ArrayAdapter<String>(getActivity(),
 						R.layout.drag_list_item, R.id.drag_list_item_text,
 						dragDatas);
@@ -153,6 +160,17 @@ public class EachTimeScoreFragment extends Fragment {
 			MyScrollListener mListener = new MyScrollListener();
 			scListView.setOnScrollListener(mListener);
 			dsListView.setOnScrollListener(mListener);
+			scListView
+					.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+						@Override
+						public boolean onItemLongClick(AdapterView<?> parent,
+								View view, int position, long id) {
+							// TODO Auto-generated method stub
+							showPopWindow(position);
+							return true;
+						}
+					});
 		} else {
 			ViewGroup parent = (ViewGroup) view.getParent();
 			if (parent != null) {
@@ -233,5 +251,33 @@ public class EachTimeScoreFragment extends Fragment {
 
 		}
 		return map;
+	}
+
+	private void showPopWindow(final int position) {
+		// TODO Auto-generated method stub
+		TextView copyView = (TextView) getActivity().getLayoutInflater()
+				.inflate(android.R.layout.simple_list_item_1, null);
+		copyView.setText("复制添加该项");
+		copyView.setTextColor(getResources().getColor(R.color.white));
+		final PopupWindow pop = new PopupWindow(copyView,
+				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		pop.setBackgroundDrawable(getResources().getDrawable(
+				R.drawable.title_function_bg));
+		pop.setOutsideTouchable(true);
+		int yoff = headView.getHeight()
+				* (position - scListView.getFirstVisiblePosition() + 1);
+		pop.showAsDropDown(headView, scListView.getRight() / 2, yoff);
+		copyView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				scores.add(position, scores.get(position));
+				scoreListAdapter.notifyDataSetChanged();
+				dragDatas.add(position, "");
+				dragAdapter.notifyDataSetChanged();
+				pop.dismiss();
+			}
+		});
+
 	}
 }

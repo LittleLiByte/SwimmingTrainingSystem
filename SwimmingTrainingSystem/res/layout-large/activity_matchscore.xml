@@ -6,7 +6,7 @@
     android:paddingBottom="5dp" >
 
     <RelativeLayout
-        android:id="@+id/athlete_headbar"
+        android:id="@+id/match_score_headbar"
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:background="#3D8BFF" >

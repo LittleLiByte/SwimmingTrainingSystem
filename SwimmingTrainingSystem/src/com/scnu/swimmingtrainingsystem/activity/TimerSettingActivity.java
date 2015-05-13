@@ -3,7 +3,9 @@ package com.scnu.swimmingtrainingsystem.activity;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -13,6 +15,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
+import android.util.SparseIntArray;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -82,7 +85,9 @@ public class TimerSettingActivity extends Activity {
 
 	private Toast toast;
 	private SparseBooleanArray map = new SparseBooleanArray();
+	private SparseIntArray swimStyle = new SparseIntArray();
 	private Long userid;
+	private HashMap<String, String> athHashMap = new HashMap<String, String>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +144,14 @@ public class TimerSettingActivity extends Activity {
 		String mapConfigString = sp.getString("mapConfig", "");
 		SparseBooleanArray configArray = JsonTools.getObject(mapConfigString,
 				SparseBooleanArray.class);
+
+		String spinnerString = sp.getString("spinnerSelection", "");
+		SparseIntArray spinnerIntArray = JsonTools.getObject(spinnerString,
+				SparseIntArray.class);
+
+		String gestureString = sp.getString("athleteGesture", "");
+		athHashMap = JsonTools.getMap(gestureString);
+		
 		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
 		userid = (Long) app.getMap().get(Constants.CURRENT_USER_ID);
 		athletes = dbManager.getAthletes(userid);
@@ -147,6 +160,7 @@ public class TimerSettingActivity extends Activity {
 		}
 		// 初始化map数据，即将全部运动员设为不选中状态
 		for (int i = 0; i < athletes.size(); i++) {
+			// 保存运动员选择情况
 			if (configArray != null && configArray.size() != 0) {
 				if (i < configArray.size()) {
 					map.put(i, configArray.get(i));
@@ -160,6 +174,16 @@ public class TimerSettingActivity extends Activity {
 				map.put(i, false);
 			}
 
+			// 保存泳姿选择情况
+			if (spinnerIntArray != null && spinnerIntArray.size() != 0) {
+				if (i < spinnerIntArray.size()) {
+					swimStyle.put(i, spinnerIntArray.get(i));
+				} else {
+					swimStyle.put(i, 0);
+				}
+			} else {
+				swimStyle.put(i, 0);
+			}
 		}
 		actInterval.setText(swimInterval);
 		acTextView.setText(swimDistance);
@@ -172,7 +196,8 @@ public class TimerSettingActivity extends Activity {
 		poolSpinner.setAdapter(adapter1);
 		poolSpinner.setSelection(selectedPositoin);
 		showChosenAthleteAdapter = new ShowChosenAthleteAdapter(
-				TimerSettingActivity.this, chosenAthletes);
+				TimerSettingActivity.this, chosenAthletes, swimStyle,
+				athHashMap);
 		chosenListView.setAdapter(showChosenAthleteAdapter);
 	}
 
@@ -231,7 +256,8 @@ public class TimerSettingActivity extends Activity {
 					public void onClick(View v) {
 						// TODO Auto-generated method stub
 						showChosenAthleteAdapter = new ShowChosenAthleteAdapter(
-								TimerSettingActivity.this, chosenAthletes);
+								TimerSettingActivity.this, chosenAthletes,
+								swimStyle, athHashMap);
 						chosenListView.setAdapter(showChosenAthleteAdapter);
 						selectDialog.dismiss();
 					}
@@ -266,6 +292,13 @@ public class TimerSettingActivity extends Activity {
 			CommonUtils.saveDistance(this, totalDistance, intervalDistance);
 			CommonUtils.saveSelectedAthlete(this,
 					JsonTools.creatJsonString(map));
+			SparseIntArray sparseIntArray = showChosenAthleteAdapter
+					.getSpinnerSelection();
+			CommonUtils.saveSpinnerSelection(this,
+					JsonTools.creatJsonString(sparseIntArray));
+			Map<String, String> athMap = showChosenAthleteAdapter.getMap();
+			CommonUtils.saveAthleteGesture(this,
+					JsonTools.creatJsonString(athMap));
 
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String date = sdf.format(new Date());
@@ -278,7 +311,7 @@ public class TimerSettingActivity extends Activity {
 			for (Athlete ath : chosenPersons) {
 				athleteNames.add(ath.getName());
 			}
-			// 报存显示在成绩运动员匹配页面的运动员名字
+			// 保存显示在成绩运动员匹配页面的运动员名字
 			app.getMap().put(Constants.DRAG_NAME_LIST, athleteNames);
 
 			String poolString = (String) poolSpinner.getSelectedItem();

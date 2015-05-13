@@ -55,7 +55,8 @@ public class TimerActivity extends Activity {
 
 	private int athletes = 1;
 
-	private ImageView min_progress_hand,second_progress_hand, hour_progress_hand;
+	private ImageView min_progress_hand, second_progress_hand,
+			hour_progress_hand;
 	// 分针、秒针、时针动画
 	private Animation rotateAnimation, secondrotateAnimation,
 			hourrotateAnimation;
@@ -157,7 +158,7 @@ public class TimerActivity extends Activity {
 						}
 					}
 				} else {
-					timerStop();
+					stopTimer();
 					CommonUtils.showToast(TimerActivity.this, toast,
 							"请不要保存太多不必要的成绩！");
 				}
@@ -299,7 +300,7 @@ public class TimerActivity extends Activity {
 			mlCount = 0;
 			tvTip.setVisibility(View.VISIBLE);
 			athletes = 1;
-			timerStop();
+			stopTimer();
 			setupData();
 			setAnimation();
 		}
@@ -308,7 +309,7 @@ public class TimerActivity extends Activity {
 	/**
 	 * 暂停计时器
 	 */
-	public void timerStop() {
+	public void stopTimer() {
 		if (null != task && null != timer) {
 			task.cancel();
 			task = null;

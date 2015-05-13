@@ -92,15 +92,6 @@
         android:paddingRight="10dp"
         android:gravity="center_vertical" >
 
-        <!-- <Button
-            android:id="@+id/time_out"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.0"
-            android:background="@drawable/startback"
-            android:onClick="timeOut"
-            android:text="暂停"
-            android:textColor="@color/aliceblue" /> -->
 
         <Button
             android:id="@+id/match_people"

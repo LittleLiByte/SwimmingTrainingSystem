@@ -29,7 +29,7 @@ public class Plan extends DataSupport {
 	 * 该计划的备注，方便查阅并区分成绩
 	 */
 	private String extra;
-
+	
 	/**
 	 * 创建计划的用户
 	 */

@@ -38,6 +38,11 @@ public class Score extends DataSupport {
 	private int type;
 
 	/**
+	 * 游泳成绩类型
+	 */
+	private String swimType;
+
+	/**
 	 * 本次成绩所属的运动员
 	 */
 	private Athlete athlete;
@@ -96,6 +101,14 @@ public class Score extends DataSupport {
 		this.type = type;
 	}
 
+	public String getSwimType() {
+		return swimType;
+	}
+
+	public void setSwimType(String swimType) {
+		this.swimType = swimType;
+	}
+
 	public Athlete getAthlete() {
 		return athlete;
 	}
@@ -124,7 +137,7 @@ public class Score extends DataSupport {
 	public String toString() {
 		return "Score [id=" + id + ", times=" + times + ", score=" + score
 				+ ", date=" + date + ", distance=" + distance + ", type="
-				+ type + "]";
+				+ type + ", swimType=" + swimType + "]";
 	}
 
 }

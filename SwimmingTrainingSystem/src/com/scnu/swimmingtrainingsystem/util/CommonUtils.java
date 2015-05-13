@@ -135,6 +135,23 @@ public class CommonUtils {
 		editor.commit();
 	}
 
+	public static void saveSpinnerSelection(Context context,
+			String sparseIntArray) {
+		SharedPreferences sp = context.getSharedPreferences(
+				Constants.LOGININFO, Context.MODE_PRIVATE);
+		Editor editor = sp.edit();
+		editor.putString("spinnerSelection", sparseIntArray);
+		editor.commit();
+	}
+
+	public static void saveAthleteGesture(Context context, String s) {
+		SharedPreferences sp = context.getSharedPreferences(
+				Constants.LOGININFO, Context.MODE_PRIVATE);
+		Editor editor = sp.edit();
+		editor.putString("athleteGesture", s);
+		editor.commit();
+	}
+
 	/**
 	 * 记录是否第一次打开应用的运动员Activity
 	 * 

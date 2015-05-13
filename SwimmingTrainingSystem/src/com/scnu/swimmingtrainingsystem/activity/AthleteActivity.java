@@ -247,7 +247,7 @@ public class AthleteActivity extends Activity {
 				loadingDialog.setCanceledOnTouchOutside(false);
 			}
 			loadingDialog.show();
-			addAthleteequest(a);
+			addAthleteRequest(a);
 		} else {
 			a.setUser(mUser);
 			a.save();
@@ -265,7 +265,7 @@ public class AthleteActivity extends Activity {
 	 * 
 	 * @param obj
 	 */
-	public void addAthleteequest(final Athlete a) {
+	public void addAthleteRequest(final Athlete a) {
 		Map<String, Object> jsonMap = new HashMap<String, Object>();
 		jsonMap.put("athlete", a);
 		jsonMap.put("uid", mUser.getUid());

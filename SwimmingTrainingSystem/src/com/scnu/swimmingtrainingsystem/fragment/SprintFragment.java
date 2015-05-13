@@ -50,7 +50,8 @@ public class SprintFragment extends Fragment implements OnClickListener {
 	// 秒表显示时间
 	private TextView tvTime;
 
-	private ImageView min_progress_hand,second_progress_hand, hour_progress_hand;
+	private ImageView min_progress_hand, second_progress_hand,
+			hour_progress_hand;
 	// 分针、秒针、时针动画
 	private Animation rotateAnimation, secondrotateAnimation,
 			hourrotateAnimation;
@@ -104,7 +105,7 @@ public class SprintFragment extends Fragment implements OnClickListener {
 		listView = (ListView) activity.findViewById(R.id.sprint_score_list);
 		// ----------------计时器动画相关--------------
 		min_progress_hand = (ImageView) activity
-				.findViewById(R.id.duocimin_progress_hand);
+				.findViewById(R.id.duocimin_progress_hand2);
 		second_progress_hand = (ImageView) activity
 				.findViewById(R.id.second_progress_hand);
 		hour_progress_hand = (ImageView) activity

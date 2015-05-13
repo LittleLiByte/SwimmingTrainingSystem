@@ -15,6 +15,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -242,6 +243,11 @@ public class MatchScoreActivity extends Activity implements
 	private void matchSuccess(String date, int nowCurrent, int distance) {
 		User user = mDbManager.getUser(userId);
 		List<Athlete> athletes = mDbManager.getAthleteByNames(dragDatas);
+		SharedPreferences sp = getSharedPreferences(Constants.LOGININFO,
+				Context.MODE_PRIVATE);
+		String gestureString = sp.getString("athleteGesture", "");
+		HashMap<String, String> athleteGestrue = JsonTools
+				.getMap(gestureString);
 		for (int i = 0; i < scores.size(); i++) {
 			Athlete a = athletes.get(i);
 			Score s = new Score();
@@ -250,11 +256,15 @@ public class MatchScoreActivity extends Activity implements
 			s.setScore(scores.get(i));
 			s.setType(Constants.NORMALSCORE);
 			s.setAthlete(a);
+			s.setSwimType(athleteGestrue.get(a.getName()));
+			System.out.println("athleteGestrue"
+					+ athleteGestrue.get(a.getName()));
 			s.setDistance(distance);
 			s.setP(plan);
 			s.setUser(user);
 			s.save();
 		}
+
 		if (isConnected) {
 			if (loadingDialog == null) {
 				loadingDialog = LoadingDialog.createDialog(this);
@@ -435,7 +445,9 @@ public class MatchScoreActivity extends Activity implements
 			smScore.setDistance(s.getDistance());
 			smScore.setType(s.getType());
 			smScore.setTimes(s.getTimes());
+			smScore.setSwimStyle(s.getSwimType());
 			smallScores.add(smScore);
+
 		}
 		List<Integer> aidList = mDbManager.getAthlteAidInScoreByDate(date);
 		User user = mDbManager.getUser(userId);

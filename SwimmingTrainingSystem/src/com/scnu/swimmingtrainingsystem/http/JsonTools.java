@@ -1,6 +1,7 @@
 package com.scnu.swimmingtrainingsystem.http;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +53,8 @@ public class JsonTools {
 	 * @param cls
 	 * @return
 	 */
-	public static <T> List<T> getObjects(String jsonString, @SuppressWarnings("rawtypes") Class cls) {
+	public static <T> List<T> getObjects(String jsonString,
+			@SuppressWarnings("rawtypes") Class cls) {
 		List<T> list = new ArrayList<T>();
 		try {
 			Gson gson = new Gson();
@@ -83,5 +85,14 @@ public class JsonTools {
 			// TODO: handle exception
 		}
 		return list;
+	}
+
+	public static HashMap<String, String> getMap(String jsonString) {
+		HashMap<String, String> map = new HashMap<String, String>();
+		Gson gson = new Gson();
+		map = gson.fromJson(jsonString,
+				new TypeToken<HashMap<String, String>>() {
+				}.getType());
+		return map;
 	}
 }

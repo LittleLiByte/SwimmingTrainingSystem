@@ -10,14 +10,14 @@
         android:padding="2dp" >
 
         <ImageView
-            android:id="@+id/min_dial"
+            android:id="@+id/min_dial2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:src="@drawable/min_dial" />
 
         <ImageView
-            android:id="@+id/duocimin_progress_hand"
+            android:id="@+id/duocimin_progress_hand2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -35,7 +35,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/min_dial"
+            android:layout_alignBottom="@+id/min_dial2"
             android:gravity="center_horizontal"
             android:orientation="horizontal" >
 

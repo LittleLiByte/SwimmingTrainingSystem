@@ -97,7 +97,7 @@ public class LoginActivity extends Activity {
 			defaulrUser.setUsername(DEFAULT_USERNAME);
 			defaulrUser.setPassword(DEFAULT_PASSWORD);
 			defaulrUser.save();
-			showSettingDialog(this);
+			showSettingDialog();
 			CommonUtils.SaveLoginInfo(this, false);
 		}
 
@@ -106,7 +106,7 @@ public class LoginActivity extends Activity {
 				Context.MODE_PRIVATE);
 		CommonUtils.HOSTURL = hostSp
 				.getString("hostInfo",
-						"http://192.168.1.230:8080/SWIMYUE33/httpPost.action?action_flag=");
+						"http://yesyueyes.xicp.net:13478/httpPost.action?action_flag=");
 		testRequest();
 	}
 
@@ -125,7 +125,7 @@ public class LoginActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				showSettingDialog(LoginActivity.this);
+				showSettingDialog();
 			}
 		});
 		forgot.setOnClickListener(new OnClickListener() {
@@ -223,8 +223,8 @@ public class LoginActivity extends Activity {
 									// 用户第一次登陆
 									CommonUtils.saveIsThisUserFirstLogin(
 											LoginActivity.this, true);
-									
-									//覆盖前一个用户选择的运动员
+
+									// 覆盖前一个用户选择的运动员
 									CommonUtils.saveSelectedAthlete(
 											LoginActivity.this, "");
 								} else {
@@ -299,7 +299,7 @@ public class LoginActivity extends Activity {
 	 * 
 	 * @param context
 	 */
-	protected void showSettingDialog(Context context) {
+	protected void showSettingDialog() {
 
 		final NiftyDialogBuilder settingDialog = NiftyDialogBuilder
 				.getInstance(this);
@@ -309,7 +309,7 @@ public class LoginActivity extends Activity {
 				.isCancelableOnTouchOutside(true).withDuration(500)
 				.withEffect(effect).withButton1Text(Constants.CANCLE_STRING)
 				.withButton2Text("完成")
-				.setCustomView(R.layout.dialog_setting_host, context);
+				.setCustomView(R.layout.dialog_setting_host, this);
 		SharedPreferences hostSp = getSharedPreferences(Constants.LOGININFO,
 				Context.MODE_PRIVATE);
 		String ip = hostSp.getString("ip", "192.168.1.161");
@@ -335,8 +335,9 @@ public class LoginActivity extends Activity {
 					CommonUtils.showToast(LoginActivity.this, toast,
 							"ip与端口地址均不可为空！");
 				} else {
-					String hostUrl = "http://" + hostIp + ":" + hostPort
-							+ "/SWIMYUE33/httpPost.action?action_flag=";
+					// String hostUrl = "http://" + hostIp + ":" + hostPort
+					// + "/SWIMYUE33/httpPost.action?action_flag=";
+					String hostUrl = "http://yesyueyes.xicp.net:13478/httpPost.action?action_flag=";
 					// 保存服务器ip和端口地址到sp
 					CommonUtils.HOSTURL = hostUrl;
 					CommonUtils.SaveLoginInfo(LoginActivity.this, hostUrl,

@@ -164,7 +164,6 @@ public class AthleteListAdapter extends BaseAdapter {
 		athleteAge.setText(athletes.get(position).getAge() + "");
 
 		String gender = athletes.get(position).getGender();
-		System.out.println("gender------->" + gender);
 		if (gender.equals("ÄÐ")) {
 			mGenderSwitch.setChecked(true);
 		} else {

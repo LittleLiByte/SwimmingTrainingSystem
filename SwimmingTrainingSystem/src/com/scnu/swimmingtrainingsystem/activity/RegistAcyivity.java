@@ -52,7 +52,6 @@ public class RegistAcyivity extends Activity {
 	private RequestQueue mQueue;
 	private Toast toast;
 	private LoadingDialog loadingDialog;
-	private Button regButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +61,6 @@ public class RegistAcyivity extends Activity {
 		setContentView(R.layout.activity_regist);
 
 		app = (MyApplication) getApplication();
-		regButton = (Button) findViewById(R.id.bt_regist);
 		username = (EditText) findViewById(R.id.et_userID);
 		password = (EditText) findViewById(R.id.et_password);
 		password1 = (EditText) findViewById(R.id.et_password1);
@@ -86,8 +84,7 @@ public class RegistAcyivity extends Activity {
 	 * 
 	 * @param v
 	 */
-	public void quick_regist(View v) {
-		regButton.setClickable(false);
+	public void quickRegist(View v) {
 		final String user = username.getText().toString().trim();
 		final String pass = password.getText().toString().trim();
 		final String pass1 = password1.getText().toString().trim();
@@ -117,6 +114,9 @@ public class RegistAcyivity extends Activity {
 				newUser.setPhone(cellphone);
 				// 发送至服务器
 				registRequest(newUser);
+			} else {
+				CommonUtils.showToast(RegistAcyivity.this, toast,
+						"无法连接服务器！请直接使用默认账号登陆试用");
 			}
 		}
 
@@ -179,7 +179,7 @@ public class RegistAcyivity extends Activity {
 						loadingDialog.dismiss();
 						CommonUtils.showToast(RegistAcyivity.this, toast,
 								"无法连接服务器！请使用默认账号试用");
-
+						app.getMap().put(Constants.IS_CONNECT_SERVER, false);
 					}
 				}) {
 

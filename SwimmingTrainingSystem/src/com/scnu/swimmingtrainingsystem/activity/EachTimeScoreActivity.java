@@ -11,6 +11,7 @@ import org.litepal.crud.DataSupport;
 
 import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -296,6 +297,11 @@ public class EachTimeScoreActivity extends FragmentActivity {
 		List<String> scoresList = (List<String>) result.get("scores");
 		List<String> namesList = (List<String>) result.get("names");
 		int scoresNumber = scoresList.size();
+		SharedPreferences preferences = getSharedPreferences(
+				Constants.LOGININFO, Context.MODE_PRIVATE);
+		String athleteGesture = preferences.getString("athleteGesture", "");
+		HashMap<String, String> hashMap = JsonTools.getMap(athleteGesture);
+
 		for (int l = 0; l < scoresNumber; l++) {
 			Score score = new Score();
 			score.setDate(date);
@@ -307,6 +313,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 			Athlete athlete = mDbManager.getAthleteByName(userID,
 					namesList.get(l));
 			score.setAthlete(athlete);
+			score.setSwimType(hashMap.get(athlete.getName()));
 			score.setUser(user);
 			score.save();
 		}
@@ -334,6 +341,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 			smScore.setDistance(s.getDistance());
 			smScore.setType(s.getType());
 			smScore.setTimes(s.getTimes());
+			smScore.setSwimStyle(s.getSwimType());
 			smallScores.add(smScore);
 		}
 		List<Integer> aidList = mDbManager.getAthlteAidInScoreByDate(date);

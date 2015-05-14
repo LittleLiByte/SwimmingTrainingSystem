@@ -137,6 +137,25 @@
                     android:hint="输入备注，方便查阅区分成绩"
                     android:singleLine="true" />
             </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:text="间歇计时"
+                    android:textSize="18sp" />
+
+                <com.scnu.swimmingtrainingsystem.view.SlipButton
+                    android:id="@+id/slipbutton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="50dp" />
+            </LinearLayout>
         </LinearLayout>
 
         <Button

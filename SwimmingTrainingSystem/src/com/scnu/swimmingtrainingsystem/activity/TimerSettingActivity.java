@@ -18,6 +18,7 @@ import android.util.SparseBooleanArray;
 import android.util.SparseIntArray;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -41,6 +42,7 @@ import com.scnu.swimmingtrainingsystem.model.Plan;
 import com.scnu.swimmingtrainingsystem.model.User;
 import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 import com.scnu.swimmingtrainingsystem.util.Constants;
+import com.scnu.swimmingtrainingsystem.view.SlipButton;
 
 /**
  * 开始计时前设定的Activity，即选择运动员以及其他添加其他信息并开始计时
@@ -55,6 +57,8 @@ public class TimerSettingActivity extends Activity {
 	private DBManager dbManager;
 	private AutoCompleteTextView acTextView, actInterval;
 	private EditText remarksEditText;
+	private SlipButton slipButton;
+	boolean ring = true;
 	/**
 	 * 展示全部运动员的ListView
 	 */
@@ -112,6 +116,20 @@ public class TimerSettingActivity extends Activity {
 		dbManager = DBManager.getInstance();
 		chosenListView = (ListView) findViewById(R.id.list_choosed);
 		poolSpinner = (Spinner) findViewById(R.id.pool_length);
+		slipButton = (SlipButton) findViewById(R.id.slipbutton);
+		slipButton.setChecked(true);
+		slipButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				if (ring) {
+					slipButton.setChecked(false);
+					ring = false;
+				} else {
+					slipButton.setChecked(true);
+					ring = true;
+				}
+			}
+		});
 		acTextView = (AutoCompleteTextView) findViewById(R.id.tv_distance);
 		String[] autoStrings = new String[] { "25", "50", "75", "100", "125",
 				"150", "175", "200", "225", "250", "275", "300", "325", "350",
@@ -140,7 +158,8 @@ public class TimerSettingActivity extends Activity {
 		int selectedPositoin = sp.getInt(Constants.SELECTED_POOL, 1);
 		String swimDistance = sp.getString(Constants.SWIM_DISTANCE, "");
 		String swimInterval = sp.getString(Constants.INTERVAL, "");
-
+		Boolean isChecked=sp.getBoolean(Constants.COUNT_TYPE, true);
+		
 		String mapConfigString = sp.getString("mapConfig", "");
 		SparseBooleanArray configArray = JsonTools.getObject(mapConfigString,
 				SparseBooleanArray.class);
@@ -187,6 +206,7 @@ public class TimerSettingActivity extends Activity {
 		}
 		actInterval.setText(swimInterval);
 		acTextView.setText(swimDistance);
+		slipButton.setChecked(isChecked);
 		List<String> poolLength = new ArrayList<String>();
 		poolLength.add("25米池");
 		poolLength.add("50米池");
@@ -289,7 +309,7 @@ public class TimerSettingActivity extends Activity {
 			// 保存这一次的配置到sp
 			CommonUtils.saveSelectedPool(this,
 					poolSpinner.getSelectedItemPosition());
-			CommonUtils.saveDistance(this, totalDistance, intervalDistance);
+			CommonUtils.saveDistance(this, totalDistance, intervalDistance,slipButton.isChecked());
 			CommonUtils.saveSelectedAthlete(this,
 					JsonTools.creatJsonString(map));
 			SparseIntArray sparseIntArray = showChosenAthleteAdapter
@@ -318,7 +338,15 @@ public class TimerSettingActivity extends Activity {
 			String extra = remarksEditText.getText().toString();
 			// 将配置保存到数据库计划表中
 			savePlan(poolString, totalDistance, extra, chosenPersons);
-			Intent i = new Intent(this, TimerActivity.class);
+			
+			Intent i=null;
+			if (slipButton.isChecked()) {
+				//间歇计时
+				i = new Intent(this, TimerActivity.class);
+			} else {
+				//不间歇计时
+				i=new Intent(this,UnstopTimerActivity.class);
+			}
 			startActivity(i);
 			finish();
 		}
@@ -333,6 +361,11 @@ public class TimerSettingActivity extends Activity {
 		plan.setPool(pool);
 		plan.setDistance(Integer.parseInt(distance));
 		plan.setExtra(extra);
+		if (slipButton.isChecked()) {
+			plan.setType("间歇计时");
+		}else{
+			plan.setType("不间歇计时");
+		}
 		plan.setUser(user);
 		plan.setAthlete(athlete);
 		plan.save();

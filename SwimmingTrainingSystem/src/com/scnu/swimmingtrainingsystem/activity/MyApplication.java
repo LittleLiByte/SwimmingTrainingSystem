@@ -40,6 +40,8 @@ public class MyApplication extends LitePalApplication {
 		mMap.put(Constants.COMPLETE_NUMBER, 0);
 		//保存每次计时时的间隔距离
 		mMap.put(Constants.INTERVAL, "");
+		// 保存每次不间歇计时跳转前的系统时间
+		mMap.put(Constants.JUMP_TIME, 0L);
 		
 	}
 

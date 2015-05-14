@@ -38,7 +38,7 @@ public class Score extends DataSupport {
 	private int type;
 
 	/**
-	 * 游泳成绩类型
+	 * 泳姿类型
 	 */
 	private String swimType;
 

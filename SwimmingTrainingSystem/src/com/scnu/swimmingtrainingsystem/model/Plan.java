@@ -31,6 +31,11 @@ public class Plan extends DataSupport {
 	private String extra;
 	
 	/**
+	 * 计时方式：间歇和不间歇计时
+	 */
+	private String type;
+	
+	/**
 	 * 创建计划的用户
 	 */
 	private User user;
@@ -85,6 +90,14 @@ public class Plan extends DataSupport {
 		this.extra = extra;
 	}
 
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
 	public User getUser() {
 		return user;
 	}
@@ -112,6 +125,8 @@ public class Plan extends DataSupport {
 	@Override
 	public String toString() {
 		return "Plan [id=" + id + ", pid=" + pid + ", pool=" + pool
-				+ ", distance=" + distance + ", extra=" + extra + "]";
+				+ ", distance=" + distance + ", extra=" + extra + ", type="
+				+ type + "]";
 	}
+
 }

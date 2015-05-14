@@ -5,6 +5,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -91,18 +93,19 @@ public class CommonUtils {
 	}
 
 	/**
-	 * 记录预计的游泳总距离
+	 * 记录预计的游泳总距离以及计时方式
 	 * 
 	 * @param context
 	 * @param distance
 	 */
 	public static void saveDistance(Context context, String distance,
-			String interval) {
+			String interval, boolean isCheck) {
 		SharedPreferences sp = context.getSharedPreferences(
 				Constants.LOGININFO, Context.MODE_PRIVATE);
 		Editor editor = sp.edit();
 		editor.putString(Constants.SWIM_DISTANCE, distance);
 		editor.putString(Constants.INTERVAL, interval);
+		editor.putBoolean(Constants.COUNT_TYPE, isCheck);
 		editor.commit();
 	}
 
@@ -304,5 +307,24 @@ public class CommonUtils {
 		Pattern p = Pattern.compile(str);
 		Matcher m = p.matcher(email);
 		return m.matches();
+	}
+	
+	/**
+	 * 判断计时服务是否在运行
+	 * 
+	 * @param context
+	 * @param serviceClassName
+	 * @return
+	 */
+	public static boolean isServiceRunning(Context context,
+			String serviceClassName) {
+		final ActivityManager activityManager = (ActivityManager) context
+				.getSystemService(Context.ACTIVITY_SERVICE);
+		final List<RunningServiceInfo> services = activityManager
+				.getRunningServices(Integer.MAX_VALUE);
+		if (services.get(0).service.getClassName().equals(serviceClassName)) {
+			return true;
+		}
+		return false;
 	}
 }

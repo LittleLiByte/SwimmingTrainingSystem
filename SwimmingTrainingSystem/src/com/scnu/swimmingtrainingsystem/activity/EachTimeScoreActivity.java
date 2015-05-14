@@ -331,7 +331,7 @@ public class EachTimeScoreActivity extends FragmentActivity {
 		sp.setDistance(plan.getDistance());
 		sp.setPool(plan.getPool());
 		sp.setExtra(plan.getExtra());
-
+		sp.setType(plan.getType());
 		List<SmallScore> smallScores = new ArrayList<SmallScore>();
 		List<Score> scoresResult = mDbManager.getScoreByDate(date);
 		for (Score s : scoresResult) {

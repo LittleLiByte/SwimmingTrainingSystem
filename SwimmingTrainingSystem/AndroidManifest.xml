@@ -103,6 +103,17 @@
             android:name="com.scnu.swimmingtrainingsystem.activity.MatchSprintScoreActivity"
             android:screenOrientation="portrait" >
         </activity>
+         <activity
+            android:name="com.scnu.swimmingtrainingsystem.activity.UnstopTimerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+
+        <receiver android:name="com.scnu.swimmingtrainingsystem.activity.UnstopTimerActivity$UITimeReceiver" >
+        </receiver>
+
+        <service android:name="com.scnu.swimmingtrainingsystem.service.TimeService" >
+        </service>
     </application>
 
 </manifest>

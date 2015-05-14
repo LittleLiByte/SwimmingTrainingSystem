@@ -58,6 +58,7 @@ import com.scnu.swimmingtrainingsystem.model.Score;
 import com.scnu.swimmingtrainingsystem.model.SmallPlan;
 import com.scnu.swimmingtrainingsystem.model.SmallScore;
 import com.scnu.swimmingtrainingsystem.model.User;
+import com.scnu.swimmingtrainingsystem.service.TimeService;
 import com.scnu.swimmingtrainingsystem.util.CommonUtils;
 import com.scnu.swimmingtrainingsystem.util.Constants;
 import com.scnu.swimmingtrainingsystem.view.LoadingDialog;
@@ -300,7 +301,14 @@ public class MatchScoreActivity extends Activity implements
 		app.getMap().put(Constants.DRAG_NAME_LIST, null);
 		int scoresNumber = adapter.getCount();
 		int athleteNumber = dragAdapter.getCount();
-
+		long condition = (Long) app.getMap().get(Constants.JUMP_TIME);
+		if (condition != 0) {
+			// 停止服务
+			Intent timeService = new Intent(this, TimeService.class);
+			stopService(timeService);
+			// 将跳转时间重置充值为0
+			app.getMap().put(Constants.JUMP_TIME, 0L);
+		}
 		if (nowCurrent == 1) {
 			if (crrentDistance == 0 && TextUtils.isEmpty(actv)) {
 				CommonUtils.showToast(this, mToast, "请填写记录当前成绩的距离！");
@@ -332,6 +340,9 @@ public class MatchScoreActivity extends Activity implements
 	 */
 	public void matchBack(View v) {
 		app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
+		app.getMap().put(Constants.JUMP_TIME, 0L);
+		Intent timeService = new Intent(this, TimeService.class);
+		stopService(timeService);
 		finish();
 		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_top_out);
 	}
@@ -373,9 +384,19 @@ public class MatchScoreActivity extends Activity implements
 				// 暂时保存到SharePreferences
 				CommonUtils.saveCurrentScoreAndAthlete(context, i,
 						crrentDistance, scoreString, athleteString);
-				Intent intent = new Intent(MatchScoreActivity.this,
-						TimerActivity.class);
-				startActivity(intent);
+				long condition = (Long) app.getMap().get(Constants.JUMP_TIME);
+
+				if (condition == 0) {
+					// 间歇计时方式
+					Intent intent = new Intent(MatchScoreActivity.this,
+							TimerActivity.class);
+					startActivity(intent);
+				} else {
+					// 不间歇计时方式
+					Intent intent = new Intent(MatchScoreActivity.this,
+							UnstopTimerActivity.class);
+					startActivity(intent);
+				}
 				finish();
 			}
 		}).show();
@@ -422,6 +443,9 @@ public class MatchScoreActivity extends Activity implements
 		// 进入计时界面却不进行成绩匹配而直接返回,要将当前第几次计时置0
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			app.getMap().put(Constants.CURRENT_SWIM_TIME, 0);
+			app.getMap().put(Constants.JUMP_TIME, 0L);
+			Intent timeService = new Intent(this, TimeService.class);
+			stopService(timeService);
 			finish();
 			overridePendingTransition(R.anim.slide_bottom_in,
 					R.anim.slide_top_out);
@@ -435,7 +459,7 @@ public class MatchScoreActivity extends Activity implements
 		sp.setDistance(plan.getDistance());
 		sp.setPool(plan.getPool());
 		sp.setExtra(plan.getExtra());
-
+		sp.setType(plan.getType());
 		List<SmallScore> smallScores = new ArrayList<SmallScore>();
 		List<Score> scoresResult = mDbManager.getScoreByDate(date);
 		for (Score s : scoresResult) {
